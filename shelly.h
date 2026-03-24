@@ -1,0 +1,76 @@
+/*
+ * PlugNSat - Shelly Plug Control
+ * Local HTTP API for Shelly Gen2/Gen3 devices.
+ * No firmware modification, no authentication needed on LAN.
+ */
+
+#ifndef SHELLY_H
+#define SHELLY_H
+
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+
+// Turn ON with auto-off timer
+bool shellySwitchOn(String shellyIp, int durationSeconds) {
+  HTTPClient http;
+  String url = "http://" + shellyIp 
+               + "/rpc/switch.set?id=0&on=true&toggle_after=" 
+               + String(durationSeconds);
+  
+  if (!http.begin(url)) return false;
+  http.setTimeout(5000);
+  
+  int code = http.GET();
+  http.end();
+  
+  Serial.println("Shelly ON: " + String(code));
+  return (code == 200);
+}
+
+// Turn OFF manually
+bool shellySwitchOff(String shellyIp) {
+  HTTPClient http;
+  String url = "http://" + shellyIp + "/rpc/switch.set?id=0&on=false";
+  
+  if (!http.begin(url)) return false;
+  http.setTimeout(5000);
+  
+  int code = http.GET();
+  http.end();
+  return (code == 200);
+}
+
+// Check if Shelly is reachable
+bool shellyIsOnline(String shellyIp) {
+  HTTPClient http;
+  String url = "http://" + shellyIp + "/rpc/Switch.GetStatus?id=0";
+  
+  if (!http.begin(url)) return false;
+  http.setTimeout(3000);
+  
+  int code = http.GET();
+  http.end();
+  return (code == 200);
+}
+
+// Get current power draw (watts)
+float shellyGetPower(String shellyIp) {
+  HTTPClient http;
+  String url = "http://" + shellyIp + "/rpc/Switch.GetStatus?id=0";
+  
+  if (!http.begin(url)) return -1.0;
+  http.setTimeout(3000);
+  
+  int code = http.GET();
+  if (code != 200) { http.end(); return -1.0; }
+  
+  String resp = http.getString();
+  http.end();
+  
+  JsonDocument doc;
+  if (deserializeJson(doc, resp)) return -1.0;
+  
+  return doc["apower"] | -1.0f;
+}
+
+#endif

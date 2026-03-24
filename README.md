@@ -1,0 +1,85 @@
+# PlugNSat Firmware v0.1.0
+
+Lightning Smart Plug Controller. Scan QR, pay Lightning, device turns on.
+
+## How it works
+
+```
+[QR on screen] --> [Customer scans] --> [Pays Lightning] --> [Shelly ON] --> [New QR]
+     ^                                                                          |
+     |__________________________________________________________________________|
+                              (automatic loop)
+```
+
+The QR code is always displayed. No button press needed to start a payment.
+QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
+
+## Hardware
+
+| Part | Price | Link |
+|------|-------|------|
+| LilyGO T-Display S3 | ~20 EUR | amazon.fr/dp/B0BX8Q2MJP |
+| Shelly Plug S Gen3 | ~26 EUR | amazon.fr/dp/B0DJFQXTY2 |
+
+## Arduino IDE Setup
+
+1. Install Arduino IDE 2.x
+2. Add ESP32 boards: File > Preferences > Board Manager URLs:
+   `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+3. Install "esp32" in Board Manager
+4. Board: ESP32S3 Dev Module
+5. USB CDC On Boot: Enabled
+6. Flash Size: 16MB
+7. Partition: Huge APP (3MB No OTA)
+8. PSRAM: OPI PSRAM
+
+### Libraries (Sketch > Include Library > Manage Libraries)
+
+- **TFT_eSPI** by Bodmer (configure User_Setup.h for T-Display S3)
+- **ArduinoJson** by Benoit Blanchon
+- **QRCode** by Richard Moore
+
+### TFT_eSPI config
+
+Copy User_Setup.h from: github.com/Xinyuan-LilyGO/T-Display-S3/tree/main/lib/TFT_eSPI
+To: ~/Arduino/libraries/TFT_eSPI/User_Setup.h
+
+## First Boot
+
+1. Flash firmware via USB-C
+2. Device shows "PlugNSat Setup" screen
+3. Connect phone to WiFi: `PlugNSat-Setup` (pass: `plugnsat21`)
+4. Open `http://192.168.4.1` in browser
+5. Enter WiFi, BTCPay, Shelly config
+6. Save -> device restarts -> QR appears
+
+## Buttons
+
+- **BTN1 (left)**: Show info screen / Long press 3s = setup mode
+- **BTN2 (right)**: Force QR refresh
+
+## Files
+
+```
+plugnsat.ino   Main sketch, state machine, WiFi, buttons
+config.h       Constants, colors, config struct
+display.h      All screen rendering (splash, QR, paid, error, info, AP)
+btcpay.h       BTCPay Server API (create invoice, check status)
+shelly.h       Shelly local HTTP API (switch on/off, status)
+webportal.h    Web config page (HTML/CSS/JS served by ESP32)
+```
+
+All files go in the same folder. Arduino IDE compiles them together.
+
+## Edge Cases Handled
+
+- WiFi disconnects -> auto reconnect, QR regenerated
+- BTCPay unreachable -> retry 3x, then error screen, auto-retry 10s
+- Invoice expires -> new QR generated silently
+- Shelly offline -> payment still accepted, warning shown
+- 10+ consecutive errors -> ESP32 restarts itself
+- Long press BTN1 from any screen -> AP setup mode
+
+## License
+
+MIT
