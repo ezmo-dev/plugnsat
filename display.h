@@ -1,18 +1,30 @@
 /*
  * PlugNSat - Display Module
- * All TFT screen rendering functions
+ * All TFT screen rendering functions : screen flow
+ * 
+ * LIBRARIES:
+ * - TFT_eSPI by Bodmer (display driver for ST7789)
+ * - QRCode by Richard Moore (QR code generation)
+ * 
+ * REFERENCES:
+ * - T-Display S3 pinout: github.com/Xinyuan-LilyGO/T-Display-S3
+ * - TFT_eSPI User_Setup: Setup206_LilyGo_T_Display_S3.h
+ * 
+ * License: MIT © 2026
+ * Author: ezmo-dev (PlugNSat)
+ * 
  */
+
 
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
 #include <TFT_eSPI.h>
 #include "config.h"
-#include "qrcode.h"
 
-// ============================================================
+//
 // SPLASH
-// ============================================================
+//
 
 void displaySplash(TFT_eSPI &tft) {
   tft.fillScreen(COLOR_BG);
@@ -28,9 +40,9 @@ void displaySplash(TFT_eSPI &tft) {
   tft.drawString("plugnsat.com", SCREEN_W / 2, SCREEN_H / 2 + 35);
 }
 
-// ============================================================
+//
 // CONNECTING
-// ============================================================
+//
 
 void displayConnecting(TFT_eSPI &tft, String ssid) {
   tft.fillScreen(COLOR_BG);
@@ -42,9 +54,9 @@ void displayConnecting(TFT_eSPI &tft, String ssid) {
   tft.drawString(ssid, SCREEN_W / 2, SCREEN_H / 2 + 5);
 }
 
-// ============================================================
+//
 // STATUS (generic)
-// ============================================================
+//
 
 void displayStatus(TFT_eSPI &tft, String line1, String line2) {
   tft.fillScreen(COLOR_BG);
@@ -58,9 +70,9 @@ void displayStatus(TFT_eSPI &tft, String line1, String line2) {
   }
 }
 
-// ============================================================
+//
 // GENERATING (brief flash while creating invoice)
-// ============================================================
+//
 
 void displayGenerating(TFT_eSPI &tft) {
   tft.fillScreen(COLOR_BG);
@@ -70,46 +82,42 @@ void displayGenerating(TFT_eSPI &tft) {
   tft.drawString("Generating invoice...", SCREEN_W / 2, SCREEN_H / 2);
 }
 
-// ============================================================
+//
 // QR CODE (main screen - stays displayed permanently)
-// ============================================================
+//
 
-void displayQR(TFT_eSPI &tft, String bolt11, int priceSats, String deviceName) {
-  tft.fillScreen(COLOR_BG);
+void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
+  ledcWrite(38, 40);
+  tft.fillScreen(TFT_BLACK);
   
-  // BOLT11 to uppercase for QR alphanumeric encoding (smaller QR)
-  String upper = bolt11;
-  upper.toUpperCase();
+  // Uppercase for alphanumeric QR encoding (smaller QR)
+  String qrData = data;
+  qrData.toUpperCase();
   
-  // Add "lightning:" prefix for wallet auto-detection
-  String qrData = "LIGHTNING:" + upper;
+  // Pick QR version based on data length
+  int version;
+  if (qrData.length() < 50) version = 3;
+  else if (qrData.length() < 85) version = 5;
+  else if (qrData.length() < 120) version = 6;
+  else if (qrData.length() < 180) version = 8;
+  else version = QR_VERSION;
   
-  // Generate QR
   QRCode qrcode;
-  uint8_t qrcodeData[qrcode_getBufferSize(QR_VERSION)];
-  
-  // Try encoding. If data is too long for version, increase version
-  int version = QR_VERSION;
+  uint8_t qrcodeData[qrcode_getBufferSize(version)];
   qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qrData.c_str());
   
   int qrSize = qrcode.size;
   
-  // Calculate pixel size to fit screen height with padding
-  int maxH = SCREEN_H - 16;  // 8px padding top and bottom
-  int pixelSize = maxH / qrSize;
+  // Full screen height
+  int pixelSize = SCREEN_H / qrSize;
   if (pixelSize < 1) pixelSize = 1;
   
   int qrPixelW = qrSize * pixelSize;
   int qrPixelH = qrSize * pixelSize;
-  int qrX = 8;  // Left aligned with small margin
+  
+  int qrX = (SCREEN_W - qrPixelW) / 2;
   int qrY = (SCREEN_H - qrPixelH) / 2;
   
-  // White background behind QR with quiet zone
-  int quietZone = 4;
-  tft.fillRect(qrX - quietZone, qrY - quietZone, 
-               qrPixelW + quietZone * 2, qrPixelH + quietZone * 2, COLOR_QR_BG);
-  
-  // Draw QR modules
   for (int y = 0; y < qrSize; y++) {
     for (int x = 0; x < qrSize; x++) {
       if (qrcode_getModule(&qrcode, x, y)) {
@@ -117,59 +125,16 @@ void displayQR(TFT_eSPI &tft, String bolt11, int priceSats, String deviceName) {
           qrX + x * pixelSize,
           qrY + y * pixelSize,
           pixelSize, pixelSize,
-          COLOR_QR_FG
+          TFT_WHITE
         );
       }
     }
   }
-  
-  // Right side text area
-  int textX = qrX + qrPixelW + quietZone + 12;
-  
-  // Device name at top
-  tft.setTextDatum(TL_DATUM);
-  tft.setTextColor(COLOR_ACCENT);
-  tft.setTextSize(1);
-  tft.drawString(deviceName, textX, 8);
-  
-  // Price (big)
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(3);
-  tft.drawString(String(priceSats), textX, 30);
-  
-  // "sats" label
-  tft.setTextSize(1);
-  tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("sats", textX, 58);
-  
-  // Lightning bolt indicator
-  tft.setTextColor(COLOR_ACCENT);
-  tft.setTextSize(2);
-  tft.drawString("~", textX, 80);  // Lightning symbol placeholder
-  
-  // Scan instruction
-  tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(1);
-  tft.drawString("Scan to pay", textX, 110);
-  
-  // WiFi status dot (bottom right)
-  if (WiFi.status() == WL_CONNECTED) {
-    tft.fillCircle(SCREEN_W - 10, SCREEN_H - 10, 4, COLOR_SUCCESS);
-  } else {
-    tft.fillCircle(SCREEN_W - 10, SCREEN_H - 10, 4, COLOR_ERROR);
-  }
-  
-  // Button hints (very small, at bottom)
-  tft.setTextColor(0x4208);  // Very dark gray
-  tft.setTextDatum(BL_DATUM);
-  tft.drawString("[1]Info", textX, SCREEN_H - 2);
-  tft.setTextDatum(BR_DATUM);
-  tft.drawString("[2]New", SCREEN_W - 20, SCREEN_H - 2);
 }
-
-// ============================================================
+  
+//
 // PAID
-// ============================================================
+//
 
 void displayPaid(TFT_eSPI &tft, int count) {
   tft.fillScreen(COLOR_BG);
@@ -206,9 +171,9 @@ void displayPaidShellyError(TFT_eSPI &tft) {
   tft.drawString("Warning: Shelly not responding!", SCREEN_W / 2, SCREEN_H - 12);
 }
 
-// ============================================================
+//
 // ERROR
-// ============================================================
+//
 
 void displayError(TFT_eSPI &tft, String title, String detail) {
   tft.fillScreen(COLOR_BG);
@@ -226,9 +191,9 @@ void displayError(TFT_eSPI &tft, String title, String detail) {
   tft.drawString("[1] Setup  [2] Retry  (auto 10s)", SCREEN_W / 2, SCREEN_H - 12);
 }
 
-// ============================================================
-// WIFI FAILED
-// ============================================================
+//
+// IF WIFI FAILED
+//
 
 void displayWiFiFailed(TFT_eSPI &tft, String ssid) {
   tft.fillScreen(COLOR_BG);
@@ -250,9 +215,9 @@ void displayWiFiFailed(TFT_eSPI &tft, String ssid) {
   tft.drawString("Auto-retry in 10s...", SCREEN_W / 2, SCREEN_H - 10);
 }
 
-// ============================================================
+//
 // INFO
-// ============================================================
+//
 
 void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.fillScreen(COLOR_BG);
@@ -282,9 +247,9 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.drawString("Press any button to return", SCREEN_W / 2, SCREEN_H - 5);
 }
 
-// ============================================================
+//
 // AP MODE
-// ============================================================
+//
 
 void displayAPMode(TFT_eSPI &tft, String apIp) {
   tft.fillScreen(COLOR_BG);

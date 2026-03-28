@@ -1,6 +1,15 @@
 /*
  * PlugNSat - Web Configuration Portal
+ *
  * Served by ESP32 at http://{ip}/ for setup and config changes.
+ *
+ * LIBRARIES:
+ * - WebServer (ESP32 built-in HTTP server)
+ * - ArduinoJson by Benoit Blanchon
+ * - Preferences (ESP32 NVS flash storage)
+ * 
+ * License: MIT © 2026
+ * Author: ezmo-dev (PlugNSat)
  */
 
 #ifndef WEBPORTAL_H

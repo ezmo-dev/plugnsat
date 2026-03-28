@@ -1,5 +1,10 @@
 /*
  * PlugNSat - Configuration
+ * 
+ * Global instuctions, constants, timing with the QRcode et config structure
+ * 
+ * License: MIT © 2026
+ * Author: ezmo-dev (PlugNSat)
  */
 
 #ifndef CONFIG_H
@@ -17,8 +22,8 @@
 #define SCREEN_H 170
 
 // QR code
-#define QR_VERSION 10  // Holds ~271 chars alphanumeric (enough for BOLT11)
-
+#define QR_VERSION 10  // LNURL mode uses verson 5-6 (~115 chars) -> For LED screen (impossible to scan BOLT11 QR due to the reflections) 
+                      
 // Colors
 #define COLOR_BG       TFT_BLACK
 #define COLOR_TEXT     TFT_WHITE
@@ -33,12 +38,12 @@
 struct PlugNSatConfig {
   String wifiSsid;
   String wifiPass;
-  String btcpayUrl;        // "https://pay.ezmo.dev"
+  String btcpayUrl;        // Instance URL, e.g. https://btcpay.mydomain.com"
   String btcpayApiKey;
   String btcpayStoreId;
-  String shellyIp;         // "192.168.1.42"
+  String shellyIp;         // To verify on the shelly app, e.g. 192.168.1.42 
   int priceSats;           // Price per activation
-  int activationDuration;  // Seconds relay stays ON
+  int activationDuration;  // Seconds relay stays ON after payment
   String deviceName;       // Shown on screen
 };
 

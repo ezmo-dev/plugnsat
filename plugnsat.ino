@@ -1,13 +1,23 @@
 /*
- * PlugNSat - Lightning Smart Plug Controller
- * Version: 0.2.0
+ * PlugNSat - Main Firmware
+ * Lightning Smart Plug Controller
+ * Version: 0.1.0
  * Hardware: LilyGO T-Display S3 (ESP32-S3 + 1.9" LCD)
  * 
+ * BASED ON:
+ * - BitcoinSwitch by @arcbtc: github.com/arcbtc/bitcoinSwitch
+ * - LNPoS by @arcbtc: github.com/arcbtc/LNPoS
+ * 
+ * HARDWARE:
+ * - LilyGO T-Display S3 (ESP32-S3 + ST7789 1.9" LCD)
+ * - Shelly Plug S Gen3 (WiFi relay, CE certified, 2500W)
+ * - BTCPay Server with Lightning (Phoenixd, LND, CLN)
+ * 
  * WORKFLOW:
- *   1. First boot: Welcome screen, AP mode for setup via web browser
- *   2. Once configured: QR code displayed permanently (passive PoS)
+ *   1. First boot: Welcome screen, AP mode for setup via web browser (webportal)
+ *   2. Once configured: QR code LNURL displayed permanently (passive PoS)
  *   3. Customer scans and pays with any Lightning wallet
- *   4. "Payment received!" screen, Shelly activates
+ *   4. "Payment received!" screen, Shelly activates (duration configured on webportal)
  *   5. New QR code auto-generated, cycle repeats
  *   6. QR auto-refreshes every 4m45s (before 5min expiry)
  *
@@ -15,8 +25,8 @@
  *   - Button 1 (GPIO 0):  Info screen / Long press = AP mode
  *   - Button 2 (GPIO 14): Force refresh QR / Confirm
  * 
- * License: MIT
- * Author: Rezmo (PlugNSat)
+ * License: MIT © 2026
+ * Author: ezmo-dev (PlugNSat)
  */
 
 #include <WiFi.h>
@@ -33,9 +43,9 @@
 #include "shelly.h"
 #include "webportal.h"
 
-// ============================================================
+//
 // GLOBALS
-// ============================================================
+//
 
 TFT_eSPI tft = TFT_eSPI();
 Preferences prefs;
@@ -84,9 +94,9 @@ bool screenNeedsRedraw = true;
 // Config
 PlugNSatConfig config;
 
-// ============================================================
+//
 // SETUP
-// ============================================================
+//
 
 void setup() {
   Serial.begin(115200);
@@ -95,6 +105,8 @@ void setup() {
 
   tft.init();
   tft.setRotation(1);
+  ledcAttach(38, 5000, 8);
+  ledcWrite(38, 40);
   tft.fillScreen(TFT_BLACK);
   tft.setSwapBytes(true);
   
@@ -112,9 +124,9 @@ void setup() {
   }
 }
 
-// ============================================================
+//
 // MAIN LOOP
-// ============================================================
+//
 
 void loop() {
   server.handleClient();
@@ -151,9 +163,9 @@ void loop() {
   delay(50);
 }
 
-// ============================================================
+//
 // WIFI
-// ============================================================
+//
 
 void connectToWiFi() {
   displayConnecting(tft, config.wifiSsid);
@@ -219,9 +231,9 @@ bool ensureWiFi() {
   return true;
 }
 
-// ============================================================
+//
 // QR DISPLAY (main operating loop)
-// ============================================================
+//
 
 void loopQRDisplay() {
   if (!ensureWiFi()) return;
@@ -316,9 +328,9 @@ void generateAndShowQR() {
   }
 }
 
-// ============================================================
+//
 // PAID
-// ============================================================
+//
 
 void loopPaid() {
   paymentCount++;
@@ -339,9 +351,9 @@ void loopPaid() {
   generateAndShowQR();
 }
 
-// ============================================================
+//
 // ERROR (auto-retry after 10s)
-// ============================================================
+//
 
 void loopError() {
   if (millis() - errorStartTime > 10000) {
@@ -353,9 +365,9 @@ void loopError() {
   if (btn2Pressed) { consecutiveErrors = 0; generateAndShowQR(); }
 }
 
-// ============================================================
+//
 // INFO
-// ============================================================
+//
 
 void loopInfo() {
   if (screenNeedsRedraw) {
@@ -372,9 +384,9 @@ void loopInfo() {
   }
 }
 
-// ============================================================
+//
 // AP MODE
-// ============================================================
+//
 
 void startAPMode() {
   WiFi.disconnect();
@@ -391,9 +403,9 @@ void startAPMode() {
   Serial.println("AP: PlugNSat-Setup / plugnsat21 / http://" + WiFi.softAPIP().toString());
 }
 
-// ============================================================
+//
 // BUTTONS
-// ============================================================
+//
 
 void readButtons() {
   btn1Pressed = false;
@@ -422,9 +434,9 @@ void readButtons() {
   }
 }
 
-// ============================================================
+//
 // CONFIG
-// ============================================================
+//
 
 void loadConfig() {
   prefs.begin("plugnsat", false);

@@ -1,7 +1,20 @@
 /*
  * PlugNSat - Shelly Plug Control
+
  * Local HTTP API for Shelly Gen2/Gen3 devices.
  * No firmware modification, no authentication needed on LAN.
+ * 
+ * LIBRARIES:
+ * - HTTPClient (local HTTP requests)
+ * 
+ * REFERENCES:
+ * - Shelly Gen2+ RPC API: shelly-api-docs.shelly.cloud/gen2/
+ * - Switch component: shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Switch/
+ * - Shelly Plug S Gen3: shelly-api-docs.shelly.cloud/gen2/Devices/Gen3/ShellyPlugSG3/
+ * 
+ * License: MIT © 2026
+ * Author: ezmo-dev (PlugNSat)
+ * 
  */
 
 #ifndef SHELLY_H
