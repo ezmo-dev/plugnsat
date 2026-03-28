@@ -65,7 +65,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     <div class="sec">
       <h2>BTCPay Server</h2>
       <label>Server URL</label>
-      <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="https://pay.ezmo.dev">
+      <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="e.g. https://btcpay.mydomain.com">
       <div class="hint">No trailing slash</div>
       <label>API Key</label>
       <input type="password" name="btcpay_key" value="%BTCPAY_KEY%">
@@ -95,7 +95,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     <button type="submit">Save and restart</button>
   </form>
   
-  <p class="footer">PlugNSat v0.2.0</p>
+  <p class="footer">PlugNSat v0.1.0</p>
 
   <script>
   function testShelly(){
