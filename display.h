@@ -36,7 +36,7 @@ void displaySplash(TFT_eSPI &tft) {
   
   tft.setTextColor(COLOR_GRAY);
   tft.setTextSize(1);
-  tft.drawString("Lightning Smart Plug v0.2", SCREEN_W / 2, SCREEN_H / 2 + 15);
+  tft.drawString("Lightning Smart Plug v0.1.0", SCREEN_W / 2, SCREEN_H / 2 + 15);
   tft.drawString("plugnsat.com", SCREEN_W / 2, SCREEN_H / 2 + 35);
 }
 

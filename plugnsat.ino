@@ -115,7 +115,7 @@ void setup() {
 
   loadConfig();
   displaySplash(tft);
-  delay(2000);
+  delay(5000);
 
   if (config.wifiSsid.length() == 0 || config.btcpayUrl.length() == 0) {
     startAPMode();
