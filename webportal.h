@@ -90,6 +90,8 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <input type="number" name="price_sats" value="%PRICE_SATS%" min="1" max="1000000">
       <label>Activation duration (seconds)</label>
       <input type="number" name="duration" value="%DURATION%" min="1" max="86400">
+      <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
+      <div id="tpst"></div>
     </div>
     
     <button type="submit">Save and restart</button>
@@ -108,6 +110,15 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       el.style.color=d.ok?'#4caf50':'#f44336';
     }).catch(()=>{el.innerHTML='Error';el.style.color='#f44336'});
   }
+  function testPayment(){
+    var el=document.getElementById('tpst');
+    el.innerHTML='Activating...';el.style.color='#888';
+    fetch('/test-payment')
+    .then(r=>r.json()).then(d=>{
+      el.innerHTML=d.ok?'Shelly ON for '+d.duration+'s!':'Failed: '+(d.error||'unknown');
+      el.style.color=d.ok?'#4caf50':'#f44336';
+  }).catch(()=>{el.innerHTML='Error';el.style.color='#f44336'});
+}
   </script>
 </body>
 </html>
@@ -160,7 +171,11 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     delay(3000);
     ESP.restart();
   });
-  
+
+
+// Test Shelly connection via IP 
+//
+
   server.on("/test-shelly", HTTP_GET, [&server]() {
     String ip = server.arg("ip");
     if (ip.length() == 0) {
@@ -184,6 +199,31 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
       server.send(200, "application/json", "{\"ok\":false}");
     }
   });
+
+// Test payment without BTCPay server to setup the duration
+//
+
+  server.on("/test-payment", HTTP_GET, [&config, &server]() {
+  HTTPClient http;
+  String url = "http://" + config.shellyIp 
+               + "/rpc/switch.set?id=0&on=true&toggle_after=" 
+               + String(config.activationDuration);
+  
+  if (!http.begin(url)) {
+    server.send(200, "application/json", "{\"ok\":false,\"error\":\"Connection failed\"}");
+    return;
+  }
+  http.setTimeout(5000);
+  int code = http.GET();
+  http.end();
+  
+  if (code == 200) {
+    server.send(200, "application/json", 
+      "{\"ok\":true,\"duration\":" + String(config.activationDuration) + "}");
+  } else {
+    server.send(200, "application/json", "{\"ok\":false,\"error\":\"Shelly error\"}");
+  }
+});
   
   server.on("/api/status", HTTP_GET, [&config, &server]() {
     JsonDocument doc;
