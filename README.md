@@ -61,14 +61,25 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 
 | Button | Short press | Long press (3s) |
 |--------|-------------|-----------------|
-| BTN1 (left) | Show info screen | Enter AP setup mode |
+| BTN1 (left) | Open Settings menu | Enter AP setup mode |
 | BTN2 (right) | Force QR refresh | - |
+
+### Settings menu
+
+Press BTN1 from the QR screen to open the Settings menu.
+
+| Option | Description |
+|--------|-------------|
+| Device Info | WiFi, IP, RSSI, Shelly host, price, uptime |
+| Brightness | Adjust screen brightness in real time, saved automatically |
+
+Navigation: BTN1 moves the cursor, BTN2 selects. The menu and Device Info screen close automatically after 6 seconds of inactivity and return to the QR code. The Brightness screen returns to the QR code 3 seconds after the last adjustment.
 
 ## Files
 ```
 plugnsat.ino   Main sketch, state machine, WiFi, buttons
 config.h       Constants, colors, config struct
-display.h      All screen rendering (splash, QR, paid, error, info, AP)
+display.h      All screen rendering (splash, QR, paid, error, info, settings, brightness, AP)
 btcpay.h       BTCPay Server API (create invoice, check status)
 shelly.h       Shelly local HTTP API (switch on/off, status)
 webportal.h    Web config page (HTML/CSS/JS served by ESP32)
