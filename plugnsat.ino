@@ -502,33 +502,48 @@ void startAPMode() {
 }
 
 //
-// BUTTONS
-//
-
 void readButtons() {
   btn1Pressed = false;
   btn2Pressed = false;
   
-  if (digitalRead(BTN_1) == LOW && millis() - btn1LastPress > DEBOUNCE_MS) {
-    btn1Pressed = true;
-    btn1LastPress = millis();
+  static bool btn1WasDown = false;
+  static bool btn2WasDown = false;
+  static unsigned long btn1DownTime = 0;
+  static unsigned long btn2DownTime = 0;
+  
+  bool btn1Down = (digitalRead(BTN_1) == LOW);
+  bool btn2Down = (digitalRead(BTN_2) == LOW);
+  
+  // BTN1: detect press and release
+  if (btn1Down && !btn1WasDown) {
+    btn1DownTime = millis();  // Just pressed
   }
-  if (digitalRead(BTN_2) == LOW && millis() - btn2LastPress > DEBOUNCE_MS) {
-    btn2Pressed = true;
-    btn2LastPress = millis();
+  if (!btn1Down && btn1WasDown) {
+    // Just released
+    unsigned long held = millis() - btn1DownTime;
+    if (held < 2000 && held > 50) {
+      btn1Pressed = true;  // Short press (between 50ms and 2s)
+    }
   }
+  btn1WasDown = btn1Down;
+  
+  // BTN2: detect press and release
+  if (btn2Down && !btn2WasDown) {
+    btn2DownTime = millis();
+  }
+  if (!btn2Down && btn2WasDown) {
+    unsigned long held = millis() - btn2DownTime;
+    if (held < 2000 && held > 50) {
+      btn2Pressed = true;
+    }
+  }
+  btn2WasDown = btn2Down;
   
   // Long press BTN_1 (3s) = AP mode from any state
-  static unsigned long btn1HoldStart = 0;
-  if (digitalRead(BTN_1) == LOW) {
-    if (btn1HoldStart == 0) btn1HoldStart = millis();
-    if (millis() - btn1HoldStart > 3000) {
-      btn1HoldStart = 0;
-      Serial.println("Long press -> AP mode");
-      startAPMode();
-    }
-  } else {
-    btn1HoldStart = 0;
+  if (btn1Down && (millis() - btn1DownTime > 3000)) {
+    btn1DownTime = millis();  // Reset to avoid retriggering
+    Serial.println("Long press -> AP mode");
+    startAPMode();
   }
 }
 
