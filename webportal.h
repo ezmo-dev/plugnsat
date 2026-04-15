@@ -260,7 +260,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
 // Scan local network for Shelly devices via mDNS
 
   server.on("/api/scan-shelly", HTTP_GET, [&server]() {
-    int n = MDNS.queryService("http", "tcp", 3000);
+    int n = MDNS.queryService("http", "tcp");
     JsonDocument doc;
     JsonArray arr = doc.to<JsonArray>();
     for (int i = 0; i < n; i++) {
@@ -268,7 +268,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
       if (h.length() > 0 && h.startsWith("shelly")) {
         JsonObject obj = arr.add<JsonObject>();
         obj["hostname"] = h + ".local";
-        obj["ip"]       = MDNS.IP(i).toString();
+        obj["ip"]       = MDNS.address(i).toString();
         obj["name"]     = h;
       }
     }
