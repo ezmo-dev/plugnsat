@@ -54,7 +54,7 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 2. Device shows "PlugNSat Setup" screen
 3. Connect phone to WiFi: `PlugNSat-Setup` (password: `plugnsat21`)
 4. Open `http://192.168.4.1` in browser
-5. Enter WiFi, BTCPay Server, and Shelly configuration (hostname or IP)
+5. Enter WiFi and BTCPay Server settings, then click "Scan network" to auto-discover your Shelly on the local network, or type its hostname/IP manually
 6. Save > device restarts > connects to WiFi > QR appears
 
 ## Buttons
@@ -85,6 +85,7 @@ All files go in the same folder. Arduino IDE compiles them together.
 - Invoice expires > new QR generated silently
 - Shelly offline > payment still accepted, warning shown
 - Shelly hostname (mDNS .local) supported to avoid DHCP IP changes
+- "Scan network" button in the web portal auto-discovers Shelly devices via mDNS (no IP needed)
 - 10+ consecutive errors > ESP32 restarts itself
 - Long press BTN1 from any screen > AP setup mode
 

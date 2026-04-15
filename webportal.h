@@ -18,6 +18,7 @@
 #include <WebServer.h>
 #include <Preferences.h>
 #include <ArduinoJson.h>
+#include <ESPmDNS.h>
 #include "config.h"
 
 void saveConfig();  // Defined in main .ino
@@ -40,6 +41,8 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     label:first-of-type{margin-top:0}
     input[type="text"],input[type="password"],input[type="number"]{width:100%;padding:10px 12px;background:#0f3460;border:1px solid #2a2a4a;border-radius:8px;color:#fff;font-size:15px;outline:none}
     input:focus{border-color:#f7931a}
+    select{width:100%;padding:10px 12px;background:#0f3460;border:1px solid #2a2a4a;border-radius:8px;color:#fff;font-size:14px;outline:none;margin-bottom:8px;cursor:pointer}
+    select:focus{border-color:#f7931a}
     .hint{font-size:11px;color:#666;margin-top:4px}
     button{width:100%;padding:14px;background:#f7931a;color:#1a1a2e;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:20px}
     button:hover{background:#e8850f}
@@ -77,8 +80,11 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     <div class="sec">
       <h2>Shelly Plug</h2>
       <label>Shelly hostname or IP</label>
-      <input type="text" name="shelly_host" value="%SHELLY_HOST%" placeholder="shellyplugsg3-xxxxxxxxxxxx.local">
-      <button type="button" class="tbtn" onclick="testShelly()">Test connection</button>
+      <button type="button" class="tbtn" onclick="scanShelly()">Scan network</button>
+      <div id="scan-st" class="hint" style="margin-top:6px"></div>
+      <select id="shelly-sel" style="display:none;margin-top:8px" onchange="selectShelly(this)"></select>
+      <input type="text" name="shelly_host" id="shelly-host" value="%SHELLY_HOST%" placeholder="shellyplugsg3-xxxxxxxxxxxx.local" style="margin-top:8px">
+      <button type="button" class="tbtn" onclick="testShelly()" style="margin-top:8px">Test connection</button>
       <div id="sst"></div>
     </div>
     
@@ -100,25 +106,52 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   <p class="footer">PlugNSat v0.1.0</p>
 
   <script>
+  function scanShelly(){
+    var el=document.getElementById('scan-st');
+    var sel=document.getElementById('shelly-sel');
+    el.innerHTML='Scanning...';el.style.color='#888';
+    sel.style.display='none';
+    fetch('/api/scan-shelly')
+    .then(function(r){return r.json()})
+    .then(function(d){
+      if(!d.length){
+        el.innerHTML='No Shelly found. Check that your Shelly is connected to the same WiFi network.';
+        el.style.color='#f44336';
+      } else {
+        el.innerHTML='';
+        sel.innerHTML='<option value="">-- select a device --</option>';
+        d.forEach(function(s){
+          var o=document.createElement('option');
+          o.value=s.hostname;
+          o.text=s.name+' ('+s.ip+')';
+          sel.appendChild(o);
+        });
+        sel.style.display='block';
+      }
+    }).catch(function(){el.innerHTML='Scan failed';el.style.color='#f44336'});
+  }
+  function selectShelly(sel){
+    if(sel.value)document.getElementById('shelly-host').value=sel.value;
+  }
   function testShelly(){
-    var host=document.querySelector('[name=shelly_host]').value;
+    var host=document.getElementById('shelly-host').value;
     var el=document.getElementById('sst');
     el.innerHTML='Testing...';el.style.color='#888';
     fetch('/test-shelly?host='+encodeURIComponent(host))
-    .then(r=>r.json()).then(d=>{
+    .then(function(r){return r.json()}).then(function(d){
       el.innerHTML=d.ok?'OK! Power: '+d.power+'W':'Failed';
       el.style.color=d.ok?'#4caf50':'#f44336';
-    }).catch(()=>{el.innerHTML='Error';el.style.color='#f44336'});
+    }).catch(function(){el.innerHTML='Error';el.style.color='#f44336'});
   }
   function testPayment(){
     var el=document.getElementById('tpst');
     el.innerHTML='Activating...';el.style.color='#888';
     fetch('/test-payment')
-    .then(r=>r.json()).then(d=>{
+    .then(function(r){return r.json()}).then(function(d){
       el.innerHTML=d.ok?'Shelly ON for '+d.duration+'s!':'Failed: '+(d.error||'unknown');
       el.style.color=d.ok?'#4caf50':'#f44336';
-  }).catch(()=>{el.innerHTML='Error';el.style.color='#f44336'});
-}
+    }).catch(function(){el.innerHTML='Error';el.style.color='#f44336'});
+  }
   </script>
 </body>
 </html>
@@ -224,6 +257,26 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   }
 });
   
+// Scan local network for Shelly devices via mDNS
+
+  server.on("/api/scan-shelly", HTTP_GET, [&server]() {
+    int n = MDNS.queryService("http", "tcp", 3000);
+    JsonDocument doc;
+    JsonArray arr = doc.to<JsonArray>();
+    for (int i = 0; i < n; i++) {
+      String h = MDNS.hostname(i);
+      if (h.length() > 0 && h.startsWith("shelly")) {
+        JsonObject obj = arr.add<JsonObject>();
+        obj["hostname"] = h + ".local";
+        obj["ip"]       = MDNS.IP(i).toString();
+        obj["name"]     = h;
+      }
+    }
+    String json;
+    serializeJson(doc, json);
+    server.send(200, "application/json", json);
+  });
+
   server.on("/api/status", HTTP_GET, [&config, &server]() {
     JsonDocument doc;
     doc["device"] = config.deviceName;

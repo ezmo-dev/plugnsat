@@ -35,6 +35,7 @@
 #include <WebServer.h>
 #include <Preferences.h>
 #include <ArduinoJson.h>
+#include <ESPmDNS.h>
 #include <TFT_eSPI.h>
 #include "qrcode.h"
 #include "config.h"
@@ -184,7 +185,9 @@ void connectToWiFi() {
     Serial.println("WiFi OK: " + WiFi.localIP().toString());
     displayStatus(tft, "WiFi connected!", WiFi.localIP().toString());
     delay(1500);
-    
+
+    MDNS.begin("plugnsat");
+
     setupWebPortal(server, config, prefs);
     server.begin();
     

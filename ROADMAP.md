@@ -5,6 +5,7 @@
 - [x] Web portal configuration
 - [x] Auto QR refresh before invoice expiry
 - [x] Simulate payment button for testing
+- [x] mDNS autodiscovery for Shelly devices (scan network instead of manual IP)
 - [ ] Splash screen with logo and branding
 - [ ] Color theme and screen brightness adjustments
 - [ ] UI polish (paid screen, error screen, info screen)
