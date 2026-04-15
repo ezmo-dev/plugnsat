@@ -24,10 +24,10 @@
 #include <ArduinoJson.h>
 
 // Turn ON with auto-off timer
-bool shellySwitchOn(String shellyIp, int durationSeconds) {
+bool shellySwitchOn(String shellyHost, int durationSeconds) {
   HTTPClient http;
-  String url = "http://" + shellyIp 
-               + "/rpc/switch.set?id=0&on=true&toggle_after=" 
+  String url = "http://" + shellyHost
+               + "/rpc/switch.set?id=0&on=true&toggle_after="
                + String(durationSeconds);
   
   if (!http.begin(url)) return false;
@@ -41,9 +41,9 @@ bool shellySwitchOn(String shellyIp, int durationSeconds) {
 }
 
 // Turn OFF manually
-bool shellySwitchOff(String shellyIp) {
+bool shellySwitchOff(String shellyHost) {
   HTTPClient http;
-  String url = "http://" + shellyIp + "/rpc/switch.set?id=0&on=false";
+  String url = "http://" + shellyHost + "/rpc/switch.set?id=0&on=false";
   
   if (!http.begin(url)) return false;
   http.setTimeout(5000);
@@ -54,9 +54,9 @@ bool shellySwitchOff(String shellyIp) {
 }
 
 // Check if Shelly is reachable
-bool shellyIsOnline(String shellyIp) {
+bool shellyIsOnline(String shellyHost) {
   HTTPClient http;
-  String url = "http://" + shellyIp + "/rpc/Switch.GetStatus?id=0";
+  String url = "http://" + shellyHost + "/rpc/Switch.GetStatus?id=0";
   
   if (!http.begin(url)) return false;
   http.setTimeout(3000);
@@ -67,9 +67,9 @@ bool shellyIsOnline(String shellyIp) {
 }
 
 // Get current power draw (watts)
-float shellyGetPower(String shellyIp) {
+float shellyGetPower(String shellyHost) {
   HTTPClient http;
-  String url = "http://" + shellyIp + "/rpc/Switch.GetStatus?id=0";
+  String url = "http://" + shellyHost + "/rpc/Switch.GetStatus?id=0";
   
   if (!http.begin(url)) return -1.0;
   http.setTimeout(3000);

@@ -336,7 +336,7 @@ void loopPaid() {
   paymentCount++;
   displayPaid(tft, paymentCount);
   
-  bool shellyOk = shellySwitchOn(config.shellyIp, config.activationDuration);
+  bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
   
   if (!shellyOk) {
     Serial.println("WARNING: Shelly failed!");
@@ -445,7 +445,7 @@ void loadConfig() {
   config.btcpayUrl          = prefs.getString("btcpay_url", "");
   config.btcpayApiKey       = prefs.getString("btcpay_key", "");
   config.btcpayStoreId      = prefs.getString("btcpay_store", "");
-  config.shellyIp           = prefs.getString("shelly_ip", "");
+  config.shellyHost         = prefs.getString("shelly_ip", "");
   config.priceSats          = prefs.getInt("price_sats", 100);
   config.activationDuration = prefs.getInt("duration", 60);
   config.deviceName         = prefs.getString("dev_name", "PlugNSat");
@@ -459,7 +459,7 @@ void saveConfig() {
   prefs.putString("btcpay_url",   config.btcpayUrl);
   prefs.putString("btcpay_key",   config.btcpayApiKey);
   prefs.putString("btcpay_store", config.btcpayStoreId);
-  prefs.putString("shelly_ip",    config.shellyIp);
+  prefs.putString("shelly_ip",    config.shellyHost);
   prefs.putInt("price_sats",      config.priceSats);
   prefs.putInt("duration",        config.activationDuration);
   prefs.putString("dev_name",     config.deviceName);

@@ -234,7 +234,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.drawString("WiFi: " + WiFi.SSID(), 10, y); y += lh;
   tft.drawString("IP: " + WiFi.localIP().toString(), 10, y); y += lh;
   tft.drawString("RSSI: " + String(WiFi.RSSI()) + " dBm", 10, y); y += lh;
-  tft.drawString("Shelly: " + config.shellyIp, 10, y); y += lh;
+  tft.drawString("Shelly: " + config.shellyHost, 10, y); y += lh;
   tft.drawString("Price: " + String(config.priceSats) + " sats / " 
                  + String(config.activationDuration) + "s", 10, y); y += lh;
   tft.drawString("Payments this session: " + String(payments), 10, y); y += lh;

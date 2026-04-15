@@ -76,8 +76,8 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     
     <div class="sec">
       <h2>Shelly Plug</h2>
-      <label>Shelly IP</label>
-      <input type="text" name="shelly_ip" value="%SHELLY_IP%" placeholder="192.168.1.42">
+      <label>Shelly hostname or IP</label>
+      <input type="text" name="shelly_host" value="%SHELLY_HOST%" placeholder="shellyplugsg3-xxxxxxxxxxxx.local">
       <button type="button" class="tbtn" onclick="testShelly()">Test connection</button>
       <div id="sst"></div>
     </div>
@@ -101,10 +101,10 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
   <script>
   function testShelly(){
-    var ip=document.querySelector('[name=shelly_ip]').value;
+    var host=document.querySelector('[name=shelly_host]').value;
     var el=document.getElementById('sst');
     el.innerHTML='Testing...';el.style.color='#888';
-    fetch('/test-shelly?ip='+encodeURIComponent(ip))
+    fetch('/test-shelly?host='+encodeURIComponent(host))
     .then(r=>r.json()).then(d=>{
       el.innerHTML=d.ok?'OK! Power: '+d.power+'W':'Failed';
       el.style.color=d.ok?'#4caf50':'#f44336';
@@ -131,7 +131,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%BTCPAY_URL%",  config.btcpayUrl);
   html.replace("%BTCPAY_KEY%",  config.btcpayApiKey);
   html.replace("%BTCPAY_STORE%", config.btcpayStoreId);
-  html.replace("%SHELLY_IP%",   config.shellyIp);
+  html.replace("%SHELLY_HOST%", config.shellyHost);
   html.replace("%PRICE_SATS%",  String(config.priceSats));
   html.replace("%DURATION%",    String(config.activationDuration));
   html.replace("%DEV_NAME%",    config.deviceName);
@@ -150,7 +150,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.btcpayUrl          = server.arg("btcpay_url");
     config.btcpayApiKey       = server.arg("btcpay_key");
     config.btcpayStoreId      = server.arg("btcpay_store");
-    config.shellyIp           = server.arg("shelly_ip");
+    config.shellyHost         = server.arg("shelly_host");
     config.priceSats          = server.arg("price_sats").toInt();
     config.activationDuration = server.arg("duration").toInt();
     config.deviceName         = server.arg("dev_name");
@@ -173,17 +173,16 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   });
 
 
-// Test Shelly connection via IP 
-//
+// Test Shelly connection
 
   server.on("/test-shelly", HTTP_GET, [&server]() {
-    String ip = server.arg("ip");
-    if (ip.length() == 0) {
+    String host = server.arg("host");
+    if (host.length() == 0) {
       server.send(400, "application/json", "{\"ok\":false}");
       return;
     }
     HTTPClient http;
-    if (!http.begin("http://" + ip + "/rpc/Switch.GetStatus?id=0")) {
+    if (!http.begin("http://" + host + "/rpc/Switch.GetStatus?id=0")) {
       server.send(200, "application/json", "{\"ok\":false}");
       return;
     }
@@ -205,8 +204,8 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
 
   server.on("/test-payment", HTTP_GET, [&config, &server]() {
   HTTPClient http;
-  String url = "http://" + config.shellyIp 
-               + "/rpc/switch.set?id=0&on=true&toggle_after=" 
+  String url = "http://" + config.shellyHost
+               + "/rpc/switch.set?id=0&on=true&toggle_after="
                + String(config.activationDuration);
   
   if (!http.begin(url)) {

@@ -41,7 +41,7 @@ struct PlugNSatConfig {
   String btcpayUrl;        // Instance URL, e.g. https://btcpay.mydomain.com"
   String btcpayApiKey;
   String btcpayStoreId;
-  String shellyIp;         // To verify on the shelly app, e.g. 192.168.1.42 
+  String shellyHost;        // IP address or mDNS hostname, e.g. 192.168.1.42 or shellyplugsg3-xxxxxxxxxxxx.local
   int priceSats;           // Price per activation
   int activationDuration;  // Seconds relay stays ON after payment
   String deviceName;       // Shown on screen
