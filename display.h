@@ -248,6 +248,127 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
 }
 
 //
+// SETTINGS MENU
+//
+
+void displaySettings(TFT_eSPI &tft, int selectedIndex) {
+  tft.fillScreen(COLOR_BG);
+
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setTextSize(1);
+  tft.drawString("Settings", SCREEN_W / 2, 12);
+
+  const char* options[] = {"Device Info", "Brightness"};
+  int count = 2;
+  int startY = 48;
+  int rowH = 36;
+
+  for (int i = 0; i < count; i++) {
+    int y = startY + i * rowH;
+    if (i == selectedIndex) {
+      tft.fillRoundRect(30, y - 2, SCREEN_W - 60, 24, 5, COLOR_ACCENT);
+      tft.setTextColor(COLOR_BG);
+    } else {
+      tft.setTextColor(COLOR_TEXT);
+    }
+    tft.setTextDatum(MC_DATUM);
+    tft.drawString(options[i], SCREEN_W / 2, y + 10);
+  }
+
+  tft.setTextDatum(BC_DATUM);
+  tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(1);
+  tft.drawString("BTN1: move   BTN2: select", SCREEN_W / 2, SCREEN_H - 5);
+}
+
+//
+// BRIGHTNESS
+//
+
+void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
+  tft.fillScreen(COLOR_BG);
+
+  // Left: QR code preview on white background
+  int leftW = 152;
+  tft.fillRect(0, 0, leftW, SCREEN_H, TFT_WHITE);
+
+  String qr = (qrData.length() > 0) ? qrData : "PLUGNSAT";
+  qr.toUpperCase();
+
+  int version;
+  if (qr.length() < 50)       version = 3;
+  else if (qr.length() < 85)  version = 5;
+  else if (qr.length() < 120) version = 6;
+  else if (qr.length() < 180) version = 8;
+  else                         version = QR_VERSION;
+
+  QRCode qrcode;
+  uint8_t qrcodeData[qrcode_getBufferSize(version)];
+  qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qr.c_str());
+
+  int qrSize  = qrcode.size;
+  int pixSize = (leftW - 8) / qrSize;
+  if (pixSize < 1) pixSize = 1;
+  int qrPixW = qrSize * pixSize;
+  int qrPixH = qrSize * pixSize;
+  int qrX    = (leftW - qrPixW) / 2;
+  int qrY    = (SCREEN_H - qrPixH) / 2;
+
+  for (int y = 0; y < qrSize; y++) {
+    for (int x = 0; x < qrSize; x++) {
+      if (qrcode_getModule(&qrcode, x, y)) {
+        tft.fillRect(qrX + x * pixSize, qrY + y * pixSize,
+                     pixSize, pixSize, TFT_BLACK);
+      }
+    }
+  }
+
+  tft.drawFastVLine(leftW, 0, SCREEN_H, COLOR_GRAY);
+
+  // Right: brightness controls
+  int cx = leftW + (SCREEN_W - leftW) / 2;  // ~236
+
+  // "-" at top (BTN1 = decrease)
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(2);
+  tft.drawString("-", cx, 10);
+  tft.setTextSize(1);
+  tft.setTextColor(COLOR_GRAY);
+  tft.drawString("BTN1", cx, 30);
+
+  // Vertical bar
+  int barH = 60;
+  int barW = 14;
+  int barX = cx - barW / 2;
+  int barY = 44;
+
+  tft.fillRect(barX, barY, barW, barH, 0x1082);
+  tft.drawRect(barX - 1, barY - 1, barW + 2, barH + 2, COLOR_GRAY);
+
+  int fillH = map(brightness, 0, 255, 0, barH);
+  if (fillH > 0) {
+    tft.fillRect(barX, barY + barH - fillH, barW, fillH, COLOR_ACCENT);
+  }
+
+  // Percentage below bar
+  int pct = map(brightness, 0, 255, 0, 100);
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setTextSize(1);
+  tft.drawString(String(pct) + "%", cx, barY + barH + 6);
+
+  // "+" at bottom (BTN2 = increase)
+  tft.setTextColor(COLOR_GRAY);
+  tft.drawString("BTN2", cx, SCREEN_H - 28);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(2);
+  tft.setTextDatum(BC_DATUM);
+  tft.drawString("+", cx, SCREEN_H - 8);
+}
+
+//
 // AP MODE
 //
 

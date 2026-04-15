@@ -69,7 +69,9 @@ enum AppState {
   STATE_QR_DISPLAY,
   STATE_PAID,
   STATE_ERROR,
-  STATE_INFO
+  STATE_INFO,
+  STATE_SETTINGS,
+  STATE_BRIGHTNESS
 };
 AppState currentState = STATE_CONNECTING;
 
@@ -85,6 +87,11 @@ unsigned long errorStartTime = 0;
 
 // Session stats
 int paymentCount = 0;
+
+// Settings menu
+int settingsIndex = 0;
+unsigned long lastSettingsInput = 0;
+unsigned long lastBrightnessInput = 0;
 
 // WiFi monitoring
 unsigned long lastWifiCheck = 0;
@@ -115,6 +122,7 @@ void setup() {
   pinMode(BTN_2, INPUT_PULLUP);
 
   loadConfig();
+  ledcWrite(38, config.brightness);
   displaySplash(tft);
   delay(5000);
 
@@ -155,6 +163,14 @@ void loop() {
 
     case STATE_INFO:
       loopInfo();
+      break;
+
+    case STATE_SETTINGS:
+      loopSettings();
+      break;
+
+    case STATE_BRIGHTNESS:
+      loopBrightness();
       break;
 
     default:
@@ -284,7 +300,9 @@ void loopQRDisplay() {
   
   // Buttons
   if (btn1Pressed) {
-    currentState = STATE_INFO;
+    settingsIndex = 0;
+    lastSettingsInput = millis();
+    currentState = STATE_SETTINGS;
     screenNeedsRedraw = true;
   }
   if (btn2Pressed) {
@@ -372,17 +390,95 @@ void loopError() {
 //
 
 void loopInfo() {
-  if (screenNeedsRedraw) {
-    displayInfo(tft, config, paymentCount);
-    screenNeedsRedraw = false;
-  }
-  if (btn1Pressed || btn2Pressed) {
+  // Auto-timeout 6s -> back to QR
+  if (millis() - lastSettingsInput > 6000) {
     if (currentBolt11.length() > 0) {
       displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
       currentState = STATE_QR_DISPLAY;
     } else {
       generateAndShowQR();
     }
+    return;
+  }
+  if (screenNeedsRedraw) {
+    displayInfo(tft, config, paymentCount);
+    screenNeedsRedraw = false;
+  }
+  if (btn1Pressed || btn2Pressed) {
+    lastSettingsInput = millis();
+    currentState = STATE_SETTINGS;
+    screenNeedsRedraw = true;
+  }
+}
+
+//
+// SETTINGS
+//
+
+void loopSettings() {
+  // Auto-timeout 6s -> back to QR
+  if (millis() - lastSettingsInput > 6000) {
+    if (currentBolt11.length() > 0) {
+      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
+      currentState = STATE_QR_DISPLAY;
+    } else {
+      generateAndShowQR();
+    }
+    return;
+  }
+  if (screenNeedsRedraw) {
+    displaySettings(tft, settingsIndex);
+    screenNeedsRedraw = false;
+  }
+  if (btn1Pressed) {
+    lastSettingsInput = millis();
+    settingsIndex = (settingsIndex + 1) % 2;
+    screenNeedsRedraw = true;
+  }
+  if (btn2Pressed) {
+    lastSettingsInput = millis();
+    if (settingsIndex == 0) {
+      currentState = STATE_INFO;
+      screenNeedsRedraw = true;
+    } else {
+      lastBrightnessInput = millis();
+      currentState = STATE_BRIGHTNESS;
+      screenNeedsRedraw = true;
+    }
+  }
+}
+
+//
+// BRIGHTNESS
+//
+
+void loopBrightness() {
+  // Auto-save and return to QR after 3s without input
+  if (millis() - lastBrightnessInput > 3000) {
+    saveConfig();
+    if (currentBolt11.length() > 0) {
+      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
+      currentState = STATE_QR_DISPLAY;
+    } else {
+      generateAndShowQR();
+    }
+    return;
+  }
+  if (screenNeedsRedraw) {
+    displayBrightness(tft, config.brightness, currentBolt11);
+    screenNeedsRedraw = false;
+  }
+  if (btn1Pressed) {
+    lastBrightnessInput = millis();
+    config.brightness = max(10, config.brightness - 10);
+    ledcWrite(38, config.brightness);
+    screenNeedsRedraw = true;
+  }
+  if (btn2Pressed) {
+    lastBrightnessInput = millis();
+    config.brightness = min(255, config.brightness + 10);
+    ledcWrite(38, config.brightness);
+    screenNeedsRedraw = true;
   }
 }
 
@@ -451,6 +547,7 @@ void loadConfig() {
   config.priceSats          = prefs.getInt("price_sats", 100);
   config.activationDuration = prefs.getInt("duration", 60);
   config.deviceName         = prefs.getString("dev_name", "PlugNSat");
+  config.brightness         = prefs.getInt("brightness", 40);
   prefs.end();
 }
 
@@ -465,5 +562,6 @@ void saveConfig() {
   prefs.putInt("price_sats",      config.priceSats);
   prefs.putInt("duration",        config.activationDuration);
   prefs.putString("dev_name",     config.deviceName);
+  prefs.putInt("brightness",      config.brightness);
   prefs.end();
 }
