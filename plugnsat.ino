@@ -183,10 +183,9 @@ void connectToWiFi() {
   
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("WiFi OK: " + WiFi.localIP().toString());
+    MDNS.begin("plugnsat");
     displayStatus(tft, "WiFi connected!", WiFi.localIP().toString());
     delay(1500);
-
-    MDNS.begin("plugnsat");
 
     setupWebPortal(server, config, prefs);
     server.begin();
