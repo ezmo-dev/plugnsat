@@ -520,7 +520,7 @@ void readButtons() {
   if (!btn1Down && btn1WasDown) {
     // Just released
     unsigned long held = millis() - btn1DownTime;
-    if (held < 2000 && held > 50) {
+    if (held < 2000 && held > 30) {
       btn1Pressed = true;  // Short press (between 50ms and 2s)
     }
   }
@@ -532,7 +532,7 @@ void readButtons() {
   }
   if (!btn2Down && btn2WasDown) {
     unsigned long held = millis() - btn2DownTime;
-    if (held < 2000 && held > 50) {
+    if (held < 2000 && held > 30) {
       btn2Pressed = true;
     }
   }
