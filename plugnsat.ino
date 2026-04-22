@@ -68,7 +68,9 @@ enum AppState {
   STATE_ERROR,
   STATE_INFO,
   STATE_SETTINGS,
-  STATE_BRIGHTNESS
+  STATE_BRIGHTNESS,
+  STATE_PRICE,
+  STATE_DURATION
 };
 AppState currentState = STATE_CONNECTING;
 
@@ -89,6 +91,8 @@ int paymentCount = 0;
 int settingsIndex = 0;
 unsigned long lastSettingsInput = 0;
 unsigned long lastBrightnessInput = 0;
+unsigned long lastPriceInput = 0;
+unsigned long lastDurationInput = 0;
 
 // AP mode
 unsigned long apModeStartTime = 0;
@@ -168,6 +172,14 @@ void loop() {
 
     case STATE_BRIGHTNESS:
       loopBrightness();
+      break;
+
+    case STATE_PRICE:
+      loopPrice();
+      break;
+
+    case STATE_DURATION:
+      loopDuration();
       break;
 
     default:
@@ -428,7 +440,7 @@ void loopSettings() {
   }
   if (btn1Pressed) {
     lastSettingsInput = millis();
-    settingsIndex = (settingsIndex + 1) % 2;
+    settingsIndex = (settingsIndex + 1) % 4;
     screenNeedsRedraw = true;
   }
   if (btn2Pressed) {
@@ -436,9 +448,17 @@ void loopSettings() {
     if (settingsIndex == 0) {
       currentState = STATE_INFO;
       screenNeedsRedraw = true;
-    } else {
+    } else if (settingsIndex == 1) {
       lastBrightnessInput = millis();
       currentState = STATE_BRIGHTNESS;
+      screenNeedsRedraw = true;
+    } else if (settingsIndex == 2) {
+      lastPriceInput = millis();
+      currentState = STATE_PRICE;
+      screenNeedsRedraw = true;
+    } else {
+      lastDurationInput = millis();
+      currentState = STATE_DURATION;
       screenNeedsRedraw = true;
     }
   }
@@ -474,6 +494,72 @@ void loopBrightness() {
     lastBrightnessInput = millis();
     config.brightness = min(255, config.brightness + 10);
     ledcWrite(38, config.brightness);
+    screenNeedsRedraw = true;
+  }
+}
+
+//
+// PRICE
+//
+
+void loopPrice() {
+  if (millis() - lastPriceInput > 3000) {
+    saveConfig();
+    if (currentBolt11.length() > 0) {
+      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
+      currentState = STATE_QR_DISPLAY;
+    } else {
+      generateAndShowQR();
+    }
+    return;
+  }
+  if (screenNeedsRedraw) {
+    displayPrice(tft, config.priceSats);
+    screenNeedsRedraw = false;
+  }
+  if (btn1Pressed) {
+    lastPriceInput = millis();
+    int step = (config.priceSats <= 1000) ? 10 : 100;
+    config.priceSats = max(1, config.priceSats - step);
+    screenNeedsRedraw = true;
+  }
+  if (btn2Pressed) {
+    lastPriceInput = millis();
+    int step = (config.priceSats <= 1000) ? 10 : 100;
+    config.priceSats += step;
+    screenNeedsRedraw = true;
+  }
+}
+
+//
+// DURATION
+//
+
+void loopDuration() {
+  if (millis() - lastDurationInput > 3000) {
+    saveConfig();
+    if (currentBolt11.length() > 0) {
+      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
+      currentState = STATE_QR_DISPLAY;
+    } else {
+      generateAndShowQR();
+    }
+    return;
+  }
+  if (screenNeedsRedraw) {
+    displayDuration(tft, config.activationDuration);
+    screenNeedsRedraw = false;
+  }
+  if (btn1Pressed) {
+    lastDurationInput = millis();
+    int step = (config.activationDuration <= 300) ? 10 : 60;
+    config.activationDuration = max(1, config.activationDuration - step);
+    screenNeedsRedraw = true;
+  }
+  if (btn2Pressed) {
+    lastDurationInput = millis();
+    int step = (config.activationDuration <= 300) ? 10 : 60;
+    config.activationDuration = min(86400, config.activationDuration + step);
     screenNeedsRedraw = true;
   }
 }

@@ -6,8 +6,9 @@
 - [x] Auto QR refresh before invoice expiry
 - [x] Simulate payment button for testing
 - [x] mDNS autodiscovery for Shelly devices (scan network instead of manual IP)
-- [ ] Splash screen with logo and branding
-- [ ] Color theme and screen brightness adjustments
+- [X] Splash screen with logo and branding
+- [X] Color theme and screen brightness adjustments
+- [ ] Adjust price and duration from device buttons (PIN-protected)
 - [ ] UI polish (paid screen, error screen, info screen)
 - [ ] Web portal mobile-friendly cleanup
 
@@ -16,7 +17,7 @@
 - [ ] UI improvements on screen (price, device name alongside QR)
 - [ ] Bug fixes and code cleanup
 - [ ] Better error messages on screen and web portal
-- [ ] Simplify first-time setup flow
+- [ ] Simplify first-time setup flow for early documentation
 - [ ] WiFi signal strength indicator on screen
 
 ### v0.3 - Blink integration (B2C mode)

@@ -23,22 +23,114 @@
 #include "config.h"
 
 //
-// SPLASH
+// SPLASH - Pixel art neon logo
 //
-
+ 
 void displaySplash(TFT_eSPI &tft) {
-  tft.fillScreen(COLOR_BG);
-  tft.setTextDatum(MC_DATUM);
+  tft.fillScreen(TFT_BLACK);
   
-  tft.setTextColor(COLOR_ACCENT);
-  tft.setTextSize(3);
-  tft.drawString("PlugNSat", SCREEN_W / 2, SCREEN_H / 2 - 30);
-
-  tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(2);
-  tft.drawString("Lightning Smart Plug", SCREEN_W / 2, SCREEN_H / 2 + 8);
+  // Colors
+  uint16_t orange = tft.color565(247, 147, 26);
+  uint16_t cyan   = tft.color565(0, 229, 255);
+  uint16_t yellow = tft.color565(255, 235, 59);
+  uint16_t gray   = tft.color565(136, 136, 136);
+  uint16_t dgray  = tft.color565(85, 85, 85);
+ 
+  // Pixel font (5 wide x 7 tall, each char is 7 bytes, bits = columns left to right)
+  // Encoded as hex: each row is 5 bits packed into a byte (high 5 bits)
+  static const uint8_t font_P[] = {0xF0,0x88,0x88,0xF0,0x80,0x80,0x80};
+  static const uint8_t font_L[] = {0x80,0x80,0x80,0x80,0x80,0x80,0xF8};
+  static const uint8_t font_U[] = {0x88,0x88,0x88,0x88,0x88,0x88,0x70};
+  static const uint8_t font_G[] = {0x70,0x88,0x80,0xB8,0x88,0x88,0x70};
+  static const uint8_t font_S[] = {0x70,0x88,0x80,0x70,0x08,0x88,0x70};
+  static const uint8_t font_A[] = {0x70,0x88,0x88,0xF8,0x88,0x88,0x88};
+  static const uint8_t font_T[] = {0xF8,0x20,0x20,0x20,0x20,0x20,0x20};
+ 
+  // Lightning bolt (7 wide x 14 tall)
+  static const uint8_t bolt[] = {
+    0x1E, // ...1111.
+    0x3C, // ..11110.
+    0x38, // ..111...
+    0x78, // .1111...
+    0x70, // .111....
+    0xFE, // 1111111.
+    0xFE, // 1111111.
+    0x3C, // ..11110.
+    0x38, // ..111...
+    0x70, // .111....
+    0x60, // .11.....
+    0xE0, // 111.....
+    0xC0, // 11......
+    0x80, // 1.......
+  };
+ 
+  int ps = 5;  // pixel size
+  int gap = ps;
+  int charW = 5 * ps + gap;  // 30
+  int bps = ps - 1;  // bolt pixel size = 4
+  int boltW = 7 * bps;  // 28
+  int boltGap = ps * 2;  // 10
+ 
+  // Total width: 4 chars + boltGap + bolt + boltGap + 3 chars - gap
+  int totalW = 4 * charW + boltGap + boltW + boltGap + 3 * charW - gap;
+ 
+  // Total height: logo(35) + gap(30) + sub1(9) + gap(14) + sub2(9) = 97
+  int logoH = 7 * ps;  // 35
+  int gapSub1 = 30;
+  int gapSub2 = 14;
+  int totalH = logoH + gapSub1 + 9 + gapSub2 + 9;
+ 
+  int topY = (SCREEN_H - totalH) / 2;
+  int startX = (SCREEN_W - totalW) / 2;
+ 
+  // Helper lambda to draw a font character
+  auto drawChar = [&](const uint8_t* f, int cx, int cy, uint16_t color) {
+    for (int row = 0; row < 7; row++) {
+      uint8_t bits = f[row];
+      for (int col = 0; col < 5; col++) {
+        if (bits & (0x80 >> col)) {
+          tft.fillRect(cx + col * ps, cy + row * ps, ps, ps, color);
+        }
+      }
+    }
+  };
+ 
+  int x = startX;
+ 
+  // "PLUG" in orange
+  drawChar(font_P, x, topY, orange); x += charW;
+  drawChar(font_L, x, topY, orange); x += charW;
+  drawChar(font_U, x, topY, orange); x += charW;
+  drawChar(font_G, x, topY, orange); x += charW;
+ 
+  // Lightning bolt in yellow
+  x += boltGap - gap;
+  int boltH = 14 * bps;
+  int boltY = topY + (logoH - boltH) / 2;
+  for (int row = 0; row < 14; row++) {
+    uint8_t bits = bolt[row];
+    for (int col = 0; col < 7; col++) {
+      if (bits & (0x80 >> col)) {
+        tft.fillRect(x + col * bps, boltY + row * bps, bps, bps, yellow);
+      }
+    }
+  }
+  x += boltW + boltGap;
+ 
+  // "SAT" in cyan
+  drawChar(font_S, x, topY, cyan); x += charW;
+  drawChar(font_A, x, topY, cyan); x += charW;
+  drawChar(font_T, x, topY, cyan);
+ 
+  // Subtitles
+  tft.setTextDatum(MC_DATUM);
   tft.setTextSize(1);
-  tft.drawString("plugnsat.com", SCREEN_W / 2, SCREEN_H / 2 + 30);
+ 
+  tft.setTextColor(gray);
+  tft.drawString("Lightning Smart Plug", SCREEN_W / 2, topY + logoH + gapSub1 + 4);
+ 
+  tft.setTextColor(dgray);
+  tft.drawString("plugnsat.com", SCREEN_W / 2, topY + logoH + gapSub1 + 4 + gapSub2);
 }
 
 //
@@ -259,10 +351,10 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex) {
   tft.setTextSize(1);
   tft.drawString("Settings", SCREEN_W / 2, 12);
 
-  const char* options[] = {"Device Info", "Brightness"};
-  int count = 2;
-  int startY = 48;
-  int rowH = 36;
+  const char* options[] = {"Device Info", "Brightness", "Price", "Duration"};
+  int count = 4;
+  int startY = 30;
+  int rowH = 32;
 
   for (int i = 0; i < count; i++) {
     int y = startY + i * rowH;
@@ -280,6 +372,97 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex) {
   tft.setTextColor(COLOR_GRAY);
   tft.setTextSize(1);
   tft.drawString("BTN1: move   BTN2: select", SCREEN_W / 2, SCREEN_H - 5);
+}
+
+//
+// PRICE
+//
+
+void displayPrice(TFT_eSPI &tft, int priceSats) {
+  tft.fillScreen(COLOR_BG);
+
+  int mid = SCREEN_W / 2;
+  int lcx = mid / 2;        // 80
+  int rcx = mid + mid / 2;  // 240
+
+  tft.drawFastVLine(mid, 0, SCREEN_H, COLOR_GRAY);
+
+  // Left: price value
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setTextSize(3);
+  tft.drawString(String(priceSats), lcx, SCREEN_H / 2 - 12);
+  tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(2);
+  tft.drawString("sats", lcx, SCREEN_H / 2 + 18);
+
+  // Right: controls
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(2);
+  tft.drawString("-", rcx, 10);
+  tft.setTextSize(1);
+  tft.setTextColor(COLOR_GRAY);
+  tft.drawString("BTN1", rcx, 30);
+
+  tft.setTextDatum(BC_DATUM);
+  tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(1);
+  tft.drawString("BTN2", rcx, SCREEN_H - 28);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(2);
+  tft.drawString("+", rcx, SCREEN_H - 8);
+}
+
+//
+// DURATION
+//
+
+void displayDuration(TFT_eSPI &tft, int durationSeconds) {
+  tft.fillScreen(COLOR_BG);
+
+  int mid = SCREEN_W / 2;
+  int lcx = mid / 2;
+  int rcx = mid + mid / 2;
+
+  tft.drawFastVLine(mid, 0, SCREEN_H, COLOR_GRAY);
+
+  // Left: duration value
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setTextSize(3);
+  tft.drawString(String(durationSeconds) + "s", lcx, SCREEN_H / 2 - 14);
+
+  // Conversion below
+  tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(1);
+  if (durationSeconds >= 3600) {
+    int h = durationSeconds / 3600;
+    int m = (durationSeconds % 3600) / 60;
+    String conv = String(h) + "h";
+    if (m > 0) conv += " " + String(m) + "min";
+    tft.drawString(conv, lcx, SCREEN_H / 2 + 12);
+  } else if (durationSeconds >= 60) {
+    int m = durationSeconds / 60;
+    tft.drawString(String(m) + " min", lcx, SCREEN_H / 2 + 12);
+  }
+
+  // Right: controls
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(2);
+  tft.drawString("-", rcx, 10);
+  tft.setTextSize(1);
+  tft.setTextColor(COLOR_GRAY);
+  tft.drawString("BTN1", rcx, 30);
+
+  tft.setTextDatum(BC_DATUM);
+  tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(1);
+  tft.drawString("BTN2", rcx, SCREEN_H - 28);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(2);
+  tft.drawString("+", rcx, SCREEN_H - 8);
 }
 
 //
