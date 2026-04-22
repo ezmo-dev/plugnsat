@@ -32,12 +32,13 @@ void displaySplash(TFT_eSPI &tft) {
   
   tft.setTextColor(COLOR_ACCENT);
   tft.setTextSize(3);
-  tft.drawString("PlugNSat", SCREEN_W / 2, SCREEN_H / 2 - 20);
-  
+  tft.drawString("PlugNSat", SCREEN_W / 2, SCREEN_H / 2 - 30);
+
   tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(2);
+  tft.drawString("Lightning Smart Plug", SCREEN_W / 2, SCREEN_H / 2 + 8);
   tft.setTextSize(1);
-  tft.drawString("Lightning Smart Plug v0.1.0", SCREEN_W / 2, SCREEN_H / 2 + 15);
-  tft.drawString("plugnsat.com", SCREEN_W / 2, SCREEN_H / 2 + 35);
+  tft.drawString("plugnsat.com", SCREEN_W / 2, SCREEN_H / 2 + 30);
 }
 
 //
@@ -48,10 +49,10 @@ void displayConnecting(TFT_eSPI &tft, String ssid) {
   tft.fillScreen(COLOR_BG);
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(1);
-  tft.drawString("Connecting to WiFi...", SCREEN_W / 2, SCREEN_H / 2 - 15);
+  tft.setTextSize(2);
+  tft.drawString("Connecting to WiFi...", SCREEN_W / 2, SCREEN_H / 2 - 12);
   tft.setTextColor(COLOR_ACCENT);
-  tft.drawString(ssid, SCREEN_W / 2, SCREEN_H / 2 + 5);
+  tft.drawString(ssid, SCREEN_W / 2, SCREEN_H / 2 + 12);
 }
 
 //
@@ -62,11 +63,11 @@ void displayStatus(TFT_eSPI &tft, String line1, String line2) {
   tft.fillScreen(COLOR_BG);
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(1);
-  tft.drawString(line1, SCREEN_W / 2, SCREEN_H / 2 - 10);
+  tft.setTextSize(2);
+  tft.drawString(line1, SCREEN_W / 2, SCREEN_H / 2 - 12);
   if (line2.length() > 0) {
     tft.setTextColor(COLOR_ACCENT);
-    tft.drawString(line2, SCREEN_W / 2, SCREEN_H / 2 + 10);
+    tft.drawString(line2, SCREEN_W / 2, SCREEN_H / 2 + 12);
   }
 }
 
@@ -78,7 +79,7 @@ void displayGenerating(TFT_eSPI &tft) {
   tft.fillScreen(COLOR_BG);
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(1);
+  tft.setTextSize(2);
   tft.drawString("Generating invoice...", SCREEN_W / 2, SCREEN_H / 2);
 }
 
@@ -375,25 +376,21 @@ void displayAPMode(TFT_eSPI &tft, String apIp) {
   tft.fillScreen(COLOR_BG);
   tft.setTextDatum(MC_DATUM);
   
-  tft.setTextColor(COLOR_ACCENT);
   tft.setTextSize(2);
-  tft.drawString("PlugNSat Setup", SCREEN_W / 2, 20);
-  
+
+  int y = 20;
   tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(1);
-  
-  int y = 55;
-  tft.drawString("1. Connect to WiFi:", SCREEN_W / 2, y); y += 18;
+  tft.drawString("1. Connect to WiFi:", SCREEN_W / 2, y); y += 28;
   tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("PlugNSat-Setup", SCREEN_W / 2, y); y += 22;
-  
+  tft.drawString("PlugNSat-Setup", SCREEN_W / 2, y); y += 28;
+
   tft.setTextColor(COLOR_TEXT);
-  tft.drawString("2. Password:", SCREEN_W / 2, y); y += 18;
+  tft.drawString("2. Password:", SCREEN_W / 2, y); y += 28;
   tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("plugnsat21", SCREEN_W / 2, y); y += 22;
-  
+  tft.drawString("plugnsat21", SCREEN_W / 2, y); y += 28;
+
   tft.setTextColor(COLOR_TEXT);
-  tft.drawString("3. Open in browser:", SCREEN_W / 2, y); y += 18;
+  tft.drawString("3. Open in browser:", SCREEN_W / 2, y); y += 28;
   tft.setTextColor(COLOR_ACCENT);
   tft.drawString("http://" + apIp, SCREEN_W / 2, y);
 }
