@@ -22,7 +22,7 @@
  *   6. QR auto-refreshes every 4m45s (before 5min expiry)
  *
  * BUTTONS (T-Display S3 built-in):
- *   - Button 1 (GPIO 0):  Info screen / Long press = AP mode
+ *   - Button 1 (GPIO 0):  Settings menu / Long press = AP mode
  *   - Button 2 (GPIO 14): Force refresh QR / Confirm
  * 
  * License: MIT © 2026
@@ -58,9 +58,6 @@ WebServer server(80);
 
 bool btn1Pressed = false;
 bool btn2Pressed = false;
-unsigned long btn1LastPress = 0;
-unsigned long btn2LastPress = 0;
-#define DEBOUNCE_MS 300
 
 // State machine
 enum AppState {
@@ -311,7 +308,6 @@ void loopQRDisplay() {
 }
 
 void generateAndShowQR() {
-  // Brief loading (don't flash screen if just refreshing)
   displayGenerating(tft);
   
   String invoiceId, bolt11;
@@ -502,6 +498,9 @@ void startAPMode() {
 }
 
 //
+// BUTTONS
+//
+
 void readButtons() {
   btn1Pressed = false;
   btn2Pressed = false;

@@ -87,7 +87,6 @@ void displayGenerating(TFT_eSPI &tft) {
 //
 
 void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
-  ledcWrite(38, 40);
   tft.fillScreen(TFT_BLACK);
   
   // Uppercase for alphanumeric QR encoding (smaller QR)
