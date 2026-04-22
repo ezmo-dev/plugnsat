@@ -174,7 +174,7 @@ void loop() {
       break;
   }
   
-  delay(50);
+  delay(10);
 }
 
 //

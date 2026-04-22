@@ -229,7 +229,7 @@ String btcpayCheckInvoice(
   if (!http.begin(client, url)) return "ERROR";
   
   http.addHeader("Authorization", "token " + apiKey);
-  http.setTimeout(5000);
+  http.setTimeout(3000);   // was 5000
   
   int code = http.GET();
   if (code != 200) { http.end(); return "ERROR"; }
