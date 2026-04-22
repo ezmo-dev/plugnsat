@@ -372,27 +372,36 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
 // AP MODE
 //
 
-void displayAPMode(TFT_eSPI &tft, String apIp) {
+void displayAPMode(TFT_eSPI &tft, String apIp, bool hasWifi) {
   tft.fillScreen(COLOR_BG);
   tft.setTextDatum(MC_DATUM);
-  
   tft.setTextSize(2);
 
-  int y = 20;
+  int y = 14;
   tft.setTextColor(COLOR_TEXT);
-  tft.drawString("1. Connect to WiFi:", SCREEN_W / 2, y); y += 28;
+  tft.drawString("1. Connect to WiFi:", SCREEN_W / 2, y); y += 26;
   tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("PlugNSat-Setup", SCREEN_W / 2, y); y += 28;
+  tft.drawString("PlugNSat-Setup", SCREEN_W / 2, y); y += 26;
 
   tft.setTextColor(COLOR_TEXT);
-  tft.drawString("2. Password:", SCREEN_W / 2, y); y += 28;
+  tft.drawString("2. Password:", SCREEN_W / 2, y); y += 26;
   tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("plugnsat21", SCREEN_W / 2, y); y += 28;
+  tft.drawString("plugnsat21", SCREEN_W / 2, y); y += 26;
 
   tft.setTextColor(COLOR_TEXT);
-  tft.drawString("3. Open in browser:", SCREEN_W / 2, y); y += 28;
+  tft.drawString("3. Open in browser:", SCREEN_W / 2, y); y += 26;
   tft.setTextColor(COLOR_ACCENT);
   tft.drawString("http://" + apIp, SCREEN_W / 2, y);
+
+  tft.setTextDatum(BC_DATUM);
+  tft.setTextSize(1);
+  if (hasWifi) {
+    tft.setTextColor(COLOR_ACCENT);
+    tft.drawString("Press any button to reconnect", SCREEN_W / 2, SCREEN_H - 2);
+  } else {
+    tft.setTextColor(COLOR_GRAY);
+    tft.drawString("Follow the 3 steps above to connect", SCREEN_W / 2, SCREEN_H - 2);
+  }
 }
 
 #endif

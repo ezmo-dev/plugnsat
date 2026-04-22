@@ -90,6 +90,9 @@ int settingsIndex = 0;
 unsigned long lastSettingsInput = 0;
 unsigned long lastBrightnessInput = 0;
 
+// AP mode
+unsigned long apModeStartTime = 0;
+
 // WiFi monitoring
 unsigned long lastWifiCheck = 0;
 
@@ -140,10 +143,7 @@ void loop() {
 
   switch (currentState) {
     case STATE_AP_SETUP:
-      if (screenNeedsRedraw) {
-        displayAPMode(tft, WiFi.softAPIP().toString());
-        screenNeedsRedraw = false;
-      }
+      loopAPSetup();
       break;
 
     case STATE_QR_DISPLAY:
@@ -493,8 +493,27 @@ void startAPMode() {
   
   currentState = STATE_AP_SETUP;
   screenNeedsRedraw = true;
-  
+  apModeStartTime = millis();
+
   Serial.println("AP: PlugNSat-Setup / plugnsat21 / http://" + WiFi.softAPIP().toString());
+}
+
+//
+// AP SETUP
+//
+
+void loopAPSetup() {
+  bool hasWifi = (config.wifiSsid.length() > 0);
+  if (screenNeedsRedraw) {
+    displayAPMode(tft, WiFi.softAPIP().toString(), hasWifi);
+    screenNeedsRedraw = false;
+  }
+  if ((btn1Pressed || btn2Pressed) && millis() - apModeStartTime > 3000) {
+    if (hasWifi) {
+      WiFi.softAPdisconnect(true);
+      connectToWiFi();
+    }
+  }
 }
 
 //
