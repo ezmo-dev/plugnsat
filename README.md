@@ -1,5 +1,6 @@
 # PlugNSat Firmware v0.1.0
 
+![cover](./assets/plugnsat-banner.png)
 An open-source Lightning Smart Plug Controller. Turn any device into a Bitcoin-powered machine!
 
 PlugNSat is an ESP32-based controller that displays a Lightning invoice QR code on screen.
