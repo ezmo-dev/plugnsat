@@ -23,21 +23,20 @@
 #include "config.h"
 
 //
-// SPLASH - Pixel art neon logo
+// SPLASH - Pixel art neon logo (matches new banner)
 //
  
 void displaySplash(TFT_eSPI &tft) {
   tft.fillScreen(TFT_BLACK);
-  
+ 
   // Colors
   uint16_t orange = tft.color565(247, 147, 26);
   uint16_t cyan   = tft.color565(0, 229, 255);
-  uint16_t yellow = tft.color565(255, 235, 59);
-  uint16_t gray   = tft.color565(136, 136, 136);
-  uint16_t dgray  = tft.color565(85, 85, 85);
+  uint16_t yellow = tft.color565(255, 215, 0);     // bolt + gold accents
+  uint16_t lgray  = tft.color565(200, 200, 210);    // "Lightning Smart Plug" (bright gray)
+  uint16_t gold   = tft.color565(255, 215, 0);      // "plugnsat.com" + pill badge
  
-  // Pixel font (5 wide x 7 tall, each char is 7 bytes, bits = columns left to right)
-  // Encoded as hex: each row is 5 bits packed into a byte (high 5 bits)
+  // Pixel font (5 wide x 7 tall)
   static const uint8_t font_P[] = {0xF0,0x88,0x88,0xF0,0x80,0x80,0x80};
   static const uint8_t font_L[] = {0x80,0x80,0x80,0x80,0x80,0x80,0xF8};
   static const uint8_t font_U[] = {0x88,0x88,0x88,0x88,0x88,0x88,0x70};
@@ -46,70 +45,66 @@ void displaySplash(TFT_eSPI &tft) {
   static const uint8_t font_A[] = {0x70,0x88,0x88,0xF8,0x88,0x88,0x88};
   static const uint8_t font_T[] = {0xF8,0x20,0x20,0x20,0x20,0x20,0x20};
  
-  // Lightning bolt (7 wide x 14 tall)
+  // Lightning bolt (5 wide x 10 tall, matches banner)
   static const uint8_t bolt[] = {
-    0x1E, // ...1111.
-    0x3C, // ..11110.
-    0x38, // ..111...
-    0x78, // .1111...
-    0x70, // .111....
-    0xFE, // 1111111.
-    0xFE, // 1111111.
-    0x3C, // ..11110.
-    0x38, // ..111...
-    0x70, // .111....
-    0x60, // .11.....
-    0xE0, // 111.....
-    0xC0, // 11......
-    0x80, // 1.......
+    0x38,  // ..XXX
+    0x70,  // .XXX.
+    0x70,  // .XXX.
+    0x60,  // .XX..
+    0xF8,  // XXXXX
+    0x70,  // .XXX.
+    0x60,  // .XX..
+    0x40,  // .X...
+    0xC0,  // XX...
+    0x80,  // X....
   };
  
-  int ps = 5;  // pixel size
+  int ps = 5;   // letter pixel size
   int gap = ps;
   int charW = 5 * ps + gap;  // 30
-  int bps = ps - 1;  // bolt pixel size = 4
-  int boltW = 7 * bps;  // 28
+  int bps = 5;  // bolt pixel size (solid, no gaps)
+  int boltCols = 5;
+  int boltRows = 10;
+  int boltW = boltCols * bps;  // 25
   int boltGap = ps * 2;  // 10
  
-  // Total width: 4 chars + boltGap + bolt + boltGap + 3 chars - gap
   int totalW = 4 * charW + boltGap + boltW + boltGap + 3 * charW - gap;
- 
-  // Total height: logo(35) + gap(30) + sub1(9) + gap(14) + sub2(9) = 97
   int logoH = 7 * ps;  // 35
-  int gapSub1 = 30;
-  int gapSub2 = 14;
-  int totalH = logoH + gapSub1 + 9 + gapSub2 + 9;
+  int boltH = boltRows * bps;  // 50
+  int visibleH = (logoH > boltH) ? logoH : boltH;
  
-  int topY = (SCREEN_H - totalH) / 2;
+  // Layout: logo, then subtitle block below
+  // Screen is 320x170
+  int topY = 10;  // logo near top, leave room for bottom elements
   int startX = (SCREEN_W - totalW) / 2;
  
-  // Helper lambda to draw a font character
+  // Helper: draw a 5x7 font character (with 1px gap between pixels)
   auto drawChar = [&](const uint8_t* f, int cx, int cy, uint16_t color) {
     for (int row = 0; row < 7; row++) {
       uint8_t bits = f[row];
       for (int col = 0; col < 5; col++) {
         if (bits & (0x80 >> col)) {
-          tft.fillRect(cx + col * ps, cy + row * ps, ps, ps, color);
+          tft.fillRect(cx + col * ps, cy + row * ps, ps - 1, ps - 1, color);
         }
       }
     }
   };
  
   int x = startX;
+  int letterY = topY + (visibleH - logoH) / 2;
  
   // "PLUG" in orange
-  drawChar(font_P, x, topY, orange); x += charW;
-  drawChar(font_L, x, topY, orange); x += charW;
-  drawChar(font_U, x, topY, orange); x += charW;
-  drawChar(font_G, x, topY, orange); x += charW;
+  drawChar(font_P, x, letterY, orange); x += charW;
+  drawChar(font_L, x, letterY, orange); x += charW;
+  drawChar(font_U, x, letterY, orange); x += charW;
+  drawChar(font_G, x, letterY, orange); x += charW;
  
-  // Lightning bolt in yellow
+  // Lightning bolt in yellow (solid blocks)
   x += boltGap - gap;
-  int boltH = 14 * bps;
-  int boltY = topY + (logoH - boltH) / 2;
-  for (int row = 0; row < 14; row++) {
+  int boltY = topY + (visibleH - boltH) / 2;
+  for (int row = 0; row < boltRows; row++) {
     uint8_t bits = bolt[row];
-    for (int col = 0; col < 7; col++) {
+    for (int col = 0; col < boltCols; col++) {
       if (bits & (0x80 >> col)) {
         tft.fillRect(x + col * bps, boltY + row * bps, bps, bps, yellow);
       }
@@ -118,19 +113,40 @@ void displaySplash(TFT_eSPI &tft) {
   x += boltW + boltGap;
  
   // "SAT" in cyan
-  drawChar(font_S, x, topY, cyan); x += charW;
-  drawChar(font_A, x, topY, cyan); x += charW;
-  drawChar(font_T, x, topY, cyan);
+  drawChar(font_S, x, letterY, cyan); x += charW;
+  drawChar(font_A, x, letterY, cyan); x += charW;
+  drawChar(font_T, x, letterY, cyan);
  
-  // Subtitles
+  // === Bottom text block ===
+  int cx = SCREEN_W / 2;
+ 
+  // 1. "Lightning Smart Plug" - light gray, textSize 2 (bold/bigger)
   tft.setTextDatum(MC_DATUM);
+  tft.setTextSize(2);
+  tft.setTextColor(lgray);
+  int line1Y = topY + visibleH + 16;
+  tft.drawString("Lightning Smart Plug", cx, line1Y);
+ 
+  // 2. "plugnsat.com" - gold (same as bolt)
   tft.setTextSize(1);
+  tft.setTextColor(gold);
+  int line2Y = line1Y + 22;
+  tft.drawString("plugnsat.com", cx, line2Y);
  
-  tft.setTextColor(gray);
-  tft.drawString("Lightning Smart Plug", SCREEN_W / 2, topY + logoH + gapSub1 + 4);
+  // 3. "v0.1.0" pill badge - gold outline + gold text
+  int pillY = line2Y + 18;
+  tft.setTextColor(gold);
+  String ver = "v0.1.0";
+  int verW = tft.textWidth(ver);
+  int pillPadX = 8;
+  int pillPadY = 3;
+  int pillW = verW + pillPadX * 2;
+  int pillH = 11 + pillPadY * 2;
+  int pillX = cx - pillW / 2;
+  int pillYtop = pillY - pillH / 2;
  
-  tft.setTextColor(dgray);
-  tft.drawString("plugnsat.com", SCREEN_W / 2, topY + logoH + gapSub1 + 4 + gapSub2);
+  tft.drawRoundRect(pillX, pillYtop, pillW, pillH, pillH / 2, gold);
+  tft.drawString(ver, cx, pillY);
 }
 
 //
