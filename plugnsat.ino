@@ -70,7 +70,8 @@ enum AppState {
   STATE_SETTINGS,
   STATE_BRIGHTNESS,
   STATE_PRICE,
-  STATE_DURATION
+  STATE_DURATION,
+  STATE_PIN_ENTRY
 };
 AppState currentState = STATE_CONNECTING;
 
@@ -93,6 +94,14 @@ unsigned long lastSettingsInput = 0;
 unsigned long lastBrightnessInput = 0;
 unsigned long lastPriceInput = 0;
 unsigned long lastDurationInput = 0;
+
+// PIN entry
+int pinEntry[4] = {0, 0, 0, 0};
+int pinDigitIndex = 0;
+AppState pinTargetState = STATE_PRICE;
+unsigned long lastPinInput = 0;
+bool pinWrong = false;
+unsigned long pinWrongTime = 0;
 
 // AP mode
 unsigned long apModeStartTime = 0;
@@ -180,6 +189,10 @@ void loop() {
 
     case STATE_DURATION:
       loopDuration();
+      break;
+
+    case STATE_PIN_ENTRY:
+      loopPinEntry();
       break;
 
     default:
@@ -453,12 +466,30 @@ void loopSettings() {
       currentState = STATE_BRIGHTNESS;
       screenNeedsRedraw = true;
     } else if (settingsIndex == 2) {
-      lastPriceInput = millis();
-      currentState = STATE_PRICE;
+      if (config.pin.length() == 4) {
+        pinDigitIndex = 0;
+        for (int i = 0; i < 4; i++) pinEntry[i] = 0;
+        pinWrong = false;
+        pinTargetState = STATE_PRICE;
+        lastPinInput = millis();
+        currentState = STATE_PIN_ENTRY;
+      } else {
+        lastPriceInput = millis();
+        currentState = STATE_PRICE;
+      }
       screenNeedsRedraw = true;
     } else {
-      lastDurationInput = millis();
-      currentState = STATE_DURATION;
+      if (config.pin.length() == 4) {
+        pinDigitIndex = 0;
+        for (int i = 0; i < 4; i++) pinEntry[i] = 0;
+        pinWrong = false;
+        pinTargetState = STATE_DURATION;
+        lastPinInput = millis();
+        currentState = STATE_PIN_ENTRY;
+      } else {
+        lastDurationInput = millis();
+        currentState = STATE_DURATION;
+      }
       screenNeedsRedraw = true;
     }
   }
@@ -565,6 +596,59 @@ void loopDuration() {
 }
 
 //
+// PIN ENTRY
+//
+
+void loopPinEntry() {
+  // 15s timeout -> back to settings
+  if (millis() - lastPinInput > 15000) {
+    currentState = STATE_SETTINGS;
+    screenNeedsRedraw = true;
+    return;
+  }
+  // Clear wrong PIN message after 1.5s and reset
+  if (pinWrong && millis() - pinWrongTime > 1500) {
+    pinWrong = false;
+    pinDigitIndex = 0;
+    for (int i = 0; i < 4; i++) pinEntry[i] = 0;
+    screenNeedsRedraw = true;
+  }
+  if (screenNeedsRedraw) {
+    displayPinEntry(tft, pinEntry, pinDigitIndex, pinWrong);
+    screenNeedsRedraw = false;
+  }
+  if (btn1Pressed && !pinWrong) {
+    lastPinInput = millis();
+    pinEntry[pinDigitIndex] = (pinEntry[pinDigitIndex] + 1) % 10;
+    screenNeedsRedraw = true;
+  }
+  if (btn2Pressed && !pinWrong) {
+    lastPinInput = millis();
+    if (pinDigitIndex < 3) {
+      pinDigitIndex++;
+      screenNeedsRedraw = true;
+    } else {
+      String entered = "";
+      for (int i = 0; i < 4; i++) entered += String(pinEntry[i]);
+      if (entered == config.pin) {
+        if (pinTargetState == STATE_PRICE) {
+          lastPriceInput = millis();
+          currentState = STATE_PRICE;
+        } else {
+          lastDurationInput = millis();
+          currentState = STATE_DURATION;
+        }
+        screenNeedsRedraw = true;
+      } else {
+        pinWrong = true;
+        pinWrongTime = millis();
+        screenNeedsRedraw = true;
+      }
+    }
+  }
+}
+
+//
 // AP MODE
 //
 
@@ -667,6 +751,7 @@ void loadConfig() {
   config.activationDuration = prefs.getInt("duration", 60);
   config.deviceName         = prefs.getString("dev_name", "PlugNSat");
   config.brightness         = prefs.getInt("brightness", 40);
+  config.pin                = prefs.getString("settings_pin", "");
   prefs.end();
 }
 
@@ -682,5 +767,6 @@ void saveConfig() {
   prefs.putInt("duration",        config.activationDuration);
   prefs.putString("dev_name",     config.deviceName);
   prefs.putInt("brightness",      config.brightness);
+  prefs.putString("settings_pin", config.pin);
   prefs.end();
 }

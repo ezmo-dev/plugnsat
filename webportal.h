@@ -98,6 +98,9 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <input type="number" name="duration" value="%DURATION%" min="1" max="86400">
       <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
       <div id="tpst"></div>
+      <label>Settings PIN (4 digits)</label>
+      <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Leave empty to disable">
+      <div class="hint">Protects Price and Duration settings on the device</div>
     </div>
     
     <button type="submit">Save and restart</button>
@@ -168,6 +171,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%PRICE_SATS%",  String(config.priceSats));
   html.replace("%DURATION%",    String(config.activationDuration));
   html.replace("%DEV_NAME%",    config.deviceName);
+  html.replace("%SETTINGS_PIN%", config.pin);
   return html;
 }
 
@@ -187,7 +191,15 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.priceSats          = server.arg("price_sats").toInt();
     config.activationDuration = server.arg("duration").toInt();
     config.deviceName         = server.arg("dev_name");
-    
+    String newPin             = server.arg("settings_pin");
+    if (newPin.length() == 0) {
+      config.pin = "";
+    } else if (newPin.length() == 4) {
+      bool allDigits = true;
+      for (int i = 0; i < 4; i++) { if (!isDigit(newPin[i])) { allDigits = false; break; } }
+      if (allDigits) config.pin = newPin;
+    }
+
     if (config.priceSats < 1) config.priceSats = 100;
     if (config.activationDuration < 1) config.activationDuration = 60;
     if (config.deviceName.length() == 0) config.deviceName = "PlugNSat";

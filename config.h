@@ -46,6 +46,7 @@ struct PlugNSatConfig {
   int activationDuration;  // Seconds relay stays ON after payment
   String deviceName;       // Shown on screen
   int brightness;          // Screen brightness (10-255)
+  String pin;              // 4-digit PIN to protect Price/Duration (empty = disabled)
 };
 
 #endif

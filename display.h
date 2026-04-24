@@ -568,6 +568,64 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
 }
 
 //
+// PIN ENTRY
+//
+
+void displayPinEntry(TFT_eSPI &tft, int digits[], int digitIndex, bool wrongPin) {
+  tft.fillScreen(COLOR_BG);
+
+  tft.setTextDatum(TC_DATUM);
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setTextSize(1);
+  tft.drawString("Enter PIN", SCREEN_W / 2, 10);
+
+  int boxW = 44;
+  int boxH = 52;
+  int boxGap = 10;
+  int totalW = 4 * boxW + 3 * boxGap;  // 206
+  int startX = (SCREEN_W - totalW) / 2; // 57
+  int boxY = 38;
+
+  for (int i = 0; i < 4; i++) {
+    int bx = startX + i * (boxW + boxGap);
+    uint16_t borderColor;
+    if (i == digitIndex)      borderColor = COLOR_ACCENT;
+    else if (i < digitIndex)  borderColor = COLOR_GRAY;
+    else                      borderColor = 0x2104;
+
+    tft.drawRoundRect(bx, boxY, boxW, boxH, 6, borderColor);
+    if (i == digitIndex) {
+      tft.fillRoundRect(bx + 1, boxY + 1, boxW - 2, boxH - 2, 5, 0x0820);
+    }
+
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextSize(3);
+    if (i < digitIndex) {
+      tft.setTextColor(COLOR_TEXT);
+      tft.drawString("*", bx + boxW / 2, boxY + boxH / 2);
+    } else if (i == digitIndex) {
+      tft.setTextColor(COLOR_ACCENT);
+      tft.drawString(String(digits[i]), bx + boxW / 2, boxY + boxH / 2);
+    } else {
+      tft.setTextColor(0x2104);
+      tft.drawString("-", bx + boxW / 2, boxY + boxH / 2);
+    }
+  }
+
+  if (wrongPin) {
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(COLOR_ERROR);
+    tft.setTextSize(1);
+    tft.drawString("Wrong PIN", SCREEN_W / 2, 110);
+  }
+
+  tft.setTextDatum(BC_DATUM);
+  tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(1);
+  tft.drawString("BTN1: change   BTN2: confirm", SCREEN_W / 2, SCREEN_H - 5);
+}
+
+//
 // AP MODE
 //
 
