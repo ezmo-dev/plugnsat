@@ -73,9 +73,9 @@ void displaySplash(TFT_eSPI &tft) {
   int boltH = boltRows * bps;  // 50
   int visibleH = (logoH > boltH) ? logoH : boltH;
  
-  // Layout: logo, then subtitle block below
-  // Screen is 320x170
-  int topY = 10;  // logo near top, leave room for bottom elements
+  // Layout vertically centered: block = logo(50) + gaps + line1(16) + line2(8) + pill(17) = 124px
+  // topY = (170 - 124) / 2 = 23
+  int topY = 23;
   int startX = (SCREEN_W - totalW) / 2;
  
   // Helper: draw a 5x7 font character (with 1px gap between pixels)
@@ -134,7 +134,7 @@ void displaySplash(TFT_eSPI &tft) {
   tft.drawString("plugnsat.com", cx, line2Y);
  
   // 3. "v0.1.0" pill badge - gold outline + gold text
-  int pillY = line2Y + 18;
+  int pillY = line2Y + 27;
   tft.setTextColor(gold);
   String ver = "v0.1.0";
   int verW = tft.textWidth(ver);
