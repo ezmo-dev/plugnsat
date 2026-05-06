@@ -359,7 +359,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
 // SETTINGS MENU
 //
 
-void displaySettings(TFT_eSPI &tft, int selectedIndex) {
+void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
   tft.fillScreen(COLOR_BG);
 
   tft.setTextDatum(TC_DATUM);
@@ -372,16 +372,34 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex) {
   int startY = 30;
   int rowH = 32;
 
+  // Padlock icon: 10w x 11h total (4px shackle + 7px body)
+  auto drawLock = [&](int lx, int ly, bool locked, uint16_t col) {
+    tft.fillRect(lx, ly + 4, 10, 7, col);         // body
+    tft.fillRect(lx + 2, ly, 6, 2, col);           // arch top bar
+    tft.fillRect(lx + 6, ly, 2, 5, col);           // right leg (always)
+    if (locked) {
+      tft.fillRect(lx + 2, ly, 2, 5, col);         // left leg (closed only)
+    }
+  };
+
   for (int i = 0; i < count; i++) {
     int y = startY + i * rowH;
+    uint16_t textColor;
     if (i == selectedIndex) {
       tft.fillRoundRect(30, y - 2, SCREEN_W - 60, 24, 5, COLOR_ACCENT);
-      tft.setTextColor(COLOR_BG);
+      textColor = COLOR_BG;
     } else {
-      tft.setTextColor(COLOR_TEXT);
+      textColor = COLOR_TEXT;
     }
     tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(textColor);
+    tft.setTextSize(1);
     tft.drawString(options[i], SCREEN_W / 2, y + 10);
+
+    if (i == 2 || i == 3) {
+      uint16_t lockColor = (i == selectedIndex) ? COLOR_BG : (pinActive ? COLOR_ACCENT : COLOR_GRAY);
+      drawLock(37, y + 4, pinActive, lockColor);
+    }
   }
 
   tft.setTextDatum(BC_DATUM);
@@ -560,7 +578,7 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
 
   // "+" at bottom (BTN2 = increase)
   tft.setTextColor(COLOR_GRAY);
-  tft.drawString("BTN2", cx, SCREEN_H - 28);
+  tft.drawString("BTN2", cx, SCREEN_H - 38);
   tft.setTextColor(COLOR_TEXT);
   tft.setTextSize(2);
   tft.setTextDatum(BC_DATUM);

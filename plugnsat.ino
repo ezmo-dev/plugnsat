@@ -448,7 +448,7 @@ void loopSettings() {
     return;
   }
   if (screenNeedsRedraw) {
-    displaySettings(tft, settingsIndex);
+    displaySettings(tft, settingsIndex, config.pin.length() == 4);
     screenNeedsRedraw = false;
   }
   if (btn1Pressed) {
