@@ -357,30 +357,94 @@ void displayWiFiFailed(TFT_eSPI &tft, String ssid) {
 
 void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.fillScreen(COLOR_BG);
-  tft.setTextDatum(TL_DATUM);
   tft.setTextSize(1);
-  
-  int y = 8;
-  int lh = 17;
-  
-  tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("PlugNSat Info", 10, y); y += lh + 4;
-  
-  tft.setTextColor(COLOR_TEXT);
-  tft.drawString("WiFi: " + WiFi.SSID(), 10, y); y += lh;
-  tft.drawString("IP: " + WiFi.localIP().toString(), 10, y); y += lh;
-  tft.drawString("RSSI: " + String(WiFi.RSSI()) + " dBm", 10, y); y += lh;
-  tft.drawString("Shelly: " + config.shellyHost, 10, y); y += lh;
-  tft.drawString("Price: " + String(config.priceSats) + " sats / " 
-                 + String(config.activationDuration) + "s", 10, y); y += lh;
-  tft.drawString("Payments this session: " + String(payments), 10, y); y += lh;
-  tft.drawString("Uptime: " + String(millis() / 60000) + " min", 10, y); y += lh;
-  
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("Config: http://" + WiFi.localIP().toString(), 10, y);
-  
+
+  uint16_t colOrange = tft.color565(247, 147, 26);
+  uint16_t colYellow = tft.color565(255, 215, 0);
+  uint16_t colCyan   = tft.color565(0, 229, 255);
+
+  // Header: "Plug" orange | "N" yellow | "sat" cyan — size 2 = 12px/char
+  tft.setTextDatum(TL_DATUM); tft.setTextSize(2);
+  tft.setTextColor(colOrange); tft.drawString("Plug", 10, 6);
+  tft.setTextColor(colYellow); tft.drawString("N",    58, 6); // 10 + 4*12
+  tft.setTextColor(colCyan);   tft.drawString("sat",  70, 6); // 58 + 1*12
+
+  // Version top-right in yellow, size 1 (small contrast with title)
+  tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
+  tft.setTextColor(colYellow);
+  tft.drawString("v0.1.0", SCREEN_W - 8, 12);
+
+  // Separator "─── Network ──────────────────"  (y=38, more room below header)
+  tft.drawFastHLine(8, 34, SCREEN_W - 16, colYellow);
+  tft.fillRect(15, 29, 56, 10, COLOR_BG);
+  tft.setTextDatum(TL_DATUM); tft.setTextColor(colYellow); tft.setTextSize(1);
+  tft.drawString("Network", 17, 30);
+
+  // Layout constants
+  int lx = 10;   // label col
+  int vx = 80;   // value col
+  int lh = 13;   // line height
+  int y  = 50;
+
+  // --- Block 1: Connection ---
+  tft.setTextDatum(TL_DATUM);
+
+  // WiFi + RSSI badge
+  tft.setTextColor(COLOR_GRAY);  tft.drawString("WiFi", lx, y);
+  String ssid = WiFi.SSID();
+  if (ssid.length() > 16) ssid = ssid.substring(0, 15) + "~";
+  tft.setTextColor(COLOR_TEXT);  tft.drawString(ssid, vx, y);
+  int rssi = WiFi.RSSI();
+  uint16_t rssiCol = (rssi > -50) ? COLOR_SUCCESS
+                   : (rssi > -70) ? tft.color565(255, 165, 0)
+                                  : COLOR_ERROR;
+  tft.setTextDatum(TR_DATUM);
+  tft.setTextColor(rssiCol);
+  tft.drawString(String(rssi) + "dBm", SCREEN_W - 8, y);
+  y += lh;
+
+  tft.setTextDatum(TL_DATUM);
+  tft.setTextColor(COLOR_GRAY);  tft.drawString("IP", lx, y);
+  tft.setTextColor(COLOR_TEXT);  tft.drawString(WiFi.localIP().toString(), vx, y);
+  y += lh;
+
+  tft.setTextColor(COLOR_GRAY);  tft.drawString("Shelly", lx, y);
+  tft.setTextColor(COLOR_TEXT);  tft.drawString(config.shellyHost, vx, y);
+  y += lh;
+
+  // Separator "─── Session ──────────────────"  (y+10, extra breathing room)
+  tft.drawFastHLine(8, y + 10, SCREEN_W - 16, colYellow);
+  tft.fillRect(15, y + 5, 56, 10, COLOR_BG);
+  tft.setTextDatum(TL_DATUM); tft.setTextColor(colYellow); tft.setTextSize(1);
+  tft.drawString("Session", 17, y + 6);
+
+  // --- Block 2: Metrics — 4 columns on one row ---
+  // Label y=120 (size 1 gray), value y=138 (size 2 white) — shifted down for breathing room
+  tft.setTextDatum(MC_DATUM);
+
+  tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
+  tft.drawString("sats", 40, 120);
+  tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
+  tft.drawString(String(config.priceSats), 40, 138);
+
+  tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
+  tft.drawString("sec", 120, 120);
+  tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
+  tft.drawString(String(config.activationDuration), 120, 138);
+
+  tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
+  tft.drawString("payments", 200, 120);
+  tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
+  tft.drawString(String(payments), 200, 138);
+
+  tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
+  tft.drawString("uptime", 280, 120);
+  tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
+  tft.drawString(String(millis() / 60000) + "m", 280, 138);
+
   tft.setTextDatum(BC_DATUM);
-  tft.drawString("Press any button to return", SCREEN_W / 2, SCREEN_H - 5);
+  tft.setTextColor(COLOR_TEXT); tft.setTextSize(1);
+  tft.drawString("Exit  BTN2", SCREEN_W / 2, SCREEN_H - 4);
 }
 
 //

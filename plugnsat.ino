@@ -426,24 +426,17 @@ void loopError() {
 //
 
 void loopInfo() {
-  // Auto-timeout 6s -> back to QR
-  if (millis() - lastSettingsInput > 6000) {
+  if (screenNeedsRedraw) {
+    displayInfo(tft, config, paymentCount);
+    screenNeedsRedraw = false;
+  }
+  if (btn2Pressed) {
     if (currentBolt11.length() > 0) {
       displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
       currentState = STATE_QR_DISPLAY;
     } else {
       generateAndShowQR();
     }
-    return;
-  }
-  if (screenNeedsRedraw) {
-    displayInfo(tft, config, paymentCount);
-    screenNeedsRedraw = false;
-  }
-  if (btn1Pressed || btn2Pressed) {
-    lastSettingsInput = millis();
-    currentState = STATE_SETTINGS;
-    screenNeedsRedraw = true;
   }
 }
 
