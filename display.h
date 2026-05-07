@@ -246,25 +246,30 @@ void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
 
 void displayPaid(TFT_eSPI &tft, int count, int amountSats, int secondsLeft) {
   tft.fillScreen(COLOR_BG);
-  tft.setTextDatum(MC_DATUM);
 
+  // Layout anchored from bottom: activating=131(fixed), amount=104, PAID!=73, checkmark cy=37
+  // Gaps: checkmark→PAID! 5px, PAID!→amount 11px, amount→activating 11px
   int cx = SCREEN_W / 2;
-  int cy = SCREEN_H / 2 - 38;
+  int cy = 37;
   for (int i = -2; i <= 2; i++) {
     tft.drawLine(cx - 25, cy + i, cx - 8, cy + 17 + i, COLOR_SUCCESS);
     tft.drawLine(cx - 8, cy + 17 + i, cx + 30, cy - 18 + i, COLOR_SUCCESS);
   }
 
+  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_SUCCESS);
-  tft.setTextSize(2);
-  tft.drawString("PAID!", cx, cy + 40);
+  tft.setTextSize(3);
+  tft.drawString("PAID!", cx, 73);
 
+  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(1);
-  tft.drawString(String(amountSats) + " sats", cx, cy + 60);
+  tft.setTextSize(2);
+  tft.drawString(String(amountSats) + " sats", cx, 104);
 
+  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_GRAY);
-  tft.drawString("Activating for " + String(secondsLeft) + "s...", cx, cy + 76);
+  tft.setTextSize(2);
+  tft.drawString("Activating for " + String(secondsLeft) + "s...", cx, 131);
 
   // Payment counter
   tft.setTextDatum(BR_DATUM);
