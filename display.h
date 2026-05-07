@@ -290,20 +290,41 @@ void displayPaidShellyError(TFT_eSPI &tft) {
 // ERROR
 //
 
-void displayError(TFT_eSPI &tft, String title, String detail) {
+void displayError(TFT_eSPI &tft, String ip, int secondsLeft) {
   tft.fillScreen(COLOR_BG);
+
+  // Layout: circle cy=40, "Error" y=76, config y=103, countdown y=131
+  int cx = SCREEN_W / 2;
+  int cy = 40;
+
+  // Red ring, 4px thick (radii 19–22)
+  for (int r = 19; r <= 22; r++) tft.drawCircle(cx, cy, r, COLOR_ERROR);
+
+  // "!" drawn manually for pixel-perfect centering inside the ring
+  // Bar: 4px wide, 12px tall, centered at (cx, cy-2)
+  tft.fillRect(cx - 2, cy - 10, 4, 12, COLOR_ERROR);
+  // Dot: 4px wide, 4px tall, 3px below bar
+  tft.fillRect(cx - 2, cy + 5, 4, 4, COLOR_ERROR);
+
+  // "Error" title — same style as "PAID!" on paid screen
   tft.setTextDatum(MC_DATUM);
-  
   tft.setTextColor(COLOR_ERROR);
-  tft.setTextSize(2);
-  tft.drawString(title, SCREEN_W / 2, SCREEN_H / 2 - 20);
-  
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(1);
-  tft.drawString(detail, SCREEN_W / 2, SCREEN_H / 2 + 10);
-  
+  tft.setTextSize(3);
+  tft.drawString("Error", cx, 76);
+
+  // Config URL
+  if (ip.length() > 0 && ip != "0.0.0.0") {
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(COLOR_TEXT);
+    tft.setTextSize(2);
+    tft.drawString("http://" + ip, cx, 106);
+  }
+
+  // Countdown — same anchor as "Activating" on paid screen
+  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_GRAY);
-  tft.drawString("[1] Setup  [2] Retry  (auto 10s)", SCREEN_W / 2, SCREEN_H - 12);
+  tft.setTextSize(2);
+  tft.drawString("Auto-retry " + String(secondsLeft) + "s...", cx, 131);
 }
 
 //

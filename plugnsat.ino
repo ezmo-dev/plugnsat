@@ -227,7 +227,7 @@ void connectToWiFi() {
 
     setupWebPortal(server, config, prefs);
     server.begin();
-    
+
     generateAndShowQR();
   } else {
     Serial.println("WiFi FAILED");
@@ -260,9 +260,7 @@ bool ensureWiFi() {
     while (WiFi.status() != WL_CONNECTED && att < 20) { delay(500); att++; }
     
     if (WiFi.status() != WL_CONNECTED) {
-      displayError(tft, "WiFi lost", "Reconnecting...");
       currentState = STATE_ERROR;
-      screenNeedsRedraw = true;
       errorStartTime = millis();
       return false;
     }
@@ -298,7 +296,7 @@ void loopQRDisplay() {
       consecutiveErrors++;
       Serial.println("Poll error #" + String(consecutiveErrors));
       if (consecutiveErrors >= 10) {
-        displayError(tft, "Server unreachable", "Restarting...");
+        displayError(tft, WiFi.localIP().toString(), 5);
         delay(5000);
         ESP.restart();
       }
@@ -358,8 +356,6 @@ void generateAndShowQR() {
     consecutiveErrors++;
     
     if (consecutiveErrors >= 3) {
-      displayError(tft, "BTCPay unreachable",
-                   "Config: http://" + WiFi.localIP().toString());
       currentState = STATE_ERROR;
       errorStartTime = millis();
     } else {
@@ -405,13 +401,24 @@ void loopPaid() {
 //
 
 void loopError() {
+  ledcWrite(38, 255);
+
+  int secondsLeft = max(0, 10 - (int)((millis() - errorStartTime) / 1000));
+
+  static int lastDisplayedSecond = -1;
+  if (secondsLeft != lastDisplayedSecond) {
+    lastDisplayedSecond = secondsLeft;
+    displayError(tft, WiFi.localIP().toString(), secondsLeft);
+  }
+
   if (millis() - errorStartTime > 10000) {
     consecutiveErrors = 0;
+    ledcWrite(38, config.brightness);
     generateAndShowQR();
     return;
   }
-  if (btn1Pressed) startAPMode();
-  if (btn2Pressed) { consecutiveErrors = 0; generateAndShowQR(); }
+  if (btn1Pressed) { ledcWrite(38, config.brightness); startAPMode(); }
+  if (btn2Pressed) { ledcWrite(38, config.brightness); consecutiveErrors = 0; generateAndShowQR(); }
 }
 
 //
