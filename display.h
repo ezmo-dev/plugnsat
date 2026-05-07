@@ -106,7 +106,7 @@ void displaySplash(TFT_eSPI &tft) {
     uint8_t bits = bolt[row];
     for (int col = 0; col < boltCols; col++) {
       if (bits & (0x80 >> col)) {
-        tft.fillRect(x + col * bps, boltY + row * bps, bps, bps, yellow);
+        tft.fillRect(x + col * bps, boltY + row * bps, bps - 1, bps - 1, yellow);
       }
     }
   }
