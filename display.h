@@ -401,6 +401,17 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.setTextDatum(TR_DATUM);
   tft.setTextColor(rssiCol);
   tft.drawString(String(rssi) + "dBm", SCREEN_W - 8, y);
+
+  // WiFi signal bars (4 bars, bottom-aligned, white=active gray=inactive)
+  // 4/4 > -50 | 3/4 -50→-65 | 2/4 -65→-75 | 1/4 -75→-85 | 0/4 < -85
+  int activeBars = (rssi > -50) ? 4 : (rssi > -65) ? 3 : (rssi > -75) ? 2 : (rssi > -85) ? 1 : 0;
+  int bx = SCREEN_W - 80;
+  int by = y + 7;
+  int barHeights[] = {4, 7, 10, 13};
+  for (int b = 0; b < 4; b++) {
+    uint16_t col = (b < activeBars) ? COLOR_TEXT : COLOR_GRAY;
+    tft.fillRect(bx + b * 6, by - barHeights[b] + 1, 4, barHeights[b], col);
+  }
   y += lh;
 
   tft.setTextDatum(TL_DATUM);
@@ -423,28 +434,28 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.setTextDatum(MC_DATUM);
 
   tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
-  tft.drawString("sats", 40, 120);
+  tft.drawString("sats", 40, 118);
   tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
   tft.drawString(String(config.priceSats), 40, 138);
 
   tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
-  tft.drawString("sec", 120, 120);
+  tft.drawString("sec", 120, 118);
   tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
   tft.drawString(String(config.activationDuration), 120, 138);
 
   tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
-  tft.drawString("payments", 200, 120);
+  tft.drawString("payments", 200, 118);
   tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
   tft.drawString(String(payments), 200, 138);
 
   tft.setTextColor(COLOR_GRAY); tft.setTextSize(1);
-  tft.drawString("uptime", 280, 120);
+  tft.drawString("uptime", 280, 118);
   tft.setTextColor(COLOR_TEXT); tft.setTextSize(2);
   tft.drawString(String(millis() / 60000) + "m", 280, 138);
 
   tft.setTextDatum(BC_DATUM);
   tft.setTextColor(COLOR_TEXT); tft.setTextSize(1);
-  tft.drawString("Exit  BTN2", SCREEN_W / 2, SCREEN_H - 4);
+  tft.drawString("Any button to exit", SCREEN_W / 2, SCREEN_H - 4);
 }
 
 //

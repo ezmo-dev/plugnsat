@@ -430,7 +430,7 @@ void loopInfo() {
     displayInfo(tft, config, paymentCount);
     screenNeedsRedraw = false;
   }
-  if (btn2Pressed) {
+  if (btn1Pressed || btn2Pressed) {
     if (currentBolt11.length() > 0) {
       displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
       currentState = STATE_QR_DISPLAY;
