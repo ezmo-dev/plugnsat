@@ -9,8 +9,12 @@
 - [X] Splash screen with logo and branding
 - [X] Color theme and screen brightness adjustments
 - [X] Adjust price and duration from device buttons (PIN-protected)
-- [ ] UI polish (paid screen, error screen, info screen)
+- [X] First 3Dprint case (test, print, upload)
+- [ ] UI polish (paid screen, error screen, info screen, settings screen)
 - [ ] Web portal mobile-friendly cleanup
+- [ ] Web portal UI polish
+- [ ] First early documentation (user flow, documentation...)
+- [ ] Test video for documentation purposes
 
 ### v0.2 - Polish and UX
 - [ ] UI improvements on web portal (better layout, mobile responsive)
