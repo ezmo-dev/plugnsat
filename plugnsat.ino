@@ -375,19 +375,27 @@ void generateAndShowQR() {
 
 void loopPaid() {
   paymentCount++;
-  displayPaid(tft, paymentCount);
-  
+
+  // Max brightness for paid screen
+  ledcWrite(38, 255);
+
   bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
-  
+
   if (!shellyOk) {
     Serial.println("WARNING: Shelly failed!");
-    displayPaidShellyError(tft);
-    delay(4000);
   } else {
     Serial.println("Shelly ON for " + String(config.activationDuration) + "s");
-    delay(3000);
   }
-  
+
+  for (int s = config.activationDuration; s > 0; s--) {
+    displayPaid(tft, paymentCount, config.priceSats, s);
+    if (!shellyOk) displayPaidShellyError(tft);
+    delay(1000);
+  }
+
+  // Restore brightness
+  ledcWrite(38, config.brightness);
+
   // Back to QR automatically
   generateAndShowQR();
 }

@@ -8,7 +8,7 @@
 - [x] mDNS autodiscovery for Shelly devices (scan network instead of manual IP)
 - [X] Splash screen with logo and branding
 - [X] Color theme and screen brightness adjustments
-- [ ] Adjust price and duration from device buttons (PIN-protected)
+- [X] Adjust price and duration from device buttons (PIN-protected)
 - [ ] UI polish (paid screen, error screen, info screen)
 - [ ] Web portal mobile-friendly cleanup
 
