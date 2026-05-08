@@ -622,10 +622,7 @@ void displayDuration(TFT_eSPI &tft, int durationSeconds) {
 void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
   tft.fillScreen(COLOR_BG);
 
-  // Left: QR code preview on white background
-  int leftW = 152;
-  tft.fillRect(0, 0, leftW, SCREEN_H, TFT_WHITE);
-
+  // QR code — slightly reduced, centered on full screen
   String qr = (qrData.length() > 0) ? qrData : "PLUGNSAT";
   qr.toUpperCase();
 
@@ -641,41 +638,34 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
   qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qr.c_str());
 
   int qrSize  = qrcode.size;
-  int pixSize = (leftW - 8) / qrSize;
+  int pixSize = SCREEN_H / qrSize;  // same as displayQR
   if (pixSize < 1) pixSize = 1;
   int qrPixW = qrSize * pixSize;
   int qrPixH = qrSize * pixSize;
-  int qrX    = (leftW - qrPixW) / 2;
+  int qrX    = (SCREEN_W - qrPixW) / 2;
   int qrY    = (SCREEN_H - qrPixH) / 2;
 
   for (int y = 0; y < qrSize; y++) {
     for (int x = 0; x < qrSize; x++) {
       if (qrcode_getModule(&qrcode, x, y)) {
         tft.fillRect(qrX + x * pixSize, qrY + y * pixSize,
-                     pixSize, pixSize, TFT_BLACK);
+                     pixSize, pixSize, TFT_WHITE);
       }
     }
   }
 
-  tft.drawFastVLine(leftW, 0, SCREEN_H, COLOR_GRAY);
+  // Center brightness bar between QR right edge and screen right edge
+  int cx = (qrX + qrPixW + SCREEN_W) / 2;
 
-  // Right: brightness controls
-  int cx = leftW + (SCREEN_W - leftW) / 2;  // ~236
-
-  // "-" at top (BTN1 = decrease)
   tft.setTextDatum(TC_DATUM);
   tft.setTextColor(COLOR_TEXT);
   tft.setTextSize(2);
-  tft.drawString("-", cx, 10);
-  tft.setTextSize(1);
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("BTN1", cx, 30);
+  tft.drawString("-", cx, 8);
 
-  // Vertical bar
-  int barH = 60;
+  int barH = 90;
   int barW = 14;
   int barX = cx - barW / 2;
-  int barY = 44;
+  int barY = 32;  // 8 + 16 + 8
 
   tft.fillRect(barX, barY, barW, barH, 0x1082);
   tft.drawRect(barX - 1, barY - 1, barW + 2, barH + 2, COLOR_GRAY);
@@ -685,20 +675,16 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
     tft.fillRect(barX, barY + barH - fillH, barW, fillH, COLOR_ACCENT);
   }
 
-  // Percentage below bar
   int pct = map(brightness, 0, 255, 0, 100);
   tft.setTextDatum(TC_DATUM);
   tft.setTextColor(COLOR_ACCENT);
   tft.setTextSize(1);
-  tft.drawString(String(pct) + "%", cx, barY + barH + 6);
+  tft.drawString(String(pct) + "%", cx, barY + barH + 8);  // 32+90+8=130
 
-  // "+" at bottom (BTN2 = increase)
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("BTN2", cx, SCREEN_H - 38);
   tft.setTextColor(COLOR_TEXT);
   tft.setTextSize(2);
   tft.setTextDatum(BC_DATUM);
-  tft.drawString("+", cx, SCREEN_H - 8);
+  tft.drawString("+", cx, SCREEN_H - 8);  // bottom at 162, gap 8 to edge
 }
 
 //

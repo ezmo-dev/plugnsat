@@ -509,7 +509,7 @@ void loopSettings() {
 
 void loopBrightness() {
   // Auto-save and return to QR after 3s without input
-  if (millis() - lastBrightnessInput > 3000) {
+  if (millis() - lastBrightnessInput > 6000) {
     saveConfig();
     if (currentBolt11.length() > 0) {
       displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
@@ -542,7 +542,7 @@ void loopBrightness() {
 //
 
 void loopPrice() {
-  if (millis() - lastPriceInput > 3000) {
+  if (millis() - lastPriceInput > 6000) {
     saveConfig();
     if (currentBolt11.length() > 0) {
       displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
@@ -575,7 +575,7 @@ void loopPrice() {
 //
 
 void loopDuration() {
-  if (millis() - lastDurationInput > 3000) {
+  if (millis() - lastDurationInput > 6000) {
     saveConfig();
     if (currentBolt11.length() > 0) {
       displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
