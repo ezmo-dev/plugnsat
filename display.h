@@ -465,50 +465,63 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
 void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
   tft.fillScreen(COLOR_BG);
 
-  tft.setTextDatum(TC_DATUM);
-  tft.setTextColor(COLOR_ACCENT);
-  tft.setTextSize(1);
-  tft.drawString("Settings", SCREEN_W / 2, 12);
+  uint16_t colYellow = tft.color565(255, 215, 0);
+  uint16_t colCyan   = tft.color565(0, 229, 255);
 
-  const char* options[] = {"Device Info", "Brightness", "Price", "Duration"};
-  int count = 4;
-  int startY = 30;
-  int rowH = 32;
-
-  // Padlock icon: 10w x 11h total (4px shackle + 7px body)
+  // Padlock: 10w x 11h (4px shackle + 7px body)
   auto drawLock = [&](int lx, int ly, bool locked, uint16_t col) {
-    tft.fillRect(lx, ly + 4, 10, 7, col);         // body
-    tft.fillRect(lx + 2, ly, 6, 2, col);           // arch top bar
-    tft.fillRect(lx + 6, ly, 2, 5, col);           // right leg (always)
-    if (locked) {
-      tft.fillRect(lx + 2, ly, 2, 5, col);         // left leg (closed only)
-    }
+    tft.fillRect(lx, ly + 4, 10, 7, col);
+    tft.fillRect(lx + 2, ly, 6, 2, col);
+    tft.fillRect(lx + 6, ly, 2, 5, col);
+    if (locked) tft.fillRect(lx + 2, ly, 2, 5, col);
   };
 
-  for (int i = 0; i < count; i++) {
-    int y = startY + i * rowH;
-    uint16_t textColor;
-    if (i == selectedIndex) {
-      tft.fillRoundRect(30, y - 2, SCREEN_W - 60, 24, 5, COLOR_ACCENT);
-      textColor = COLOR_BG;
-    } else {
-      textColor = COLOR_TEXT;
-    }
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(textColor);
-    tft.setTextSize(1);
-    tft.drawString(options[i], SCREEN_W / 2, y + 10);
+  const char* options[] = {"Device Info", "Brightness", "Price", "Duration"};
+  // Vertically centered: 130px content in 170px screen → topY=20 → cy=34,68,102,136
+  int itemCY[]    = {34, 68, 102, 136};
+  const int rectH = 28;
+  const int rectX = 8;
+  const int rectW = SCREEN_W - 60;   // 260px, right edge at 268
+  const int btnCX = rectX + rectW / 2; // 138 = horizontal center of button zone
+  const int rx    = 294;              // center of right margin (268..320)
 
-    if (i == 2 || i == 3) {
-      uint16_t lockColor = (i == selectedIndex) ? COLOR_BG : (pinActive ? COLOR_ACCENT : COLOR_GRAY);
-      drawLock(37, y + 4, pinActive, lockColor);
+  for (int i = 0; i < 4; i++) {
+    int cy = itemCY[i];
+    bool selected = (i == selectedIndex);
+    uint16_t textColor = selected ? colYellow : COLOR_TEXT;
+
+    if (selected) {
+      tft.drawRoundRect(rectX, cy - rectH / 2, rectW, rectH, 6, colYellow);
+    }
+
+    tft.setTextSize(2);
+    bool hasPadlock = (i == 2 || i == 3);
+
+    if (!hasPadlock) {
+      tft.setTextDatum(MC_DATUM);
+      tft.setTextColor(textColor);
+      tft.drawString(options[i], btnCX, cy);
+    } else {
+      int textW  = strlen(options[i]) * 12;
+      int groupW = 10 + 4 + textW;
+      int gx     = btnCX - groupW / 2;
+      drawLock(gx, cy - 5, pinActive, textColor);
+      tft.setTextDatum(TL_DATUM);
+      tft.setTextColor(textColor);
+      tft.drawString(options[i], gx + 14, cy - 8);
     }
   }
 
-  tft.setTextDatum(BC_DATUM);
-  tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(1);
-  tft.drawString("BTN1: move   BTN2: select", SCREEN_W / 2, SCREEN_H - 5);
+  // Right margin indicators (cyan = "sat" color)
+  // ✓ — facing BTN2 (top button), 2px thick
+  for (int i = 0; i <= 1; i++) {
+    tft.drawLine(rx - 5, 31 + i, rx - 1, 36 + i, colCyan);
+    tft.drawLine(rx - 1, 36 + i, rx + 5, 25 + i, colCyan);
+  }
+
+  // ▲▼ — facing BTN1 (bottom button), 6px gap between shapes
+  tft.fillTriangle(rx,     134, rx - 5, 140, rx + 5, 140, colCyan);
+  tft.fillTriangle(rx,     152, rx - 5, 146, rx + 5, 146, colCyan);
 }
 
 //
