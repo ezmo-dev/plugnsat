@@ -702,9 +702,9 @@ void displayPinEntry(TFT_eSPI &tft, int digits[], int digitIndex, bool wrongPin)
   int boxW = 44;
   int boxH = 52;
   int boxGap = 10;
-  int totalW = 4 * boxW + 3 * boxGap;  // 206
-  int startX = (SCREEN_W - totalW) / 2; // 57
-  int boxY = 38;
+  int totalW = 4 * boxW + 3 * boxGap;          // 206
+  int startX = (SCREEN_W - totalW) / 2;         // 57
+  int boxY   = (SCREEN_H - boxH) / 2;           // vertically centered = 59
 
   for (int i = 0; i < 4; i++) {
     int bx = startX + i * (boxW + boxGap);
@@ -736,13 +736,20 @@ void displayPinEntry(TFT_eSPI &tft, int digits[], int digitIndex, bool wrongPin)
     tft.setTextDatum(MC_DATUM);
     tft.setTextColor(COLOR_ERROR);
     tft.setTextSize(1);
-    tft.drawString("Wrong PIN", SCREEN_W / 2, 110);
+    tft.drawString("Wrong PIN", SCREEN_W / 2, boxY + boxH + 12);
   }
 
-  tft.setTextDatum(BC_DATUM);
-  tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(1);
-  tft.drawString("BTN1: change   BTN2: confirm", SCREEN_W / 2, SCREEN_H - 5);
+  // Right margin indicators — same positions as settings screen
+  uint16_t colCyan = tft.color565(0, 229, 255);
+  int rx = 294;
+
+  for (int i = 0; i <= 1; i++) {
+    tft.drawLine(rx - 5, 31 + i, rx - 1, 36 + i, colCyan);
+    tft.drawLine(rx - 1, 36 + i, rx + 5, 25 + i, colCyan);
+  }
+
+  tft.fillTriangle(rx,     134, rx - 5, 140, rx + 5, 140, colCyan);
+  tft.fillTriangle(rx,     152, rx - 5, 146, rx + 5, 146, colCyan);
 }
 
 //
