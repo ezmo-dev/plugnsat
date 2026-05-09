@@ -503,12 +503,12 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
       tft.drawString(options[i], btnCX, cy);
     } else {
       int textW  = strlen(options[i]) * 12;
-      int groupW = 10 + 4 + textW;
+      int groupW = 10 + 8 + textW;
       int gx     = btnCX - groupW / 2;
       drawLock(gx, cy - 5, pinActive, textColor);
       tft.setTextDatum(TL_DATUM);
       tft.setTextColor(textColor);
-      tft.drawString(options[i], gx + 14, cy - 8);
+      tft.drawString(options[i], gx + 18, cy - 8);
     }
   }
 
