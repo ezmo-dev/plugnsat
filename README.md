@@ -9,7 +9,7 @@ When a customer pays, it triggers a CE-certified Shelly smart plug to power on a
 Connect to WiFi, set your price in sats, and go!
 No modification to the target device needed.
 
-Built for Bitcoin hubs, stores, coworking spaces, companies, meetups, events, and more.
+Built for Bitcoin hubs, conferences, stores, coworking spaces, companies, meetups, events, and more.
 
 ## How it works
 ```
@@ -49,21 +49,44 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 - **ArduinoJson** by Benoit Blanchon
 - **QRCode** by Richard Moore
 
-## First Boot
+## Setup
 
-1. Flash firmware via USB-C
-2. Device shows "PlugNSat Setup" screen
-3. Connect phone to WiFi: `PlugNSat-Setup` (password: `plugnsat21`)
-4. Open `http://192.168.4.1` in browser
-5. Enter WiFi and BTCPay Server settings, then click "Scan network" to auto-discover your Shelly on the local network, or type its hostname/IP manually
-6. Save > device restarts > connects to WiFi > QR appears
+### 1. Prepare the Shelly Plug
+
+1. Download the **Shelly app** ([iOS](https://apps.apple.com/app/shelly-cloud/id1147164547) / [Android](https://play.google.com/store/apps/details?id=cloud.shelly.smartcontrol))
+2. Plug the Shelly into a wall outlet
+3. Open the app and follow the instructions to add the device to your WiFi network
+4. Once connected, go to the plug settings and set **Initial state** to **Off**
+
+> The Shelly must be on the same WiFi network that PlugNSat will connect to.
+
+### 2. Flash the firmware (DIY only)
+
+> Skip this step if you bought a pre-assembled PlugNSat.
+
+1. Connect the LilyGO T-Display S3 to your computer via USB-C
+2. Open Arduino IDE, select the board and settings (see [Arduino IDE Setup](#arduino-ide-setup) above)
+3. Upload the firmware
+4. The device shows the "PlugNSat Setup" screen
+
+### 3. Configure PlugNSat
+
+1. Power on the PlugNSat via USB-C
+2. On your phone, connect to WiFi: `PlugNSat-Setup` (password: `plugnsat21`)
+3. Open `http://192.168.4.1` in your browser
+4. Enter your WiFi credentials (same network as the Shelly)
+5. Enter your BTCPay Server URL, API key, and Store ID
+6. Click **Scan network** to auto-discover your Shelly, or type its hostname/IP manually
+7. Set your price in sats, activation duration in seconds, and optionally a 4-digit PIN to protect these settings on the device
+8. Click **Save and restart**
+9. The device connects to WiFi and the QR code appears. You're live!
 
 ## Buttons
 
 | Button | Short press | Long press (3s) |
 |--------|-------------|-----------------|
-| BTN1 (left) | Open Settings menu | Enter AP setup mode |
-| BTN2 (right) | Force QR refresh | - |
+| BTN1 (left) | Settings menu / Navigate | Enter AP setup mode |
+| BTN2 (right) | Force QR refresh / Confirm | - |
 
 ### Settings menu
 
@@ -71,10 +94,14 @@ Press BTN1 from the QR screen to open the Settings menu.
 
 | Option | Description |
 |--------|-------------|
-| Device Info | WiFi, IP, RSSI, Shelly host, price, uptime |
-| Brightness | Adjust screen brightness in real time, saved automatically |
+| Device Info | WiFi, IP, RSSI, Shelly host, price, duration, payments, uptime |
+| Brightness | Adjust screen brightness (BTN1 decreases, BTN2 increases) |
+| Price | Change price in sats (BTN1 decreases, BTN2 increases) |
+| Duration | Change activation duration in seconds (BTN1 decreases, BTN2 increases) |
 
-Navigation: BTN1 moves the cursor, BTN2 selects. The menu and Device Info screen close automatically after 6 seconds of inactivity and return to the QR code. The Brightness screen returns to the QR code 3 seconds after the last adjustment.
+Price and Duration can be protected with a 4-digit PIN, configurable in the web portal. If a PIN is set, it must be entered before accessing these settings.
+
+Navigation: BTN1 moves the cursor, BTN2 selects. All screens return to the QR code automatically after 6 seconds of inactivity. Changes to Brightness, Price, and Duration are saved automatically on exit. On the Device Info screen, press any button to return to the QR code.
 
 ## Files
 ```
