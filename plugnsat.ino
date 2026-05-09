@@ -135,9 +135,10 @@ void setup() {
   pinMode(BTN_2, INPUT_PULLUP);
 
   loadConfig();
-  ledcWrite(38, config.brightness);
+  ledcWrite(38, 255);
   displaySplash(tft);
   delay(5000);
+  ledcWrite(38, config.brightness);
 
   if (config.wifiSsid.length() == 0 || config.btcpayUrl.length() == 0) {
     startAPMode();
