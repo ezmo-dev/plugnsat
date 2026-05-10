@@ -30,33 +30,253 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PlugNSat Setup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:-apple-system,system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;padding:20px;max-width:480px;margin:0 auto}
-    h1{color:#f7931a;text-align:center;margin-bottom:8px;font-size:28px}
-    .sub{text-align:center;color:#888;margin-bottom:24px;font-size:14px}
-    .sec{background:#16213e;border-radius:12px;padding:20px;margin-bottom:16px}
-    .sec h2{color:#f7931a;font-size:16px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2a4a}
-    label{display:block;font-size:13px;color:#aaa;margin:12px 0 4px}
-    label:first-of-type{margin-top:0}
-    input[type="text"],input[type="password"],input[type="number"]{width:100%;padding:10px 12px;background:#0f3460;border:1px solid #2a2a4a;border-radius:8px;color:#fff;font-size:15px;outline:none}
-    input:focus{border-color:#f7931a}
-    select{width:100%;padding:10px 12px;background:#0f3460;border:1px solid #2a2a4a;border-radius:8px;color:#fff;font-size:14px;outline:none;margin-bottom:8px;cursor:pointer}
-    select:focus{border-color:#f7931a}
-    .hint{font-size:11px;color:#666;margin-top:4px}
-    button{width:100%;padding:14px;background:#f7931a;color:#1a1a2e;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:20px}
-    button:hover{background:#e8850f}
-    .tbtn{background:#2a2a4a;color:#e0e0e0;padding:8px 16px;border:1px solid #444;border-radius:6px;font-size:13px;cursor:pointer;margin-top:8px;width:auto}
-    .tbtn:hover{background:#3a3a5a}
-    .footer{text-align:center;color:#444;font-size:12px;margin-top:24px}
-    .ok{background:#0a3d2a;color:#4caf50;padding:12px;border-radius:8px;margin-top:16px;text-align:center}
+    :root {
+      --pn-orange:        #F7931A;
+      --pn-orange-hover:  #E8850F;
+      --pn-orange-press:  #C9710A;
+      --pn-gold:          #FFD700;
+      --pn-cyan:          #00E5FF;
+      --pn-bg:            #FBFAF8;
+      --pn-surface:       #FFFFFF;
+      --pn-sunk:          #F4F2EE;
+      --pn-fg:            #0A0A0A;
+      --pn-fg-2:          #535862;
+      --pn-fg-3:          #90939B;
+      --pn-border:        #EAE7E0;
+      --pn-border-2:      #D9D5CB;
+      --pn-success:       #1F8A5B;
+      --pn-success-soft:  #E5F4EC;
+      --pn-success-bd:    #C8E6D2;
+      --pn-danger:        #C8372D;
+      --pn-danger-soft:   #FBEAE7;
+      --pn-shadow-sm:     0 1px 2px rgba(10,10,10,.04), 0 0 0 1px rgba(10,10,10,.04);
+      --pn-shadow-md:     0 8px 24px rgba(10,10,10,.06), 0 1px 2px rgba(10,10,10,.04);
+      --pn-focus-ring:    0 0 0 3px rgba(247,147,26,.28);
+      --pn-r-input:       8px;
+      --pn-r-card:        14px;
+      --pn-font:          -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+      --pn-mono:          ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      --pn-pixel:         "Press Start 2P", ui-monospace, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--pn-bg);
+      color: var(--pn-fg);
+      font-family: var(--pn-font);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 24px 0 32px;
+      text-align: center;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--pn-pixel);
+      font-size: 22px;
+      letter-spacing: .02em;
+      line-height: 1;
+    }
+    .logo-plug { color: var(--pn-orange); }
+    .logo-bolt { width: 20px; height: 30px; color: var(--pn-gold); display: block; }
+    .logo-sat  { color: var(--pn-cyan); }
+    h1 {
+      margin: 6px 0 0;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+      color: var(--pn-fg);
+    }
+    h1 .accent { color: var(--pn-orange); font-weight: 700; }
+    .sub {
+      margin: 0;
+      font-size: 13px;
+      color: var(--pn-fg-2);
+    }
+    form { display: block; counter-reset: sec; }
+    .sec {
+      background: var(--pn-surface);
+      border-radius: var(--pn-r-card);
+      box-shadow: var(--pn-shadow-sm);
+      padding: 22px 22px 24px;
+      margin-bottom: 18px;
+      position: relative;
+      counter-increment: sec;
+    }
+    .sec h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--pn-fg);
+    }
+    .sec h2::before {
+      content: "STEP";
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--pn-fg-3);
+      margin-bottom: 10px;
+    }
+    .sec h2::after {
+      content: "";
+      display: block;
+      height: 1px;
+      background: var(--pn-border);
+      margin-top: 14px;
+    }
+    .sec::after {
+      content: counter(sec);
+      position: absolute;
+      top: 22px; right: 22px;
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--pn-sunk);
+      color: var(--pn-fg-2);
+      font-size: 11px; font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      display: flex; align-items: center; justify-content: center;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--pn-fg-2);
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    select {
+      width: 100%;
+      font: inherit;
+      font-size: 14px;
+      color: var(--pn-fg);
+      background: var(--pn-surface);
+      border: 1px solid var(--pn-border-2);
+      border-radius: var(--pn-r-input);
+      padding: 10px 12px;
+      margin-top: 6px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="number"] { font-variant-numeric: tabular-nums; }
+    input::placeholder { color: var(--pn-fg-3); }
+    input:hover, select:hover { border-color: #C2BCAE; }
+    input:focus, select:focus {
+      border-color: var(--pn-orange);
+      box-shadow: var(--pn-focus-ring);
+    }
+    .hint {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--pn-fg-3);
+      line-height: 1.45;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    button, input[type="submit"] {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: var(--pn-r-input);
+      transition: background-color .12s ease, transform .08s ease, box-shadow .12s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    button:active, input[type="submit"]:active { transform: scale(.985); }
+    .tbtn {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--pn-fg);
+      background: var(--pn-surface);
+      border: 1px solid var(--pn-border-2);
+      padding: 8px 14px;
+      margin-top: 12px;
+      margin-right: 8px;
+      width: auto;
+    }
+    .tbtn:hover { background: var(--pn-sunk); }
+    .tbtn:focus-visible {
+      outline: none;
+      box-shadow: var(--pn-focus-ring);
+      border-color: var(--pn-orange);
+    }
+    button[type="submit"] {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #0A0A0A;
+      background: var(--pn-orange);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(247,147,26,.32);
+    }
+    button[type="submit"]:hover { background: var(--pn-orange-hover); }
+    button[type="submit"]:active {
+      background: var(--pn-orange-press);
+      box-shadow: 0 2px 6px rgba(247,147,26,.28);
+    }
+    .footer {
+      text-align: center;
+      margin: 24px 0 0;
+      font-size: 11px;
+      font-family: var(--pn-mono);
+      color: var(--pn-fg-3);
+      letter-spacing: .01em;
+    }
+    ::selection { background: rgba(247,147,26,.25); color: var(--pn-fg); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: .001ms !important;
+        animation-duration: .001ms !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>PlugNSat</h1>
-  <p class="sub">Lightning Smart Plug Controller</p>
-  
+
+<div class="container">
+
+  <header>
+    <div class="logo" aria-label="PlugNSat">
+      <span class="logo-plug">PLUG</span>
+      <svg class="logo-bolt" viewBox="0 0 12 18" aria-hidden="true">
+        <path d="M7 0 H10 V7 H12 L5 18 V11 H2 Z" fill="currentColor"></path>
+      </svg>
+      <span class="logo-sat">SAT</span>
+    </div>
+    <h1>Configure your <span class="accent">PlugNSat</span>.</h1>
+    <p class="sub">Four steps. About two minutes.</p>
+  </header>
+
   <form action="/save" method="POST">
+
     <div class="sec">
       <h2>WiFi</h2>
       <label>SSID</label>
@@ -64,7 +284,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <label>Password</label>
       <input type="password" name="wifi_pass" value="%WIFI_PASS%">
     </div>
-    
+
     <div class="sec">
       <h2>BTCPay Server</h2>
       <label>Server URL</label>
@@ -76,7 +296,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <label>Store ID</label>
       <input type="text" name="btcpay_store" value="%BTCPAY_STORE%">
     </div>
-    
+
     <div class="sec">
       <h2>Shelly Plug</h2>
       <label>Shelly hostname or IP</label>
@@ -85,28 +305,36 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <select id="shelly-sel" style="display:none;margin-top:8px" onchange="selectShelly(this)"></select>
       <input type="text" name="shelly_host" id="shelly-host" value="%SHELLY_HOST%" placeholder="shellyplugsg3-xxxxxxxxxxxx.local" style="margin-top:8px">
       <button type="button" class="tbtn" onclick="testShelly()" style="margin-top:8px">Test connection</button>
-      <div id="sst"></div>
+      <div id="sst" class="hint" style="margin-top:6px"></div>
     </div>
-    
+
     <div class="sec">
-      <h2>Device</h2>
+      <h2>Device settings</h2>
       <label>Name</label>
       <input type="text" name="dev_name" value="%DEV_NAME%" placeholder="PlugNSat">
-      <label>Price (satoshis)</label>
-      <input type="number" name="price_sats" value="%PRICE_SATS%" min="1" max="1000000">
-      <label>Activation duration (seconds)</label>
-      <input type="number" name="duration" value="%DURATION%" min="1" max="86400">
+      <div class="row">
+        <div>
+          <label>Price (satoshis)</label>
+          <input type="number" name="price_sats" value="%PRICE_SATS%" min="1" max="1000000">
+        </div>
+        <div>
+          <label>Duration (seconds)</label>
+          <input type="number" name="duration" value="%DURATION%" min="1" max="86400">
+        </div>
+      </div>
       <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
-      <div id="tpst"></div>
+      <div id="tpst" class="hint" style="margin-top:6px"></div>
       <label>Settings PIN (4 digits)</label>
-      <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Leave empty to disable">
+      <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Optional" inputmode="numeric" pattern="[0-9]{0,4}">
       <div class="hint">Protects Price and Duration settings on the device</div>
     </div>
-    
-    <button type="submit">Save and restart</button>
+
+    <button type="submit">Save and restart &rarr;</button>
   </form>
-  
-  <p class="footer">PlugNSat v0.1.0</p>
+
+  <p class="footer">v0.1.0 &middot; plugnsat.com &middot; open-source &middot; MIT</p>
+
+</div>
 
   <script>
   function scanShelly(){
@@ -210,15 +438,12 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     saveConfig();
     
     server.send(200, "text/html", 
-      "<html><body style='background:#1a1a2e;color:#4caf50;text-align:center;"
-      "padding:60px;font-family:sans-serif'>"
-      "<h1>Saved!</h1><p>Restarting...</p></body></html>");
+      "<html><body style='background:#FBFAF8;color:#1F8A5B;text-align:center;"
+      "padding:60px;font-family:-apple-system,system-ui,sans-serif'>"
+      "<h1 style=\"color:#F7931A\">Saved!</h1><p>Restarting...</p></body></html>");
     delay(3000);
     ESP.restart();
   });
-
-
-// Test Shelly connection
 
   server.on("/test-shelly", HTTP_GET, [&server]() {
     String host = server.arg("host");
@@ -244,32 +469,27 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     }
   });
 
-// Test payment without BTCPay server to setup the duration
-//
-
   server.on("/test-payment", HTTP_GET, [&config, &server]() {
-  HTTPClient http;
-  String url = "http://" + config.shellyHost
-               + "/rpc/switch.set?id=0&on=true&toggle_after="
-               + String(config.activationDuration);
-  
-  if (!http.begin(url)) {
-    server.send(200, "application/json", "{\"ok\":false,\"error\":\"Connection failed\"}");
-    return;
-  }
-  http.setTimeout(5000);
-  int code = http.GET();
-  http.end();
-  
-  if (code == 200) {
-    server.send(200, "application/json", 
-      "{\"ok\":true,\"duration\":" + String(config.activationDuration) + "}");
-  } else {
-    server.send(200, "application/json", "{\"ok\":false,\"error\":\"Shelly error\"}");
-  }
-});
-  
-// Scan local network for Shelly devices via mDNS
+    HTTPClient http;
+    String url = "http://" + config.shellyHost
+                 + "/rpc/switch.set?id=0&on=true&toggle_after="
+                 + String(config.activationDuration);
+    
+    if (!http.begin(url)) {
+      server.send(200, "application/json", "{\"ok\":false,\"error\":\"Connection failed\"}");
+      return;
+    }
+    http.setTimeout(5000);
+    int code = http.GET();
+    http.end();
+    
+    if (code == 200) {
+      server.send(200, "application/json", 
+        "{\"ok\":true,\"duration\":" + String(config.activationDuration) + "}");
+    } else {
+      server.send(200, "application/json", "{\"ok\":false,\"error\":\"Shelly error\"}");
+    }
+  });
 
   server.on("/api/scan-shelly", HTTP_GET, [&server]() {
     Serial.println("mDNS scan starting...");
