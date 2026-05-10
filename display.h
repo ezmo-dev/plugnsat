@@ -758,33 +758,45 @@ void displayPinEntry(TFT_eSPI &tft, int digits[], int digitIndex, bool wrongPin)
 
 void displayAPMode(TFT_eSPI &tft, String apIp, bool hasWifi) {
   tft.fillScreen(COLOR_BG);
+
+  uint16_t colGold = tft.color565(255, 215, 0);
+  int cx   = SCREEN_W / 2;
+  int boxX = 20;
+  int boxW = SCREEN_W - 40;  // 280
+  int boxH = 46;
+  int boxR = 8;
+
+  // 3 boxes + 2 gaps fit in 160px, 5px top/bottom margin, footer in last 10px
+  // layout: 5 + 46 + 6 + 46 + 6 + 46 + 5 = 160, footer y=160..170
+  int boxY[3] = { 5, 57, 109 };
+
+  const char* labels[] = {
+    "1 - Connect to Wifi:",
+    "2 - Password:",
+    "3 - Open in browser:"
+  };
+  String values[] = {
+    "PlugNSat-Setup",
+    "plugnsat21",
+    "http://" + apIp
+  };
+
   tft.setTextDatum(MC_DATUM);
   tft.setTextSize(2);
 
-  int y = 14;
-  tft.setTextColor(COLOR_TEXT);
-  tft.drawString("1. Connect to WiFi:", SCREEN_W / 2, y); y += 26;
-  tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("PlugNSat-Setup", SCREEN_W / 2, y); y += 26;
+  for (int i = 0; i < 3; i++) {
+    tft.drawRoundRect(boxX, boxY[i], boxW, boxH, boxR, colGold);
+    tft.setTextColor(COLOR_TEXT);
+    tft.drawString(labels[i], cx, boxY[i] + boxH / 2 - 10);
+    tft.setTextColor(colGold);
+    tft.drawString(values[i], cx, boxY[i] + boxH / 2 + 10);
+  }
 
-  tft.setTextColor(COLOR_TEXT);
-  tft.drawString("2. Password:", SCREEN_W / 2, y); y += 26;
-  tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("plugnsat21", SCREEN_W / 2, y); y += 26;
-
-  tft.setTextColor(COLOR_TEXT);
-  tft.drawString("3. Open in browser:", SCREEN_W / 2, y); y += 26;
-  tft.setTextColor(COLOR_ACCENT);
-  tft.drawString("http://" + apIp, SCREEN_W / 2, y);
-
-  tft.setTextDatum(BC_DATUM);
-  tft.setTextSize(1);
   if (hasWifi) {
-    tft.setTextColor(COLOR_ACCENT);
-    tft.drawString("Press any button to reconnect", SCREEN_W / 2, SCREEN_H - 2);
-  } else {
-    tft.setTextColor(COLOR_GRAY);
-    tft.drawString("Follow the 3 steps above to connect", SCREEN_W / 2, SCREEN_H - 2);
+    tft.setTextDatum(BC_DATUM);
+    tft.setTextColor(COLOR_TEXT);
+    tft.setTextSize(1);
+    tft.drawString("Any button to reconnect", cx, SCREEN_H - 3);
   }
 }
 
