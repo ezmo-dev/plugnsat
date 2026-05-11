@@ -360,24 +360,23 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.setTextSize(1);
 
   uint16_t colOrange = tft.color565(247, 147, 26);
-  uint16_t colYellow = tft.color565(255, 215, 0);
   uint16_t colCyan   = tft.color565(0, 229, 255);
 
   // Header: "Plug" orange | "N" yellow | "sat" cyan — size 2 = 12px/char
   tft.setTextDatum(TL_DATUM); tft.setTextSize(2);
   tft.setTextColor(colOrange); tft.drawString("Plug", 10, 6);
-  tft.setTextColor(colYellow); tft.drawString("N",    58, 6); // 10 + 4*12
+  tft.setTextColor(colOrange); tft.drawString("N",    58, 6); // 10 + 4*12
   tft.setTextColor(colCyan);   tft.drawString("sat",  70, 6); // 58 + 1*12
 
-  // Version top-right in yellow, size 1 (small contrast with title)
+  // Version top-right in gray
   tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
-  tft.setTextColor(colYellow);
+  tft.setTextColor(COLOR_GRAY);
   tft.drawString("v0.1.0", SCREEN_W - 8, 12);
 
   // Separator "─── Network ──────────────────"  (y=38, more room below header)
-  tft.drawFastHLine(8, 34, SCREEN_W - 16, colYellow);
+  tft.drawFastHLine(8, 34, SCREEN_W - 16, colOrange);
   tft.fillRect(15, 29, 56, 10, COLOR_BG);
-  tft.setTextDatum(TL_DATUM); tft.setTextColor(colYellow); tft.setTextSize(1);
+  tft.setTextDatum(TL_DATUM); tft.setTextColor(colOrange); tft.setTextSize(1);
   tft.drawString("Network", 17, 30);
 
   // Layout constants
@@ -424,9 +423,9 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   y += lh;
 
   // Separator "─── Session ──────────────────"  (y+10, extra breathing room)
-  tft.drawFastHLine(8, y + 10, SCREEN_W - 16, colYellow);
+  tft.drawFastHLine(8, y + 10, SCREEN_W - 16, colOrange);
   tft.fillRect(15, y + 5, 56, 10, COLOR_BG);
-  tft.setTextDatum(TL_DATUM); tft.setTextColor(colYellow); tft.setTextSize(1);
+  tft.setTextDatum(TL_DATUM); tft.setTextColor(colOrange); tft.setTextSize(1);
   tft.drawString("Session", 17, y + 6);
 
   // --- Block 2: Metrics — 4 columns on one row ---
@@ -454,7 +453,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.drawString(String(millis() / 60000) + "m", 280, 138);
 
   tft.setTextDatum(BC_DATUM);
-  tft.setTextColor(COLOR_TEXT); tft.setTextSize(1);
+  tft.setTextColor(colCyan); tft.setTextSize(1);
   tft.drawString("Any button to exit", SCREEN_W / 2, SCREEN_H - 4);
 }
 
@@ -465,7 +464,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
 void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
   tft.fillScreen(COLOR_BG);
 
-  uint16_t colYellow = tft.color565(255, 215, 0);
+  uint16_t colOrange = tft.color565(247, 147, 26);
   uint16_t colCyan   = tft.color565(0, 229, 255);
 
   // Padlock: 10w x 11h (4px shackle + 7px body)
@@ -488,10 +487,10 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
   for (int i = 0; i < 4; i++) {
     int cy = itemCY[i];
     bool selected = (i == selectedIndex);
-    uint16_t textColor = selected ? colYellow : COLOR_TEXT;
+    uint16_t textColor = selected ? colOrange : COLOR_TEXT;
 
     if (selected) {
-      tft.drawRoundRect(rectX, cy - rectH / 2, rectW, rectH, 6, colYellow);
+      tft.drawRoundRect(rectX, cy - rectH / 2, rectW, rectH, 6, colOrange);
     }
 
     tft.setTextSize(2);
@@ -537,11 +536,11 @@ void displayPrice(TFT_eSPI &tft, int priceSats) {
 
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ACCENT);
-  tft.setTextSize(3);
-  tft.drawString(String(priceSats), cx, SCREEN_H / 2 - 12);
+  tft.setTextSize(4);
+  tft.drawString(String(priceSats), cx, SCREEN_H / 2 - 20);
   tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(2);
-  tft.drawString("sats", cx, SCREEN_H / 2 + 18);
+  tft.setTextSize(3);
+  tft.drawString("sats", cx, SCREEN_H / 2 + 24);
 
   // "+" — BTN2 (top), same position as settings checkmark
   for (int t = 0; t < 2; t++) {
@@ -569,21 +568,21 @@ void displayDuration(TFT_eSPI &tft, int durationSeconds) {
   // Centered duration value
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ACCENT);
-  tft.setTextSize(3);
-  tft.drawString(String(durationSeconds) + "s", cx, SCREEN_H / 2 - 14);
+  tft.setTextSize(4);
+  tft.drawString(String(durationSeconds) + "s", cx, SCREEN_H / 2 - 20);
 
   // Conversion below
   tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(1);
+  tft.setTextSize(2);
   if (durationSeconds >= 3600) {
     int h = durationSeconds / 3600;
     int m = (durationSeconds % 3600) / 60;
     String conv = String(h) + "h";
     if (m > 0) conv += " " + String(m) + "min";
-    tft.drawString(conv, cx, SCREEN_H / 2 + 12);
+    tft.drawString(conv, cx, SCREEN_H / 2 + 22);
   } else if (durationSeconds >= 60) {
     int m = durationSeconds / 60;
-    tft.drawString(String(m) + " min", cx, SCREEN_H / 2 + 12);
+    tft.drawString(String(m) + " min", cx, SCREEN_H / 2 + 22);
   }
 
   // "+" — BTN2 (top), same position as settings checkmark
@@ -747,7 +746,7 @@ void displayPinEntry(TFT_eSPI &tft, int digits[], int digitIndex, bool wrongPin)
 void displayAPMode(TFT_eSPI &tft, String apIp, bool hasWifi) {
   tft.fillScreen(COLOR_BG);
 
-  uint16_t colGold = tft.color565(255, 215, 0);
+  uint16_t colGold = tft.color565(0, 229, 255);
   int cx   = SCREEN_W / 2;
   int boxX = 20;
   int boxW = SCREEN_W - 40;  // 280
@@ -782,7 +781,7 @@ void displayAPMode(TFT_eSPI &tft, String apIp, bool hasWifi) {
 
   if (hasWifi) {
     tft.setTextDatum(BC_DATUM);
-    tft.setTextColor(COLOR_TEXT);
+    tft.setTextColor(colGold);
     tft.setTextSize(1);
     tft.drawString("Any button to reconnect", cx, SCREEN_H - 3);
   }
