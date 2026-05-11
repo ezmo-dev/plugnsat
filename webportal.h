@@ -52,7 +52,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       --pn-danger-soft:   #FBEAE7;
       --pn-shadow-sm:     0 1px 2px rgba(10,10,10,.04), 0 0 0 1px rgba(10,10,10,.04);
       --pn-shadow-md:     0 8px 24px rgba(10,10,10,.06), 0 1px 2px rgba(10,10,10,.04);
-      --pn-focus-ring:    0 0 0 3px rgba(247,147,26,.28);
+      --pn-focus-ring:    0 0 0 3px rgba(0,229,255,.22);
       --pn-r-input:       8px;
       --pn-r-card:        14px;
       --pn-font:          -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
@@ -178,7 +178,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     input::placeholder { color: var(--pn-fg-3); }
     input:hover, select:hover { border-color: #C2BCAE; }
     input:focus, select:focus {
-      border-color: var(--pn-orange);
+      border-color: var(--pn-cyan);
       box-shadow: var(--pn-focus-ring);
     }
     .hint {
@@ -217,8 +217,14 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     .tbtn:focus-visible {
       outline: none;
       box-shadow: var(--pn-focus-ring);
-      border-color: var(--pn-orange);
+      border-color: var(--pn-cyan);
     }
+    .tbtn-cyan { color: var(--pn-cyan); border-color: var(--pn-cyan); }
+    .tbtn-cyan:hover { background: rgba(0,229,255,.06); }
+    .tbtn-ok  { color: var(--pn-success); border-color: var(--pn-success); background: var(--pn-success-soft); }
+    .tbtn-err { color: var(--pn-danger);  border-color: var(--pn-danger);  background: var(--pn-danger-soft); }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-row .tbtn { flex: 1; margin-top: 0; margin-right: 0; text-align: center; }
     button[type="submit"] {
       display: block;
       width: 100%;
@@ -377,12 +383,14 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Shelly Plug</h2>
-      <label>Shelly hostname or IP</label>
-      <button type="button" class="tbtn" onclick="scanShelly()">Scan network</button>
+      <label>Shelly hostname or IP <span class="tip" data-tip="Make sure the Shelly is plugged in, connected to the same WiFi, and set to Off (initial state). Use 'Scan network' to find it automatically.">i</span></label>
       <div id="scan-st" class="hint" style="margin-top:6px"></div>
       <select id="shelly-sel" style="display:none;margin-top:8px" onchange="selectShelly(this)"></select>
-      <input type="text" name="shelly_host" id="shelly-host" value="%SHELLY_HOST%" placeholder="shellyplugsg3-xxxxxxxxxxxx.local" style="margin-top:8px">
-      <button type="button" class="tbtn" onclick="testShelly()" style="margin-top:8px">Test connection</button>
+      <input type="text" name="shelly_host" id="shelly-host" value="%SHELLY_HOST%" placeholder="shellyplugsg3-xxxxxxxxxxxx.local">
+      <div class="btn-row">
+        <button type="button" class="tbtn" id="btn-scan" onclick="scanShelly()">Scan network</button>
+        <button type="button" class="tbtn" id="btn-test" onclick="testShelly()">Test connection</button>
+      </div>
       <div id="sst" class="hint" style="margin-top:6px"></div>
     </div>
 
@@ -418,14 +426,17 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   function scanShelly(){
     var el=document.getElementById('scan-st');
     var sel=document.getElementById('shelly-sel');
+    var btn=document.getElementById('btn-scan');
     el.innerHTML='Scanning...';el.style.color='#888';
     sel.style.display='none';
+    btn.className='tbtn tbtn-cyan';
     fetch('/api/scan-shelly')
     .then(function(r){return r.json()})
     .then(function(d){
       if(!d.length){
         el.innerHTML='No Shelly found. Check that your Shelly is connected to the same WiFi network.';
         el.style.color='#f44336';
+        btn.className='tbtn tbtn-err';
       } else {
         el.innerHTML='';
         sel.innerHTML='<option value="">-- select a device --</option>';
@@ -436,8 +447,12 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
           sel.appendChild(o);
         });
         sel.style.display='block';
+        btn.className='tbtn tbtn-ok';
       }
-    }).catch(function(){el.innerHTML='Scan failed';el.style.color='#f44336'});
+    }).catch(function(){
+      el.innerHTML='Scan failed';el.style.color='#f44336';
+      btn.className='tbtn tbtn-err';
+    });
   }
   function selectShelly(sel){
     if(sel.value)document.getElementById('shelly-host').value=sel.value;
@@ -445,12 +460,18 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   function testShelly(){
     var host=document.getElementById('shelly-host').value;
     var el=document.getElementById('sst');
+    var btn=document.getElementById('btn-test');
     el.innerHTML='Testing...';el.style.color='#888';
+    btn.className='tbtn tbtn-cyan';
     fetch('/test-shelly?host='+encodeURIComponent(host))
     .then(function(r){return r.json()}).then(function(d){
       el.innerHTML=d.ok?'OK! Power: '+d.power+'W':'Failed';
       el.style.color=d.ok?'#4caf50':'#f44336';
-    }).catch(function(){el.innerHTML='Error';el.style.color='#f44336'});
+      btn.className='tbtn '+(d.ok?'tbtn-ok':'tbtn-err');
+    }).catch(function(){
+      el.innerHTML='Error';el.style.color='#f44336';
+      btn.className='tbtn tbtn-err';
+    });
   }
   function testPayment(){
     var el=document.getElementById('tpst');
