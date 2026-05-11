@@ -30,7 +30,6 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PlugNSat Setup</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root {
       --pn-orange:        #F7931A;
@@ -58,7 +57,6 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       --pn-r-card:        14px;
       --pn-font:          -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
       --pn-mono:          ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-      --pn-pixel:         "Press Start 2P", ui-monospace, monospace;
     }
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
@@ -83,18 +81,14 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       padding: 24px 0 32px;
       text-align: center;
     }
-    .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--pn-pixel);
-      font-size: 22px;
-      letter-spacing: .02em;
-      line-height: 1;
+    .logo svg {
+      display: block;
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
-    .logo-plug { color: var(--pn-orange); }
-    .logo-bolt { width: 20px; height: 30px; color: var(--pn-gold); display: block; }
-    .logo-sat  { color: var(--pn-cyan); }
     h1 {
       margin: 6px 0 0;
       font-size: 26px;
@@ -265,11 +259,53 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
   <header>
     <div class="logo" aria-label="PlugNSat">
-      <span class="logo-plug">PLUG</span>
-      <svg class="logo-bolt" viewBox="0 0 12 18" aria-hidden="true">
-        <path d="M7 0 H10 V7 H12 L5 18 V11 H2 Z" fill="currentColor"></path>
+      <svg viewBox="0 0 245 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><rect id="p" width="4" height="4"/></defs>
+        <g fill="#F7931A">
+          <use href="#p" x="0" y="7"/><use href="#p" x="5" y="7"/><use href="#p" x="10" y="7"/><use href="#p" x="15" y="7"/>
+          <use href="#p" x="0" y="12"/><use href="#p" x="20" y="12"/>
+          <use href="#p" x="0" y="17"/><use href="#p" x="20" y="17"/>
+          <use href="#p" x="0" y="22"/><use href="#p" x="5" y="22"/><use href="#p" x="10" y="22"/><use href="#p" x="15" y="22"/>
+          <use href="#p" x="0" y="27"/><use href="#p" x="0" y="32"/><use href="#p" x="0" y="37"/>
+          <use href="#p" x="30" y="7"/><use href="#p" x="30" y="12"/><use href="#p" x="30" y="17"/><use href="#p" x="30" y="22"/><use href="#p" x="30" y="27"/><use href="#p" x="30" y="32"/>
+          <use href="#p" x="30" y="37"/><use href="#p" x="35" y="37"/><use href="#p" x="40" y="37"/><use href="#p" x="45" y="37"/><use href="#p" x="50" y="37"/>
+          <use href="#p" x="60" y="7"/><use href="#p" x="80" y="7"/><use href="#p" x="60" y="12"/><use href="#p" x="80" y="12"/>
+          <use href="#p" x="60" y="17"/><use href="#p" x="80" y="17"/><use href="#p" x="60" y="22"/><use href="#p" x="80" y="22"/>
+          <use href="#p" x="60" y="27"/><use href="#p" x="80" y="27"/><use href="#p" x="60" y="32"/><use href="#p" x="80" y="32"/>
+          <use href="#p" x="65" y="37"/><use href="#p" x="70" y="37"/><use href="#p" x="75" y="37"/>
+          <use href="#p" x="95" y="7"/><use href="#p" x="100" y="7"/><use href="#p" x="105" y="7"/>
+          <use href="#p" x="90" y="12"/><use href="#p" x="110" y="12"/><use href="#p" x="90" y="17"/>
+          <use href="#p" x="90" y="22"/><use href="#p" x="100" y="22"/><use href="#p" x="105" y="22"/><use href="#p" x="110" y="22"/>
+          <use href="#p" x="90" y="27"/><use href="#p" x="110" y="27"/><use href="#p" x="90" y="32"/><use href="#p" x="110" y="32"/>
+          <use href="#p" x="95" y="37"/><use href="#p" x="100" y="37"/><use href="#p" x="105" y="37"/>
+        </g>
+        <g fill="#FFD700">
+          <use href="#p" x="135" y="0"/><use href="#p" x="140" y="0"/><use href="#p" x="145" y="0"/>
+          <use href="#p" x="130" y="5"/><use href="#p" x="135" y="5"/><use href="#p" x="140" y="5"/>
+          <use href="#p" x="130" y="10"/><use href="#p" x="135" y="10"/><use href="#p" x="140" y="10"/>
+          <use href="#p" x="130" y="15"/><use href="#p" x="135" y="15"/>
+          <use href="#p" x="125" y="20"/><use href="#p" x="130" y="20"/><use href="#p" x="135" y="20"/><use href="#p" x="140" y="20"/><use href="#p" x="145" y="20"/>
+          <use href="#p" x="130" y="25"/><use href="#p" x="135" y="25"/><use href="#p" x="140" y="25"/>
+          <use href="#p" x="130" y="30"/><use href="#p" x="135" y="30"/>
+          <use href="#p" x="130" y="35"/>
+          <use href="#p" x="125" y="40"/><use href="#p" x="130" y="40"/>
+          <use href="#p" x="125" y="45"/>
+        </g>
+        <g fill="#00E5FF">
+          <use href="#p" x="165" y="7"/><use href="#p" x="170" y="7"/><use href="#p" x="175" y="7"/>
+          <use href="#p" x="160" y="12"/><use href="#p" x="180" y="12"/><use href="#p" x="160" y="17"/>
+          <use href="#p" x="165" y="22"/><use href="#p" x="170" y="22"/><use href="#p" x="175" y="22"/>
+          <use href="#p" x="180" y="27"/><use href="#p" x="160" y="32"/><use href="#p" x="180" y="32"/>
+          <use href="#p" x="165" y="37"/><use href="#p" x="170" y="37"/><use href="#p" x="175" y="37"/>
+          <use href="#p" x="195" y="7"/><use href="#p" x="200" y="7"/><use href="#p" x="205" y="7"/>
+          <use href="#p" x="190" y="12"/><use href="#p" x="210" y="12"/><use href="#p" x="190" y="17"/><use href="#p" x="210" y="17"/>
+          <use href="#p" x="190" y="22"/><use href="#p" x="195" y="22"/><use href="#p" x="200" y="22"/><use href="#p" x="205" y="22"/><use href="#p" x="210" y="22"/>
+          <use href="#p" x="190" y="27"/><use href="#p" x="210" y="27"/><use href="#p" x="190" y="32"/><use href="#p" x="210" y="32"/>
+          <use href="#p" x="190" y="37"/><use href="#p" x="210" y="37"/>
+          <use href="#p" x="220" y="7"/><use href="#p" x="225" y="7"/><use href="#p" x="230" y="7"/><use href="#p" x="235" y="7"/><use href="#p" x="240" y="7"/>
+          <use href="#p" x="230" y="12"/><use href="#p" x="230" y="17"/><use href="#p" x="230" y="22"/><use href="#p" x="230" y="27"/><use href="#p" x="230" y="32"/><use href="#p" x="230" y="37"/>
+        </g>
       </svg>
-      <span class="logo-sat">SAT</span>
     </div>
     <h1>Configure your <span class="accent">PlugNSat</span>.</h1>
     <p class="sub">Four steps. About two minutes.</p>

@@ -20,7 +20,7 @@
 - [ ] UI improvements on web portal (better layout, mobile responsive)
 - [ ] UI improvements on screen (price, device name alongside QR)
 - [ ] Bug fixes and code cleanup
-- [ ] Better error messages on screen and web portal
+- [ ] Better error messages and info indicators on screen and web portal
 - [ ] Simplify first-time setup flow for early documentation
 - [ ] WiFi signal strength indicator on screen
 
