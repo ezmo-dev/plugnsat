@@ -531,37 +531,28 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
 void displayPrice(TFT_eSPI &tft, int priceSats) {
   tft.fillScreen(COLOR_BG);
 
-  int mid = SCREEN_W / 2;
-  int lcx = mid / 2;        // 80
-  int rcx = mid + mid / 2;  // 240
+  uint16_t colCyan = tft.color565(0, 229, 255);
+  int cx = SCREEN_W / 2;
+  int rx = 294;
 
-  tft.drawFastVLine(mid, 0, SCREEN_H, COLOR_GRAY);
-
-  // Left: price value
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ACCENT);
   tft.setTextSize(3);
-  tft.drawString(String(priceSats), lcx, SCREEN_H / 2 - 12);
+  tft.drawString(String(priceSats), cx, SCREEN_H / 2 - 12);
   tft.setTextColor(COLOR_GRAY);
   tft.setTextSize(2);
-  tft.drawString("sats", lcx, SCREEN_H / 2 + 18);
+  tft.drawString("sats", cx, SCREEN_H / 2 + 18);
 
-  // Right: controls
-  tft.setTextDatum(TC_DATUM);
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString("-", rcx, 10);
-  tft.setTextSize(1);
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("BTN1", rcx, 30);
+  // "+" — BTN2 (top), same position as settings checkmark
+  for (int t = 0; t < 2; t++) {
+    tft.drawFastHLine(rx - 5, 30 + t, 11, colCyan);
+    tft.drawFastVLine(rx + t, 25, 12, colCyan);
+  }
 
-  tft.setTextDatum(BC_DATUM);
-  tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(1);
-  tft.drawString("BTN2", rcx, SCREEN_H - 28);
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString("+", rcx, SCREEN_H - 8);
+  // "−" — BTN1 (bottom), same y-zone as settings triangles
+  for (int t = 0; t < 2; t++) {
+    tft.drawFastHLine(rx - 5, 142 + t, 11, colCyan);
+  }
 }
 
 //
@@ -571,17 +562,15 @@ void displayPrice(TFT_eSPI &tft, int priceSats) {
 void displayDuration(TFT_eSPI &tft, int durationSeconds) {
   tft.fillScreen(COLOR_BG);
 
-  int mid = SCREEN_W / 2;
-  int lcx = mid / 2;
-  int rcx = mid + mid / 2;
+  uint16_t colCyan = tft.color565(0, 229, 255);
+  int cx = SCREEN_W / 2;
+  int rx = 294;
 
-  tft.drawFastVLine(mid, 0, SCREEN_H, COLOR_GRAY);
-
-  // Left: duration value
+  // Centered duration value
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ACCENT);
   tft.setTextSize(3);
-  tft.drawString(String(durationSeconds) + "s", lcx, SCREEN_H / 2 - 14);
+  tft.drawString(String(durationSeconds) + "s", cx, SCREEN_H / 2 - 14);
 
   // Conversion below
   tft.setTextColor(COLOR_GRAY);
@@ -591,28 +580,22 @@ void displayDuration(TFT_eSPI &tft, int durationSeconds) {
     int m = (durationSeconds % 3600) / 60;
     String conv = String(h) + "h";
     if (m > 0) conv += " " + String(m) + "min";
-    tft.drawString(conv, lcx, SCREEN_H / 2 + 12);
+    tft.drawString(conv, cx, SCREEN_H / 2 + 12);
   } else if (durationSeconds >= 60) {
     int m = durationSeconds / 60;
-    tft.drawString(String(m) + " min", lcx, SCREEN_H / 2 + 12);
+    tft.drawString(String(m) + " min", cx, SCREEN_H / 2 + 12);
   }
 
-  // Right: controls
-  tft.setTextDatum(TC_DATUM);
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString("-", rcx, 10);
-  tft.setTextSize(1);
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("BTN1", rcx, 30);
+  // "+" — BTN2 (top), same position as settings checkmark
+  for (int t = 0; t < 2; t++) {
+    tft.drawFastHLine(rx - 5, 30 + t, 11, colCyan);
+    tft.drawFastVLine(rx + t, 25, 12, colCyan);
+  }
 
-  tft.setTextDatum(BC_DATUM);
-  tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(1);
-  tft.drawString("BTN2", rcx, SCREEN_H - 28);
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString("+", rcx, SCREEN_H - 8);
+  // "−" — BTN1 (bottom), same y-zone as settings triangles
+  for (int t = 0; t < 2; t++) {
+    tft.drawFastHLine(rx - 5, 142 + t, 11, colCyan);
+  }
 }
 
 //
