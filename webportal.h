@@ -292,6 +292,40 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       z-index: 10;
     }
     .tip:hover::after { opacity: 1; }
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      cursor: pointer;
+      user-select: none;
+      font-size: inherit;
+    }
+    .toggle input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+    .toggle-track {
+      flex-shrink: 0;
+      width: 36px; height: 20px;
+      border-radius: 10px;
+      background: var(--pn-border-2);
+      position: relative;
+      transition: background .15s ease;
+    }
+    .toggle input:checked + .toggle-track { background: var(--pn-cyan); }
+    .toggle-thumb {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+      transition: transform .15s ease;
+    }
+    .toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
+    .toggle-label { font-size: 13px; color: var(--pn-fg-2); font-weight: 500; }
     ::selection { background: rgba(247,147,26,.25); color: var(--pn-fg); }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -396,21 +430,31 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Device settings</h2>
-      <label>Name</label>
+      <label>Name <span class="tip" data-tip="Displayed on the device screen and on the web portal status page.">i</span></label>
       <input type="text" name="dev_name" value="%DEV_NAME%" placeholder="PlugNSat">
+      <label class="toggle">
+        <input type="checkbox" name="show_name" value="1" %SHOW_NAME_CHECKED%>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        <span class="toggle-label">Show name on QR screen</span>
+      </label>
       <div class="row">
         <div>
-          <label>Price (satoshis)</label>
+          <label>Price (satoshis) <span class="tip" data-tip="Amount in satoshis the customer pays to activate the plug.">i</span></label>
           <input type="number" name="price_sats" value="%PRICE_SATS%" min="1" max="1000000">
         </div>
         <div>
-          <label>Duration (seconds)</label>
+          <label>Duration (seconds) <span class="tip" data-tip="How long the Shelly stays on after payment, in seconds.">i</span></label>
           <input type="number" name="duration" value="%DURATION%" min="1" max="86400">
         </div>
       </div>
+      <label class="toggle">
+        <input type="checkbox" name="show_price" value="1" %SHOW_PRICE_CHECKED%>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        <span class="toggle-label">Show price on QR screen</span>
+      </label>
       <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
       <div id="tpst" class="hint" style="margin-top:6px"></div>
-      <label>Settings PIN (4 digits)</label>
+      <label>Settings PIN (4 digits) <span class="tip" data-tip="If set, this 4-digit PIN is required to change Price and Duration directly on the device. Leave empty to disable.">i</span></label>
       <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Optional" inputmode="numeric" pattern="[0-9]{0,4}">
       <div class="hint">Protects Price and Duration settings on the device</div>
     </div>
@@ -578,7 +622,9 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%PRICE_SATS%",  String(config.priceSats));
   html.replace("%DURATION%",    String(config.activationDuration));
   html.replace("%DEV_NAME%",    config.deviceName);
-  html.replace("%SETTINGS_PIN%", config.pin);
+  html.replace("%SETTINGS_PIN%",       config.pin);
+  html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
+  html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
   return html;
 }
 
@@ -598,6 +644,8 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.priceSats          = server.arg("price_sats").toInt();
     config.activationDuration = server.arg("duration").toInt();
     config.deviceName         = server.arg("dev_name");
+    config.showName  = server.arg("show_name")  == "1";
+    config.showPrice = server.arg("show_price") == "1";
     String newPin             = server.arg("settings_pin");
     if (newPin.length() == 0) {
       config.pin = "";

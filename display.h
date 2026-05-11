@@ -215,14 +215,13 @@ void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
   qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qrData.c_str());
   
   int qrSize = qrcode.size;
-  
-  // Full screen height
-  int pixelSize = SCREEN_H / qrSize;
+
+  int pixelSize = (SCREEN_H - 2) / qrSize;
   if (pixelSize < 1) pixelSize = 1;
-  
+
   int qrPixelW = qrSize * pixelSize;
   int qrPixelH = qrSize * pixelSize;
-  
+
   int qrX = (SCREEN_W - qrPixelW) / 2;
   int qrY = (SCREEN_H - qrPixelH) / 2;
   
@@ -240,6 +239,163 @@ void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
   }
 }
   
+//
+// QR CODE WITH INFO PANEL (right side: mini logo + optional name/price)
+//
+
+void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceName, bool showName, bool showPrice) {
+  tft.fillScreen(TFT_BLACK);
+
+  String qrData = data;
+  qrData.toUpperCase();
+
+  int version;
+  if (qrData.length() < 50)       version = 3;
+  else if (qrData.length() < 85)  version = 5;
+  else if (qrData.length() < 120) version = 6;
+  else if (qrData.length() < 180) version = 8;
+  else                             version = QR_VERSION;
+
+  QRCode qrcode;
+  uint8_t qrcodeData[qrcode_getBufferSize(version)];
+  qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qrData.c_str());
+
+  int qrSize    = qrcode.size;
+  int pixelSize = (SCREEN_H - 2) / qrSize;
+  if (pixelSize < 1) pixelSize = 1;
+  int qrPixW = qrSize * pixelSize;
+  int qrPixH = qrSize * pixelSize;
+  int qrX = 3;
+  int qrY = (SCREEN_H - qrPixH) / 2;
+
+  for (int y = 0; y < qrSize; y++) {
+    for (int x = 0; x < qrSize; x++) {
+      if (qrcode_getModule(&qrcode, x, y)) {
+        tft.fillRect(qrX + x * pixelSize, qrY + y * pixelSize, pixelSize, pixelSize, TFT_WHITE);
+      }
+    }
+  }
+
+  // Right info panel — starts at the actual right edge of the QR (qrX + qrPixW)
+  int panelLeft = qrX + qrPixW;
+  int panelCX   = (panelLeft + SCREEN_W) / 2;
+
+  uint16_t orange = tft.color565(247, 147, 26);
+  uint16_t yellow = tft.color565(255, 215, 0);
+  uint16_t cyan   = tft.color565(0, 229, 255);
+
+  static const uint8_t font_P[] = {0xF0,0x88,0x88,0xF0,0x80,0x80,0x80};
+  static const uint8_t font_L[] = {0x80,0x80,0x80,0x80,0x80,0x80,0xF8};
+  static const uint8_t font_U[] = {0x88,0x88,0x88,0x88,0x88,0x88,0x70};
+  static const uint8_t font_G[] = {0x70,0x88,0x80,0xB8,0x88,0x88,0x70};
+  static const uint8_t font_S[] = {0x70,0x88,0x80,0x70,0x08,0x88,0x70};
+  static const uint8_t font_A[] = {0x70,0x88,0x88,0xF8,0x88,0x88,0x88};
+  static const uint8_t font_T[] = {0xF8,0x20,0x20,0x20,0x20,0x20,0x20};
+  static const uint8_t bolt[]   = {0x38,0x70,0x70,0x60,0xF8,0x70,0x60,0x40,0xC0,0x80};
+
+  int ps      = 2;
+  int gap     = ps;
+  int charW   = 5 * ps + gap;   // 12
+  int bps     = 2;
+  int boltW   = 5 * bps;        // 10
+  int boltGap = ps * 2;         // 4
+  // totalW = 4*12 + 4 + 10 + 4 + 3*12 - 2 = 100
+  int totalW  = 4 * charW + boltGap + boltW + boltGap + 3 * charW - gap;
+  int logoH   = 7 * ps;         // 14
+  int boltH   = 10 * bps;       // 20
+  int visibleH = boltH;         // bolt is tallest
+
+  int startX = max(panelLeft + 1, panelCX - totalW / 2);
+  int topY   = 14;
+
+  auto drawChar = [&](const uint8_t* f, int cx, int cy, uint16_t color) {
+    for (int row = 0; row < 7; row++) {
+      uint8_t bits = f[row];
+      for (int col = 0; col < 5; col++) {
+        if (bits & (0x80 >> col))
+          tft.fillRect(cx + col * ps, cy + row * ps, ps - 1, ps - 1, color);
+      }
+    }
+  };
+
+  int x       = startX;
+  int letterY = topY + (visibleH - logoH) / 2;
+
+  drawChar(font_P, x, letterY, orange); x += charW;
+  drawChar(font_L, x, letterY, orange); x += charW;
+  drawChar(font_U, x, letterY, orange); x += charW;
+  drawChar(font_G, x, letterY, orange); x += charW;
+
+  x += boltGap - gap;
+  for (int row = 0; row < 10; row++) {
+    uint8_t bits = bolt[row];
+    for (int col = 0; col < 5; col++) {
+      if (bits & (0x80 >> col))
+        tft.fillRect(x + col * bps, topY + row * bps, bps - 1, bps - 1, yellow);
+    }
+  }
+  x += boltW + boltGap;
+
+  drawChar(font_S, x, letterY, cyan); x += charW;
+  drawChar(font_A, x, letterY, cyan); x += charW;
+  drawChar(font_T, x, letterY, cyan);
+
+  // Pre-measure name at textSize(2) to know if 1 or 2 lines
+  int maxW = (SCREEN_W - panelLeft) - 6;
+  bool name2Lines = false;
+  int nameSplit   = -1;
+  if (showName && deviceName.length() > 0) {
+    tft.setTextSize(2);
+    if (tft.textWidth(deviceName) > maxW) {
+      for (int i = (int)deviceName.length() - 1; i >= 1; i--) {
+        if (deviceName[i] == ' ' && tft.textWidth(deviceName.substring(0, i)) <= maxW) {
+          nameSplit = i; name2Lines = true; break;
+        }
+      }
+    }
+  }
+
+  // Compute content block height (textSize(2) = 16px/line)
+  int contentH = 0;
+  if (showName && deviceName.length() > 0) contentH += 10 + (name2Lines ? 34 : 16);
+  if (showPrice) contentH += 12 + 54;  // 12 gap + 24 price + 10 gap + 8 sats
+
+  // Center block in space below logo
+  int remaining = SCREEN_H - (topY + visibleH);
+  int curY = topY + visibleH + max(0, (remaining - contentH) / 2);
+
+  tft.setTextDatum(MC_DATUM);
+
+  if (showName && deviceName.length() > 0) {
+    curY += 10;
+    tft.setTextColor(COLOR_TEXT);
+    tft.setTextSize(2);
+    if (!name2Lines) {
+      tft.drawString(deviceName, panelCX, curY + 8);
+      curY += 16;
+    } else {
+      String line1 = deviceName.substring(0, nameSplit);
+      String line2 = deviceName.substring(nameSplit + 1);
+      while (line2.length() > 1 && tft.textWidth(line2) > maxW)
+        line2 = line2.substring(0, line2.length() - 1);
+      tft.drawString(line1, panelCX, curY + 8);
+      tft.drawString(line2, panelCX, curY + 26);
+      curY += 34;
+    }
+  }
+
+  if (showPrice) {
+    curY += 12;
+    tft.setTextColor(COLOR_ACCENT);
+    tft.setTextSize(3);
+    tft.drawString(String(priceSats), panelCX, curY + 12);
+    curY += 34;
+    tft.setTextColor(COLOR_GRAY);
+    tft.setTextSize(1);
+    tft.drawString("sats", panelCX, curY + 4);
+  }
+}
+
 //
 // PAID
 //
@@ -620,7 +776,7 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
   qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qr.c_str());
 
   int qrSize  = qrcode.size;
-  int pixSize = SCREEN_H / qrSize;  // same as displayQR
+  int pixSize = (SCREEN_H - 2) / qrSize;
   if (pixSize < 1) pixSize = 1;
   int qrPixW = qrSize * pixSize;
   int qrPixH = qrSize * pixSize;

@@ -331,6 +331,15 @@ void loopQRDisplay() {
   }
 }
 
+void showCurrentQR() {
+  if (config.showName || config.showPrice) {
+    displayQRWithInfo(tft, currentBolt11, config.priceSats, config.deviceName, config.showName, config.showPrice);
+  } else {
+    displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
+  }
+  currentState = STATE_QR_DISPLAY;
+}
+
 void generateAndShowQR() {
   displayGenerating(tft);
   
@@ -349,8 +358,7 @@ void generateAndShowQR() {
     lastPollTime = millis();
     consecutiveErrors = 0;
     
-    displayQR(tft, bolt11, config.priceSats, config.deviceName);
-    currentState = STATE_QR_DISPLAY;
+    showCurrentQR();
     
     Serial.println("QR ready. Invoice: " + invoiceId + " (" + String(bolt11.length()) + " chars)");
   } else {
@@ -433,8 +441,7 @@ void loopInfo() {
   }
   if (btn1Pressed || btn2Pressed) {
     if (currentBolt11.length() > 0) {
-      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
-      currentState = STATE_QR_DISPLAY;
+      showCurrentQR();
     } else {
       generateAndShowQR();
     }
@@ -449,8 +456,7 @@ void loopSettings() {
   // Auto-timeout 6s -> back to QR
   if (millis() - lastSettingsInput > 6000) {
     if (currentBolt11.length() > 0) {
-      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
-      currentState = STATE_QR_DISPLAY;
+      showCurrentQR();
     } else {
       generateAndShowQR();
     }
@@ -513,8 +519,7 @@ void loopBrightness() {
   if (millis() - lastBrightnessInput > 6000) {
     saveConfig();
     if (currentBolt11.length() > 0) {
-      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
-      currentState = STATE_QR_DISPLAY;
+      showCurrentQR();
     } else {
       generateAndShowQR();
     }
@@ -546,8 +551,7 @@ void loopPrice() {
   if (millis() - lastPriceInput > 6000) {
     saveConfig();
     if (currentBolt11.length() > 0) {
-      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
-      currentState = STATE_QR_DISPLAY;
+      showCurrentQR();
     } else {
       generateAndShowQR();
     }
@@ -579,8 +583,7 @@ void loopDuration() {
   if (millis() - lastDurationInput > 6000) {
     saveConfig();
     if (currentBolt11.length() > 0) {
-      displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
-      currentState = STATE_QR_DISPLAY;
+      showCurrentQR();
     } else {
       generateAndShowQR();
     }
@@ -761,6 +764,8 @@ void loadConfig() {
   config.deviceName         = prefs.getString("dev_name", "PlugNSat");
   config.brightness         = prefs.getInt("brightness", 40);
   config.pin                = prefs.getString("settings_pin", "");
+  config.showName           = prefs.getBool("show_name",  false);
+  config.showPrice          = prefs.getBool("show_price", false);
   prefs.end();
 }
 
@@ -777,5 +782,7 @@ void saveConfig() {
   prefs.putString("dev_name",     config.deviceName);
   prefs.putInt("brightness",      config.brightness);
   prefs.putString("settings_pin", config.pin);
+  prefs.putBool("show_name",      config.showName);
+  prefs.putBool("show_price",     config.showPrice);
   prefs.end();
 }

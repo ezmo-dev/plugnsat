@@ -11,7 +11,8 @@
 - [x] Web portal UI redesign (light theme, step-based layout)
 - [x] UI polish: paid screen, error screen, info screen, settings screen
 - [ ] Better error messages and info indicators on all screens
-- [ ] Info tooltips on web portal fields
+- [X] Info tooltips on web portal fields
+- [ ] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
 - [ ] First test video
 - [ ] Documentation structure: create outline with all major sections
 - [ ] README v1 on GitHub

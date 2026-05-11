@@ -47,6 +47,8 @@ struct PlugNSatConfig {
   String deviceName;       // Shown on screen
   int brightness;          // Screen brightness (10-255)
   String pin;              // 4-digit PIN to protect Price/Duration (empty = disabled)
+  bool showName;           // Show device name on QR screen
+  bool showPrice;          // Show price on QR screen
 };
 
 #endif
