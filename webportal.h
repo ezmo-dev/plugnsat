@@ -487,6 +487,86 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 </html>
 )rawliteral";
 
+const char SAVED_PAGE[] PROGMEM = R"rawliteral(
+<!DOCTYPE html><html><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PlugNSat</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,sans-serif;background:#FBFAF8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.wrap{text-align:center;max-width:340px;width:100%}
+.logo svg{display:block;width:210px;margin:0 auto 32px;image-rendering:pixelated;image-rendering:crisp-edges}
+.saved{font-size:42px;font-weight:800;color:#00E676;margin-bottom:20px;letter-spacing:-.02em}
+.card{background:#F4F2EE;border-radius:12px;padding:14px 20px;margin-bottom:28px;font-size:14px;color:#535862}
+.count{font-size:13px;color:#90939B}
+</style>
+</head><body>
+<div class="wrap">
+<div class="logo">
+<svg viewBox="0 0 245 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<defs><rect id="p" width="4" height="4"/></defs>
+<g fill="#F7931A">
+<use href="#p" x="0" y="7"/><use href="#p" x="5" y="7"/><use href="#p" x="10" y="7"/><use href="#p" x="15" y="7"/>
+<use href="#p" x="0" y="12"/><use href="#p" x="20" y="12"/>
+<use href="#p" x="0" y="17"/><use href="#p" x="20" y="17"/>
+<use href="#p" x="0" y="22"/><use href="#p" x="5" y="22"/><use href="#p" x="10" y="22"/><use href="#p" x="15" y="22"/>
+<use href="#p" x="0" y="27"/><use href="#p" x="0" y="32"/><use href="#p" x="0" y="37"/>
+<use href="#p" x="30" y="7"/><use href="#p" x="30" y="12"/><use href="#p" x="30" y="17"/><use href="#p" x="30" y="22"/><use href="#p" x="30" y="27"/><use href="#p" x="30" y="32"/>
+<use href="#p" x="30" y="37"/><use href="#p" x="35" y="37"/><use href="#p" x="40" y="37"/><use href="#p" x="45" y="37"/><use href="#p" x="50" y="37"/>
+<use href="#p" x="60" y="7"/><use href="#p" x="80" y="7"/><use href="#p" x="60" y="12"/><use href="#p" x="80" y="12"/>
+<use href="#p" x="60" y="17"/><use href="#p" x="80" y="17"/><use href="#p" x="60" y="22"/><use href="#p" x="80" y="22"/>
+<use href="#p" x="60" y="27"/><use href="#p" x="80" y="27"/><use href="#p" x="60" y="32"/><use href="#p" x="80" y="32"/>
+<use href="#p" x="65" y="37"/><use href="#p" x="70" y="37"/><use href="#p" x="75" y="37"/>
+<use href="#p" x="95" y="7"/><use href="#p" x="100" y="7"/><use href="#p" x="105" y="7"/>
+<use href="#p" x="90" y="12"/><use href="#p" x="110" y="12"/><use href="#p" x="90" y="17"/>
+<use href="#p" x="90" y="22"/><use href="#p" x="100" y="22"/><use href="#p" x="105" y="22"/><use href="#p" x="110" y="22"/>
+<use href="#p" x="90" y="27"/><use href="#p" x="110" y="27"/><use href="#p" x="90" y="32"/><use href="#p" x="110" y="32"/>
+<use href="#p" x="95" y="37"/><use href="#p" x="100" y="37"/><use href="#p" x="105" y="37"/>
+</g>
+<g fill="#FFD700">
+<use href="#p" x="135" y="0"/><use href="#p" x="140" y="0"/><use href="#p" x="145" y="0"/>
+<use href="#p" x="130" y="5"/><use href="#p" x="135" y="5"/><use href="#p" x="140" y="5"/>
+<use href="#p" x="130" y="10"/><use href="#p" x="135" y="10"/><use href="#p" x="140" y="10"/>
+<use href="#p" x="130" y="15"/><use href="#p" x="135" y="15"/>
+<use href="#p" x="125" y="20"/><use href="#p" x="130" y="20"/><use href="#p" x="135" y="20"/><use href="#p" x="140" y="20"/><use href="#p" x="145" y="20"/>
+<use href="#p" x="130" y="25"/><use href="#p" x="135" y="25"/><use href="#p" x="140" y="25"/>
+<use href="#p" x="130" y="30"/><use href="#p" x="135" y="30"/>
+<use href="#p" x="130" y="35"/>
+<use href="#p" x="125" y="40"/><use href="#p" x="130" y="40"/>
+<use href="#p" x="125" y="45"/>
+</g>
+<g fill="#00E5FF">
+<use href="#p" x="165" y="7"/><use href="#p" x="170" y="7"/><use href="#p" x="175" y="7"/>
+<use href="#p" x="160" y="12"/><use href="#p" x="180" y="12"/><use href="#p" x="160" y="17"/>
+<use href="#p" x="165" y="22"/><use href="#p" x="170" y="22"/><use href="#p" x="175" y="22"/>
+<use href="#p" x="180" y="27"/><use href="#p" x="160" y="32"/><use href="#p" x="180" y="32"/>
+<use href="#p" x="165" y="37"/><use href="#p" x="170" y="37"/><use href="#p" x="175" y="37"/>
+<use href="#p" x="195" y="7"/><use href="#p" x="200" y="7"/><use href="#p" x="205" y="7"/>
+<use href="#p" x="190" y="12"/><use href="#p" x="210" y="12"/><use href="#p" x="190" y="17"/><use href="#p" x="210" y="17"/>
+<use href="#p" x="190" y="22"/><use href="#p" x="195" y="22"/><use href="#p" x="200" y="22"/><use href="#p" x="205" y="22"/><use href="#p" x="210" y="22"/>
+<use href="#p" x="190" y="27"/><use href="#p" x="210" y="27"/><use href="#p" x="190" y="32"/><use href="#p" x="210" y="32"/>
+<use href="#p" x="190" y="37"/><use href="#p" x="210" y="37"/>
+<use href="#p" x="220" y="7"/><use href="#p" x="225" y="7"/><use href="#p" x="230" y="7"/><use href="#p" x="235" y="7"/><use href="#p" x="240" y="7"/>
+<use href="#p" x="230" y="12"/><use href="#p" x="230" y="17"/><use href="#p" x="230" y="22"/><use href="#p" x="230" y="27"/><use href="#p" x="230" y="32"/><use href="#p" x="230" y="37"/>
+</g>
+</svg>
+</div>
+<div class="saved">Saved!</div>
+<div class="card">%DEV_NAME% &middot; %PRICE_SATS% sats &middot; %DURATION%s</div>
+<div class="count" id="c">Restarting in 3...</div>
+</div>
+<script>var n=3;var t=setInterval(function(){n--;if(n>0){document.getElementById('c').textContent='Restarting in '+n+'...';}else{document.getElementById('c').textContent='Restarting now...';clearInterval(t);}},1000);</script>
+</body></html>
+)rawliteral";
+
+String processSavedPage(PlugNSatConfig &config) {
+  String html = String(SAVED_PAGE);
+  html.replace("%DEV_NAME%",   config.deviceName);
+  html.replace("%PRICE_SATS%", String(config.priceSats));
+  html.replace("%DURATION%",   String(config.activationDuration));
+  return html;
+}
+
 String processTemplate(PlugNSatConfig &config) {
   String html = String(HTML_PAGE);
   html.replace("%WIFI_SSID%",   config.wifiSsid);
@@ -536,10 +616,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     
     saveConfig();
     
-    server.send(200, "text/html", 
-      "<html><body style='background:#FBFAF8;color:#1F8A5B;text-align:center;"
-      "padding:60px;font-family:-apple-system,system-ui,sans-serif'>"
-      "<h1 style=\"color:#F7931A\">Saved!</h1><p>Restarting...</p></body></html>");
+    server.send(200, "text/html", processSavedPage(config));
     delay(3000);
     ESP.restart();
   });
