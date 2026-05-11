@@ -244,6 +244,48 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       color: var(--pn-fg-3);
       letter-spacing: .01em;
     }
+    .tip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 1.5px solid var(--pn-fg-3);
+      color: var(--pn-fg-3);
+      font-size: 8px;
+      font-style: normal;
+      font-weight: 700;
+      font-family: var(--pn-font);
+      line-height: 1;
+      cursor: default;
+      position: relative;
+      vertical-align: super;
+      margin-left: 2px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .tip::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 0;
+      top: calc(100% + 8px);
+      background: var(--pn-fg);
+      color: #fff;
+      font-size: 12px;
+      font-style: normal;
+      font-family: var(--pn-font);
+      font-weight: 400;
+      padding: 8px 12px;
+      border-radius: 8px;
+      width: 240px;
+      text-align: left;
+      line-height: 1.45;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+      z-index: 10;
+    }
+    .tip:hover::after { opacity: 1; }
     ::selection { background: rgba(247,147,26,.25); color: var(--pn-fg); }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -314,7 +356,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   <form action="/save" method="POST">
 
     <div class="sec">
-      <h2>WiFi</h2>
+      <h2>WiFi <span class="tip" data-tip="Your WiFi network name and password. The Shelly plug must be on the same network.">i</span></h2>
       <label>SSID</label>
       <input type="text" name="wifi_ssid" value="%WIFI_SSID%">
       <label>Password</label>
@@ -323,13 +365,13 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>BTCPay Server</h2>
-      <label>Server URL</label>
+      <label>Server URL <span class="tip" data-tip="The full URL of your BTCPay Server instance, without trailing slash. Example: https://btcpay.mydomain.com">i</span></label>
       <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="e.g. https://btcpay.mydomain.com">
       <div class="hint">No trailing slash</div>
-      <label>API Key</label>
+      <label>API Key <span class="tip" data-tip="Generate it in BTCPay Server: Account > API Keys. Required permissions: cancreateinvoice, canviewinvoices, canuselightningnode.">i</span></label>
       <input type="password" name="btcpay_key" value="%BTCPAY_KEY%">
       <div class="hint">Permissions: cancreateinvoice, canviewinvoices</div>
-      <label>Store ID</label>
+      <label>Store ID <span class="tip" data-tip="Found in BTCPay Server: Settings > General. It's the long alphanumeric string in the URL when viewing your store.">i</span></label>
       <input type="text" name="btcpay_store" value="%BTCPAY_STORE%">
     </div>
 

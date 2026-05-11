@@ -9,7 +9,7 @@
 - [x] Adjust price and duration from device buttons (PIN-protected)
 - [x] First 3D print case
 - [x] Web portal UI redesign (light theme, step-based layout)
-- [ ] UI polish: paid screen, error screen, info screen, settings screen
+- [x] UI polish: paid screen, error screen, info screen, settings screen
 - [ ] Better error messages and info indicators on all screens
 - [ ] Info tooltips on web portal fields
 - [ ] First test video
