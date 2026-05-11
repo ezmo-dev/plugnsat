@@ -640,15 +640,19 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
   // Center brightness bar between QR right edge and screen right edge
   int cx = (qrX + qrPixW + SCREEN_W) / 2;
 
-  tft.setTextDatum(TC_DATUM);
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString("-", cx, 8);
+  uint16_t colCyan = tft.color565(0, 229, 255);
+  int rx = cx;  // icons centered above/below bar
 
-  int barH = 90;
+  // "+" — BTN2 (top), slightly higher for breathing room
+  for (int t = 0; t < 2; t++) {
+    tft.drawFastHLine(rx - 5, 22 + t, 11, colCyan);
+    tft.drawFastVLine(rx + t, 17, 12, colCyan);
+  }
+
+  int barH = 80;
   int barW = 14;
   int barX = cx - barW / 2;
-  int barY = 32;  // 8 + 16 + 8
+  int barY = 44;  // centered between "+" (ends y=28) and "−" (starts y=153)
 
   tft.fillRect(barX, barY, barW, barH, 0x1082);
   tft.drawRect(barX - 1, barY - 1, barW + 2, barH + 2, COLOR_GRAY);
@@ -658,16 +662,17 @@ void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
     tft.fillRect(barX, barY + barH - fillH, barW, fillH, COLOR_ACCENT);
   }
 
+  // "%" between bar and "−", no overlap (bar ends y=124, % y=129–137, "−" y=145)
   int pct = map(brightness, 0, 255, 0, 100);
   tft.setTextDatum(TC_DATUM);
   tft.setTextColor(COLOR_ACCENT);
   tft.setTextSize(1);
-  tft.drawString(String(pct) + "%", cx, barY + barH + 8);  // 32+90+8=130
+  tft.drawString(String(pct) + "%", cx, barY + barH + 4);
 
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.setTextDatum(BC_DATUM);
-  tft.drawString("+", cx, SCREEN_H - 8);  // bottom at 162, gap 8 to edge
+  // "−" — BTN1 (bottom), slightly lower for breathing room
+  for (int t = 0; t < 2; t++) {
+    tft.drawFastHLine(rx - 5, 153 + t, 11, colCyan);
+  }
 }
 
 //
