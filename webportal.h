@@ -601,7 +601,7 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#FBFAF8;min-heigh
 <div class="saved">Saved!</div>
 <div class="card">%DEV_NAME% &middot; %PRICE_SATS% sats &middot; %DURATION%s</div>
 <div class="count" id="c">Restarting in 3...</div>
-<p class="back"><a href="http://%IP%">Configure your PlugNSat &rarr;</a></p>
+<p class="back"><a href="http://%IP%">Back to PlugNSat settings &rarr;</a></p>
 </div>
 <script>var n=3;var t=setInterval(function(){n--;if(n>0){document.getElementById('c').textContent='Restarting in '+n+'...';}else{document.getElementById('c').textContent='Restarting now...';clearInterval(t);}},1000);</script>
 </body></html>
