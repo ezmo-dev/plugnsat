@@ -265,7 +265,7 @@ void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceN
   if (pixelSize < 1) pixelSize = 1;
   int qrPixW = qrSize * pixelSize;
   int qrPixH = qrSize * pixelSize;
-  int qrX = 3;
+  int qrX = 7;
   int qrY = (SCREEN_H - qrPixH) / 2;
 
   for (int y = 0; y < qrSize; y++) {
