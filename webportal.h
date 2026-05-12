@@ -543,6 +543,9 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#FBFAF8;min-heigh
 .saved{font-size:42px;font-weight:800;color:#00E676;margin-bottom:20px;letter-spacing:-.02em}
 .card{background:#F4F2EE;border-radius:12px;padding:14px 20px;margin-bottom:28px;font-size:14px;color:#535862}
 .count{font-size:13px;color:#90939B}
+.back{margin-top:18px;font-size:13px}
+.back a{color:#00E5FF;text-decoration:none;font-weight:500}
+.back a:hover{text-decoration:underline}
 </style>
 </head><body>
 <div class="wrap">
@@ -598,6 +601,7 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#FBFAF8;min-heigh
 <div class="saved">Saved!</div>
 <div class="card">%DEV_NAME% &middot; %PRICE_SATS% sats &middot; %DURATION%s</div>
 <div class="count" id="c">Restarting in 3...</div>
+<p class="back"><a href="http://%IP%">Configure your PlugNSat &rarr;</a></p>
 </div>
 <script>var n=3;var t=setInterval(function(){n--;if(n>0){document.getElementById('c').textContent='Restarting in '+n+'...';}else{document.getElementById('c').textContent='Restarting now...';clearInterval(t);}},1000);</script>
 </body></html>
@@ -608,6 +612,9 @@ String processSavedPage(PlugNSatConfig &config) {
   html.replace("%DEV_NAME%",   config.deviceName);
   html.replace("%PRICE_SATS%", String(config.priceSats));
   html.replace("%DURATION%",   String(config.activationDuration));
+  String ip = WiFi.localIP().toString();
+  if (ip == "0.0.0.0") ip = WiFi.softAPIP().toString();
+  html.replace("%IP%", ip);
   return html;
 }
 
