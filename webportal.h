@@ -431,9 +431,10 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     <div class="sec">
       <h2>Device settings</h2>
       <label>Name <span class="tip" data-tip="Displayed on the device screen and on the web portal status page.">i</span></label>
-      <input type="text" name="dev_name" value="%DEV_NAME%" placeholder="PlugNSat">
+      <input type="text" name="dev_name" id="dev-name" value="%DEV_NAME%" placeholder="PlugNSat" oninput="validateName()">
+      <div id="name-err" class="hint"></div>
       <label class="toggle">
-        <input type="checkbox" name="show_name" value="1" %SHOW_NAME_CHECKED%>
+        <input type="checkbox" name="show_name" id="show-name-cb" value="1" %SHOW_NAME_CHECKED% onchange="validateName()">
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span class="toggle-label">Show name on QR screen</span>
       </label>
@@ -459,7 +460,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <div class="hint">Protects Price and Duration settings on the device</div>
     </div>
 
-    <button type="submit">Save and restart &rarr;</button>
+    <button type="submit" id="btn-save">Save and restart &rarr;</button>
   </form>
 
   <p class="footer">v0.1.0 &middot; plugnsat.com &middot; open-source &middot; MIT</p>
@@ -467,6 +468,25 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 </div>
 
   <script>
+  function validateName(){
+    var inp=document.getElementById('dev-name');
+    var cb=document.getElementById('show-name-cb');
+    var err=document.getElementById('name-err');
+    var btn=document.getElementById('btn-save');
+    var v=inp.value;
+    var msg='';
+    if(cb.checked){
+      if(v.length>18||!/^[A-Za-z0-9 .\-]*$/.test(v))
+        msg='Max 18 characters, no special characters';
+    } else {
+      if(v.length>40) msg='Max 40 characters';
+    }
+    inp.style.borderColor=msg?'var(--pn-danger)':'';
+    inp.style.boxShadow=msg?'0 0 0 3px rgba(200,55,45,.18)':'';
+    err.textContent=msg;
+    err.style.color='var(--pn-danger)';
+    btn.disabled=!!msg;
+  }
   function scanShelly(){
     var el=document.getElementById('scan-st');
     var sel=document.getElementById('shelly-sel');

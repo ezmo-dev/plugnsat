@@ -340,25 +340,19 @@ void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceN
   drawChar(font_A, x, letterY, cyan); x += charW;
   drawChar(font_T, x, letterY, cyan);
 
-  // Pre-measure name at textSize(2) to know if 1 or 2 lines
-  int maxW = (SCREEN_W - panelLeft) - 6;
-  bool name2Lines = false;
-  int nameSplit   = -1;
-  if (showName && deviceName.length() > 0) {
-    tft.setTextSize(2);
-    if (tft.textWidth(deviceName) > maxW) {
-      for (int i = (int)deviceName.length() - 1; i >= 1; i--) {
-        if (deviceName[i] == ' ' && tft.textWidth(deviceName.substring(0, i)) <= maxW) {
-          nameSplit = i; name2Lines = true; break;
-        }
-      }
+  // Char-based split: max 9 chars per line (enforced by webportal validation)
+  bool name2Lines = (showName && (int)deviceName.length() > 9);
+  int nameSplit = 9;
+  if (name2Lines) {
+    for (int i = 8; i >= 1; i--) {
+      if (deviceName[i] == ' ') { nameSplit = i; break; }
     }
   }
 
   // Compute content block height (textSize(2) = 16px/line)
   int contentH = 0;
   if (showName && deviceName.length() > 0) contentH += 10 + (name2Lines ? 34 : 16);
-  if (showPrice) contentH += 12 + 54;  // 12 gap + 24 price + 10 gap + 8 sats
+  if (showPrice) contentH += 12 + 54;
 
   // Center block in space below logo
   int remaining = SCREEN_H - (topY + visibleH);
@@ -375,9 +369,9 @@ void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceN
       curY += 16;
     } else {
       String line1 = deviceName.substring(0, nameSplit);
-      String line2 = deviceName.substring(nameSplit + 1);
-      while (line2.length() > 1 && tft.textWidth(line2) > maxW)
-        line2 = line2.substring(0, line2.length() - 1);
+      bool atSpace = (nameSplit < (int)deviceName.length() && deviceName[nameSplit] == ' ');
+      String line2 = deviceName.substring(atSpace ? nameSplit + 1 : nameSplit);
+      if ((int)line2.length() > 9) line2 = line2.substring(0, 9);
       tft.drawString(line1, panelCX, curY + 8);
       tft.drawString(line2, panelCX, curY + 26);
       curY += 34;
