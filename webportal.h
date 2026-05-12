@@ -150,7 +150,8 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       display: flex; align-items: center; justify-content: center;
     }
     label {
-      display: block;
+      display: flex;
+      align-items: center;
       margin-top: 12px;
       font-size: 12px;
       font-weight: 500;
@@ -254,19 +255,18 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 12px; height: 12px;
+      width: 16px; height: 16px;
       border-radius: 50%;
       border: 1.5px solid var(--pn-fg-3);
       color: var(--pn-fg-3);
-      font-size: 8px;
+      font-size: 10px;
       font-style: normal;
-      font-weight: 700;
+      font-weight: 600;
       font-family: var(--pn-font);
       line-height: 1;
       cursor: default;
       position: relative;
-      vertical-align: super;
-      margin-left: 2px;
+      margin-left: 5px;
       flex-shrink: 0;
       user-select: none;
     }
