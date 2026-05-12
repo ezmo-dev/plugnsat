@@ -349,14 +349,23 @@ void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceN
     }
   }
 
-  // Compute content block height (textSize(2) = 16px/line)
-  int contentH = 0;
-  if (showName && deviceName.length() > 0) contentH += 10 + (name2Lines ? 34 : 16);
-  if (showPrice) contentH += 12 + 54;
-
-  // Center block in space below logo
+  // Vertical positioning:
+  // - Both active  → stack normally, block centered in remaining space
+  // - One active   → that element centered at the mid-point of the remaining space
   int remaining = SCREEN_H - (topY + visibleH);
-  int curY = topY + visibleH + max(0, (remaining - contentH) / 2);
+  int centerY   = topY + visibleH + remaining / 2 - 8;  // mid-point shifted up
+  int curY;
+  bool hasName  = showName && deviceName.length() > 0;
+  if (hasName && showPrice) {
+    int contentH = 10 + (name2Lines ? 34 : 16) + 12 + 54;
+    curY = topY + visibleH + max(0, (remaining - contentH) / 2) - 8;
+  } else if (hasName) {
+    curY = centerY - 10 - (name2Lines ? 17 : 8);
+  } else if (showPrice) {
+    curY = centerY - 37;
+  } else {
+    curY = topY + visibleH;
+  }
 
   tft.setTextDatum(MC_DATUM);
 
@@ -384,7 +393,7 @@ void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceN
     tft.setTextSize(3);
     tft.drawString(String(priceSats), panelCX, curY + 12);
     curY += 34;
-    tft.setTextColor(COLOR_GRAY);
+    tft.setTextColor(COLOR_ACCENT);
     tft.setTextSize(1);
     tft.drawString("sats", panelCX, curY + 4);
   }
