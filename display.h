@@ -403,37 +403,66 @@ void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceN
 // PAID
 //
 
-void displayPaid(TFT_eSPI &tft, int count, int amountSats, int secondsLeft) {
+void displayPaid(TFT_eSPI &tft, int count, int amountSats, int secondsLeft, int totalDuration) {
   tft.fillScreen(COLOR_BG);
 
-  // Layout anchored from bottom: activating=131(fixed), amount=104, PAID!=73, checkmark cy=37
-  // Gaps: checkmark→PAID! 5px, PAID!→amount 11px, amount→activating 11px
-  int cx = SCREEN_W / 2;
-  int cy = 37;
-  for (int i = -2; i <= 2; i++) {
-    tft.drawLine(cx - 25, cy + i, cx - 8, cy + 17 + i, COLOR_SUCCESS);
-    tft.drawLine(cx - 8, cy + 17 + i, cx + 30, cy - 18 + i, COLOR_SUCCESS);
+  // Vertical divider (gray, visible)
+  tft.drawFastVLine(160, 20, 130, 0x4208);
+
+  // --- LEFT ZONE (cx=80) ---
+  // lcy=73: outer ring top=30, PAID bottom=140 → block centered at 85 in zone[20,150]
+  int lcx = 80;
+  int lcy = 73;
+
+  uint16_t darkGreen = tft.color565(0, 55, 0);
+  tft.drawCircle(lcx, lcy, 43, darkGreen);   // second outer ring
+  tft.drawCircle(lcx, lcy, 35, darkGreen);   // first outer ring
+  tft.fillCircle(lcx, lcy, 28, tft.color565(10, 46, 20));
+  tft.drawCircle(lcx, lcy, 28, COLOR_SUCCESS);
+
+  // Checkmark (3px thick)
+  for (int i = -1; i <= 1; i++) {
+    tft.drawLine(lcx - 15, lcy + i,      lcx - 3,  lcy + 12 + i, COLOR_SUCCESS);
+    tft.drawLine(lcx - 3,  lcy + 12 + i, lcx + 17, lcy - 8 + i,  COLOR_SUCCESS);
   }
 
+  // "PAID" — 8px gap below outer ring bottom (73+43=116 → text center at 132)
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_SUCCESS);
-  tft.setTextSize(3);
-  tft.drawString("PAID!", cx, 73);
+  tft.setTextSize(2);
+  tft.drawString("P A I D", lcx, 132);
 
+  // --- RIGHT ZONE (cx=240) ---
+  int rcx = 240;
+
+  // Amount (larger)
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString(String(amountSats) + " sats", cx, 104);
+  tft.setTextSize(4);
+  tft.drawString(String(amountSats), rcx, 46);
 
+  // "SATS"
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(2);
-  tft.drawString("Activating for " + String(secondsLeft) + "s...", cx, 131);
+  tft.setTextSize(1);
+  tft.drawString("SATS", rcx, 72);
+
+  // Countdown
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setTextSize(3);
+  tft.drawString(String(secondsLeft) + "s", rcx, 112);
+
+  // Progress bar
+  tft.fillRect(190, 140, 100, 3, 0x1082);
+  int fillW = (totalDuration > 0) ? map(secondsLeft, 0, totalDuration, 0, 100) : 0;
+  if (fillW > 0) tft.fillRect(190, 140, fillW, 3, COLOR_ACCENT);
 
   // Payment counter
   tft.setTextDatum(BR_DATUM);
-  tft.setTextColor(0x4208);
-  tft.drawString("#" + String(count), SCREEN_W - 5, SCREEN_H - 5);
+  tft.setTextColor(0x3186);
+  tft.setTextSize(1);
+  tft.drawString("#" + String(count), 315, 165);
 }
 
 void displayPaidShellyError(TFT_eSPI &tft) {

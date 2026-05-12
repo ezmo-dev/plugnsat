@@ -393,7 +393,7 @@ void loopPaid() {
   }
 
   for (int s = config.activationDuration; s > 0; s--) {
-    displayPaid(tft, paymentCount, config.priceSats, s);
+    displayPaid(tft, paymentCount, config.priceSats, s, config.activationDuration);
     if (!shellyOk) displayPaidShellyError(tft);
     delay(1000);
   }

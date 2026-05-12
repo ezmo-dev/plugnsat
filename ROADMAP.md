@@ -12,7 +12,7 @@
 - [x] UI polish: paid screen, error screen, info screen, settings screen
 - [ ] Better error messages and info indicators on all screens
 - [X] Info tooltips on web portal fields
-- [ ] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
+- [X] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
 - [ ] First test video
 - [ ] Documentation structure: create outline with all major sections
 - [ ] README v1 on GitHub
