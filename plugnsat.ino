@@ -66,6 +66,7 @@ enum AppState {
   STATE_QR_DISPLAY,
   STATE_PAID,
   STATE_ERROR,
+  STATE_SHELLY_OFFLINE,
   STATE_INFO,
   STATE_SETTINGS,
   STATE_BRIGHTNESS,
@@ -84,6 +85,7 @@ unsigned long lastPollTime     = 0;
 // Error tracking
 int consecutiveErrors = 0;
 unsigned long errorStartTime = 0;
+unsigned long shellyOfflineStartTime = 0;
 
 // Session stats
 int paymentCount = 0;
@@ -170,6 +172,10 @@ void loop() {
 
     case STATE_ERROR:
       loopError();
+      break;
+
+    case STATE_SHELLY_OFFLINE:
+      loopShellyOffline();
       break;
 
     case STATE_INFO:
@@ -342,7 +348,7 @@ void showCurrentQR() {
 
 void generateAndShowQR() {
   displayGenerating(tft);
-  
+
   String invoiceId, bolt11;
   
   bool ok = btcpayCreateInvoice(
@@ -384,7 +390,13 @@ void loopPaid() {
   // Max brightness for paid screen
   ledcWrite(38, 255);
 
-  shellySwitchOn(config.shellyHost, config.activationDuration);
+  bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
+  if (!shellyOk) {
+    Serial.println("Shelly offline at payment — showing offline screen");
+    shellyOfflineStartTime = millis();
+    currentState = STATE_SHELLY_OFFLINE;
+    return;
+  }
   Serial.println("Shelly ON for " + String(config.activationDuration) + "s");
 
   for (int s = config.activationDuration; s > 0; s--) {
@@ -422,6 +434,40 @@ void loopError() {
   }
   if (btn1Pressed) { ledcWrite(38, config.brightness); startAPMode(); }
   if (btn2Pressed) { ledcWrite(38, config.brightness); consecutiveErrors = 0; generateAndShowQR(); }
+}
+
+//
+// SHELLY OFFLINE
+//
+
+void loopShellyOffline() {
+  int secondsLeft = max(0, 10 - (int)((millis() - shellyOfflineStartTime) / 1000));
+
+  static int lastDisplayedSecond = -1;
+  if (secondsLeft != lastDisplayedSecond) {
+    lastDisplayedSecond = secondsLeft;
+    displayShellyOffline(tft, config.shellyHost, secondsLeft);
+  }
+
+  if (btn1Pressed) {
+    lastDisplayedSecond = -1;
+    ledcWrite(38, config.brightness);
+    startAPMode();
+    return;
+  }
+
+  bool retry = btn2Pressed || (millis() - shellyOfflineStartTime > 10000);
+  if (retry) {
+    lastDisplayedSecond = -1;
+    if (shellyIsOnline(config.shellyHost)) {
+      Serial.println("Shelly back online");
+      ledcWrite(38, config.brightness);
+      generateAndShowQR();
+    } else {
+      Serial.println("Shelly still offline, retrying in 10s");
+      shellyOfflineStartTime = millis();
+    }
+  }
 }
 
 //
