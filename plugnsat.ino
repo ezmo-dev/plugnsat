@@ -384,17 +384,11 @@ void loopPaid() {
   // Max brightness for paid screen
   ledcWrite(38, 255);
 
-  bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
-
-  if (!shellyOk) {
-    Serial.println("WARNING: Shelly failed!");
-  } else {
-    Serial.println("Shelly ON for " + String(config.activationDuration) + "s");
-  }
+  shellySwitchOn(config.shellyHost, config.activationDuration);
+  Serial.println("Shelly ON for " + String(config.activationDuration) + "s");
 
   for (int s = config.activationDuration; s > 0; s--) {
     displayPaid(tft, paymentCount, config.priceSats, s, config.activationDuration);
-    if (!shellyOk) displayPaidShellyError(tft);
     delay(1000);
   }
 
