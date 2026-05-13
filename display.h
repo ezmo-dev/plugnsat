@@ -466,66 +466,55 @@ void displayPaid(TFT_eSPI &tft, int count, int amountSats, int secondsLeft, int 
 }
 
 
-void displayShellyOffline(TFT_eSPI &tft, String shellyHost, int secondsLeft) {
+void displayShellyOffline(TFT_eSPI &tft, int secondsLeft) {
   tft.fillScreen(COLOR_BG);
 
   // Vertical divider
   tft.drawFastVLine(160, 20, 130, 0x4208);
 
-  // --- LEFT ZONE (cx=80) ---
+  // --- LEFT ZONE (cx=80) — same style as displayPaid ---
+  // lcy=66: ring bottom at 109, text starts at 122 (13px gap)
+  int lcx = 80, lcy = 66;
   uint16_t darkRed = tft.color565(55, 0, 0);
-  tft.drawCircle(80, 73, 43, darkRed);
-  tft.drawCircle(80, 73, 35, darkRed);
-  tft.fillCircle(80, 73, 28, tft.color565(26, 8, 8));
-  tft.drawCircle(80, 73, 28, COLOR_ERROR);
+  tft.drawCircle(lcx, lcy, 43, darkRed);
+  tft.drawCircle(lcx, lcy, 35, darkRed);
+  tft.fillCircle(lcx, lcy, 28, tft.color565(46, 10, 10));
+  tft.drawCircle(lcx, lcy, 28, COLOR_ERROR);
 
-  // X mark (3px thick)
+  // X mark (3px thick, centered on lcy)
   for (int i = -1; i <= 1; i++) {
-    tft.drawLine(65 + i, 58, 95 + i, 88, COLOR_ERROR);
-    tft.drawLine(95 + i, 58, 65 + i, 88, COLOR_ERROR);
+    tft.drawLine(lcx - 15 + i, lcy - 15, lcx + 15 + i, lcy + 15, COLOR_ERROR);
+    tft.drawLine(lcx + 15 + i, lcy - 15, lcx - 15 + i, lcy + 15, COLOR_ERROR);
   }
 
+  // "Shelly not found" — two lines with extra spacing
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ERROR);
   tft.setTextSize(2);
-  tft.drawString("O F F L I N E", 80, 132);
+  tft.drawString("Shelly", lcx, 122);
+  tft.drawString("not found", lcx, 143);
 
   // --- RIGHT ZONE (cx=240) ---
   tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString("Shelly not found", 240, 46);
-
-  // Hostname badge
-  tft.fillRoundRect(178, 60, 124, 20, 4, tft.color565(15, 15, 40));
-  tft.drawRoundRect(178, 60, 124, 20, 4, 0x4208);
-  String host = shellyHost.length() > 18 ? shellyHost.substring(0, 18) : shellyHost;
-  tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(COLOR_ACCENT);
-  tft.setTextSize(1);
-  tft.drawString(host, 240, 70);
-
-  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_GRAY);
   tft.setTextSize(1);
-  tft.drawString("Payments paused", 240, 96);
+  tft.drawString("Payments paused", 240, 62);
 
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_TEXT);
   tft.setTextSize(3);
-  tft.drawString(String(secondsLeft) + "s", 240, 120);
+  tft.drawString(String(secondsLeft) + "s", 240, 92);
 
   // Progress bar (red)
-  tft.fillRect(190, 144, 100, 3, 0x1082);
+  tft.fillRect(190, 114, 100, 3, 0x1082);
   int fillW = map(secondsLeft, 0, 10, 0, 100);
-  if (fillW > 0) tft.fillRect(190, 144, fillW, 3, COLOR_ERROR);
+  if (fillW > 0) tft.fillRect(190, 114, fillW, 3, COLOR_ERROR);
 
-  // Button hints
-  tft.setTextDatum(TL_DATUM);
+  // "Press to exit" hint
+  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(0x3186);
   tft.setTextSize(1);
-  tft.drawString("[1] Setup",  190, 162);
-  tft.drawString("[2] Retry",  260, 162);
+  tft.drawString("Press to exit", 240, 128);
 }
 
 //

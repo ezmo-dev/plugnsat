@@ -446,18 +446,17 @@ void loopShellyOffline() {
   static int lastDisplayedSecond = -1;
   if (secondsLeft != lastDisplayedSecond) {
     lastDisplayedSecond = secondsLeft;
-    displayShellyOffline(tft, config.shellyHost, secondsLeft);
+    displayShellyOffline(tft, secondsLeft);
   }
 
-  if (btn1Pressed) {
+  if (btn1Pressed || btn2Pressed) {
     lastDisplayedSecond = -1;
     ledcWrite(38, config.brightness);
-    startAPMode();
+    generateAndShowQR();
     return;
   }
 
-  bool retry = btn2Pressed || (millis() - shellyOfflineStartTime > 10000);
-  if (retry) {
+  if (millis() - shellyOfflineStartTime > 10000) {
     lastDisplayedSecond = -1;
     if (shellyIsOnline(config.shellyHost)) {
       Serial.println("Shelly back online");
