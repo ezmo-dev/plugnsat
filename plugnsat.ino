@@ -78,7 +78,7 @@ AppState currentState = STATE_CONNECTING;
 
 // Invoice tracking
 String currentInvoiceId = "";
-String currentBolt11    = "";
+String currentLnurl     = "";
 unsigned long invoiceCreatedAt = 0;
 unsigned long lastPollTime     = 0;
 
@@ -339,9 +339,9 @@ void loopQRDisplay() {
 
 void showCurrentQR() {
   if (config.showName || config.showPrice) {
-    displayQRWithInfo(tft, currentBolt11, config.priceSats, config.deviceName, config.showName, config.showPrice);
+    displayQRWithInfo(tft, currentLnurl, config.priceSats, config.deviceName, config.showName, config.showPrice);
   } else {
-    displayQR(tft, currentBolt11, config.priceSats, config.deviceName);
+    displayQR(tft, currentLnurl, config.priceSats, config.deviceName);
   }
   currentState = STATE_QR_DISPLAY;
 }
@@ -349,24 +349,24 @@ void showCurrentQR() {
 void generateAndShowQR() {
   displayGenerating(tft);
 
-  String invoiceId, bolt11;
-  
+  String invoiceId, lnurl;
+
   bool ok = btcpayCreateInvoice(
     config.btcpayUrl, config.btcpayApiKey,
     config.btcpayStoreId, config.priceSats,
-    invoiceId, bolt11
+    invoiceId, lnurl
   );
-  
-  if (ok && bolt11.length() > 0) {
+
+  if (ok && lnurl.length() > 0) {
     currentInvoiceId = invoiceId;
-    currentBolt11 = bolt11;
+    currentLnurl = lnurl;
     invoiceCreatedAt = millis();
     lastPollTime = millis();
     consecutiveErrors = 0;
-    
+
     showCurrentQR();
-    
-    Serial.println("QR ready. Invoice: " + invoiceId + " (" + String(bolt11.length()) + " chars)");
+
+    Serial.println("QR ready. Invoice: " + invoiceId + " (" + String(lnurl.length()) + " chars)");
   } else {
     consecutiveErrors++;
     
@@ -479,7 +479,7 @@ void loopInfo() {
     screenNeedsRedraw = false;
   }
   if (btn1Pressed || btn2Pressed) {
-    if (currentBolt11.length() > 0) {
+    if (currentLnurl.length() > 0) {
       showCurrentQR();
     } else {
       generateAndShowQR();
@@ -494,7 +494,7 @@ void loopInfo() {
 void loopSettings() {
   // Auto-timeout 6s -> back to QR
   if (millis() - lastSettingsInput > 6000) {
-    if (currentBolt11.length() > 0) {
+    if (currentLnurl.length() > 0) {
       showCurrentQR();
     } else {
       generateAndShowQR();
@@ -557,7 +557,7 @@ void loopBrightness() {
   // Auto-save and return to QR after 3s without input
   if (millis() - lastBrightnessInput > 6000) {
     saveConfig();
-    if (currentBolt11.length() > 0) {
+    if (currentLnurl.length() > 0) {
       showCurrentQR();
     } else {
       generateAndShowQR();
@@ -565,7 +565,7 @@ void loopBrightness() {
     return;
   }
   if (screenNeedsRedraw) {
-    displayBrightness(tft, config.brightness, currentBolt11);
+    displayBrightness(tft, config.brightness, currentLnurl);
     screenNeedsRedraw = false;
   }
   if (btn1Pressed) {
@@ -589,7 +589,7 @@ void loopBrightness() {
 void loopPrice() {
   if (millis() - lastPriceInput > 6000) {
     saveConfig();
-    if (currentBolt11.length() > 0) {
+    if (currentLnurl.length() > 0) {
       showCurrentQR();
     } else {
       generateAndShowQR();
@@ -621,7 +621,7 @@ void loopPrice() {
 void loopDuration() {
   if (millis() - lastDurationInput > 6000) {
     saveConfig();
-    if (currentBolt11.length() > 0) {
+    if (currentLnurl.length() > 0) {
       showCurrentQR();
     } else {
       generateAndShowQR();

@@ -524,38 +524,48 @@ void displayShellyOffline(TFT_eSPI &tft, int secondsLeft) {
 void displayError(TFT_eSPI &tft, String ip, int secondsLeft) {
   tft.fillScreen(COLOR_BG);
 
-  // Layout: circle cy=40, "Error" y=76, config y=103, countdown y=131
-  int cx = SCREEN_W / 2;
-  int cy = 40;
+  // Vertical divider
+  tft.drawFastVLine(160, 20, 130, 0x4208);
 
-  // Red ring, 4px thick (radii 19–22)
-  for (int r = 19; r <= 22; r++) tft.drawCircle(cx, cy, r, COLOR_ERROR);
+  // --- LEFT ZONE — same style as displayShellyOffline ---
+  int lcx = 80, lcy = 66;
+  uint16_t darkRed = tft.color565(55, 0, 0);
+  tft.drawCircle(lcx, lcy, 43, darkRed);
+  tft.drawCircle(lcx, lcy, 35, darkRed);
+  tft.fillCircle(lcx, lcy, 28, tft.color565(46, 10, 10));
+  tft.drawCircle(lcx, lcy, 28, COLOR_ERROR);
 
-  // "!" drawn manually for pixel-perfect centering inside the ring
-  // Bar: 4px wide, 12px tall, centered at (cx, cy-2)
-  tft.fillRect(cx - 2, cy - 10, 4, 12, COLOR_ERROR);
-  // Dot: 4px wide, 4px tall, 3px below bar
-  tft.fillRect(cx - 2, cy + 5, 4, 4, COLOR_ERROR);
-
-  // "Error" title — same style as "PAID!" on paid screen
-  tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(COLOR_ERROR);
-  tft.setTextSize(3);
-  tft.drawString("Error", cx, 76);
-
-  // Config URL
-  if (ip.length() > 0 && ip != "0.0.0.0") {
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(COLOR_TEXT);
-    tft.setTextSize(2);
-    tft.drawString("http://" + ip, cx, 106);
+  // X mark (3px thick, centered on lcy)
+  for (int i = -1; i <= 1; i++) {
+    tft.drawLine(lcx - 15 + i, lcy - 15, lcx + 15 + i, lcy + 15, COLOR_ERROR);
+    tft.drawLine(lcx + 15 + i, lcy - 15, lcx - 15 + i, lcy + 15, COLOR_ERROR);
   }
 
-  // Countdown — same anchor as "Activating" on paid screen
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(COLOR_ERROR);
+  tft.setTextSize(2);
+  tft.drawString("Server error", lcx, 130);
+
+  // --- RIGHT ZONE ---
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_GRAY);
-  tft.setTextSize(2);
-  tft.drawString("Auto-retry " + String(secondsLeft) + "s...", cx, 131);
+  tft.setTextSize(1);
+  tft.drawString("Connection failed", 240, 62);
+
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(3);
+  tft.drawString(String(secondsLeft) + "s", 240, 92);
+
+  // Progress bar (red)
+  tft.fillRect(190, 114, 100, 3, 0x1082);
+  int fillW = map(secondsLeft, 0, 10, 0, 100);
+  if (fillW > 0) tft.fillRect(190, 114, fillW, 3, COLOR_ERROR);
+
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(0x3186);
+  tft.setTextSize(1);
+  tft.drawString("Press to exit", 240, 128);
 }
 
 //

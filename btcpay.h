@@ -28,8 +28,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-// Forward declarations
-bool btcpayGetBolt11(String url, String key, String store, String id, String &bolt11);
+// Forward declaration
 bool btcpayGetLNURL(String url, String key, String store, String id, String &lnurl);
 
 // 
@@ -39,7 +38,7 @@ bool btcpayGetLNURL(String url, String key, String store, String id, String &lnu
 bool btcpayCreateInvoice(
   String btcpayUrl, String apiKey, String storeId,
   int amountSats,
-  String &outInvoiceId, String &outBolt11
+  String &outInvoiceId, String &outLNURL
 ) {
   WiFiClientSecure client;
   client.setInsecure();
@@ -63,7 +62,6 @@ bool btcpayCreateInvoice(
   
   JsonObject checkout = doc["checkout"].to<JsonObject>();
   JsonArray methods = checkout["paymentMethods"].to<JsonArray>();
-  methods.add("BTC-LN");
   methods.add("BTC-LNURL");
   checkout["expirationMinutes"] = INVOICE_EXPIRY_MIN;
   checkout["monitoringMinutes"] = INVOICE_EXPIRY_MIN;
@@ -96,8 +94,7 @@ bool btcpayCreateInvoice(
     return false;
   }
   
-  // Get LNURL from payment methods (short QR, scannable on LCD)
-  return btcpayGetLNURL(btcpayUrl, apiKey, storeId, outInvoiceId, outBolt11);
+  return btcpayGetLNURL(btcpayUrl, apiKey, storeId, outInvoiceId, outLNURL);
 }
 
 //
@@ -148,69 +145,11 @@ bool btcpayGetLNURL(
     }
   }
   
-  // Fallback: try BOLT11
-  Serial.println("BTCPay: no LNURL found, trying BOLT11");
-  return btcpayGetBolt11(btcpayUrl, apiKey, storeId, invoiceId, outLNURL);
-}
-
-//
-// GET BOLT11 (fallback, or for OLED screens later)
-//
-
-bool btcpayGetBolt11(
-  String btcpayUrl, String apiKey, String storeId,
-  String invoiceId, String &outBolt11
-) {
-  WiFiClientSecure client;
-  client.setInsecure();
-  
-  HTTPClient http;
-  String url = btcpayUrl + "/api/v1/stores/" + storeId 
-               + "/invoices/" + invoiceId + "/payment-methods";
-  
-  if (!http.begin(client, url)) return false;
-  
-  http.addHeader("Authorization", "token " + apiKey);
-  http.setTimeout(10000);
-  
-  int code = http.GET();
-  if (code != 200) { http.end(); return false; }
-  
-  String response = http.getString();
-  http.end();
-  
-  JsonDocument doc;
-  if (deserializeJson(doc, response)) return false;
-  
-  JsonArray arr = doc.as<JsonArray>();
-  for (JsonObject method : arr) {
-    String pm = method["paymentMethodId"].as<String>();
-    if (pm.indexOf("Lightning") >= 0 || pm.indexOf("LN") >= 0) {
-      if (pm == "BTC-LNURL") continue;  // Skip LNURL, we want BOLT11
-      
-      if (method.containsKey("destination")) {
-        outBolt11 = method["destination"].as<String>();
-      } else if (method.containsKey("paymentLink")) {
-        outBolt11 = method["paymentLink"].as<String>();
-      }
-      
-      if (outBolt11.length() > 0) {
-        if (outBolt11.startsWith("lightning:")) {
-          outBolt11 = outBolt11.substring(10);
-        }
-        if (outBolt11.startsWith("LIGHTNING:")) {
-          outBolt11 = outBolt11.substring(10);
-        }
-        return true;
-      }
-    }
-  }
-  
-  Serial.println("BTCPay: no Lightning method found in invoice");
+  Serial.println("BTCPay: no LNURL found");
   return false;
 }
 
-// 
+//
 // CHECK INVOICE STATUS
 //
 
