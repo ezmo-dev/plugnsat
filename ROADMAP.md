@@ -10,7 +10,7 @@
 - [x] First 3D print case
 - [x] Web portal UI redesign (light theme, step-based layout)
 - [x] UI polish: paid screen, error screen, info screen, settings screen
-- [ ] Better error messages and info indicators on all screens
+- [X] Better error messages and info indicators on all screens
 - [X] Info tooltips on web portal fields
 - [X] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
 - [ ] First test video
@@ -25,6 +25,7 @@
 - [ ] Update info indicators on web portal for both backends
 - [ ] Enclosure prototypes: desk stand, magnetic mount, wall mount
 - [ ] Test prints for each enclosure
+- [ ] UI polish: review all screens for improvements and new integrations
 - [ ] Continue documentation: Blink guide, BTCPay guide
 
 ### v0.3 - OTA, landing page, and beta testing (USB model)
