@@ -24,3 +24,19 @@ You will need:
 - A Lightning backend: **Blink wallet** (easy, no server needed) or **BTCPay Server** (self-hosted, advanced)
 - A USB-C power source (phone charger, power bank, laptop USB port, anything)
 - Something to power with the Shelly: a lamp, a coffee machine, a phone charger, anything with a plug
+
+## Step 1 — Choose your Lightning backend
+
+PlugNSat needs a Lightning backend to create invoices and detect payments. You have two options:
+
+| | Blink | BTCPay Server |
+|---|---|---|
+| Difficulty | Easy (5 min) | Advanced (1+ hours if starting from scratch) |
+| Cost | Free | Free (self-hosted) or ~5 EUR/month (hosted) |
+| Requires | A Blink account | A BTCPay Server instance with Lightning |
+| Custody | Blink holds your sats | You hold your keys |
+| Best for | Getting started fast, demos, events | Permanent setups, sovereignty, businesses |
+
+**Pick one and follow the matching section below.** You can always switch later from the web portal.
+
+---
