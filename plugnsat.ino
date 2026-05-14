@@ -138,6 +138,12 @@ void setup() {
 
   loadConfig();
   ledcWrite(38, 255);
+
+  // ===== TEST SCREEN — DELETE BEFORE COMMIT =====
+  displayWiFiFailed(tft, "MyHomeNetwork", 7);
+  delay(8000);
+  // ===== END TEST =====
+
   displaySplash(tft);
   delay(5000);
   ledcWrite(38, config.brightness);
@@ -238,15 +244,19 @@ void connectToWiFi() {
     generateAndShowQR();
   } else {
     Serial.println("WiFi FAILED");
-    displayWiFiFailed(tft, config.wifiSsid);
-    
-    // Wait for user input or auto-retry
+
     unsigned long t = millis();
+    int lastSecond = -1;
     while (millis() - t < 10000) {
       readButtons();
       if (btn1Pressed) { startAPMode(); return; }
       if (btn2Pressed) { connectToWiFi(); return; }
       server.handleClient();
+      int secondsLeft = max(0, 10 - (int)((millis() - t) / 1000));
+      if (secondsLeft != lastSecond) {
+        lastSecond = secondsLeft;
+        displayWiFiFailed(tft, config.wifiSsid, secondsLeft);
+      }
       delay(50);
     }
     connectToWiFi();  // Auto-retry

@@ -544,8 +544,8 @@ void displayError(TFT_eSPI &tft, String ip, int secondsLeft) {
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ERROR);
   tft.setTextSize(2);
-  tft.drawString("Server", lcx, 122);
-  tft.drawString("error", lcx, 143);
+  tft.drawString("Server", lcx, 119);
+  tft.drawString("error", lcx, 140);
 
   // --- RIGHT ZONE ---
   tft.setTextDatum(MC_DATUM);
@@ -573,24 +573,68 @@ void displayError(TFT_eSPI &tft, String ip, int secondsLeft) {
 // IF WIFI FAILED
 //
 
-void displayWiFiFailed(TFT_eSPI &tft, String ssid) {
+void displayWiFiFailed(TFT_eSPI &tft, String ssid, int secondsLeft) {
   tft.fillScreen(COLOR_BG);
+
+  // Vertical divider
+  tft.drawFastVLine(160, 20, 130, 0x4208);
+
+  // --- LEFT ZONE ---
+  // Block: circle_top=34, bar_bottom=72, texts at 84/102/124, bar=133 → center=85
+  // 4 WiFi signal bars (gray, bottom=72, left edge x=61, 4×6px + 3×5px = 39px wide)
+  int barH[] = {8, 14, 20, 26};
+  for (int b = 0; b < 4; b++) {
+    tft.fillRoundRect(61 + b * 11, 72 - barH[b], 6, barH[b], 2, COLOR_GRAY);
+  }
+
+  // Red X circle (smaller: r=7) shifted right, X centered (±3px)
+  tft.fillCircle(110, 41, 7, tft.color565(60, 0, 0));
+  tft.drawCircle(110, 41, 7, COLOR_ERROR);
+  for (int i = -1; i <= 1; i++) {
+    tft.drawLine(107 + i, 38, 113 + i, 44, COLOR_ERROR);
+    tft.drawLine(113 + i, 38, 107 + i, 44, COLOR_ERROR);
+  }
+
+  // Text lines — 18px then 22px spacing
   tft.setTextDatum(MC_DATUM);
-  
-  tft.setTextColor(COLOR_ERROR);
-  tft.setTextSize(2);
-  tft.drawString("WiFi Failed", SCREEN_W / 2, 30);
-  
+  tft.setTextColor(COLOR_GRAY);
+  tft.setTextSize(1);
+  tft.drawString("Could not connect to", 80, 84);
+
+  String displaySsid = ssid.length() > 22 ? ssid.substring(0, 22) : ssid;
+  tft.setTextColor(COLOR_ACCENT);
+  tft.drawString(displaySsid, 80, 102);
+
+  tft.setTextColor(COLOR_GRAY);
+  tft.drawString("Retry in " + String(secondsLeft) + "s", 80, 124);
+
+  // Progress bar (red, 120px centered at x=80)
+  tft.fillRect(20, 133, 120, 3, 0x1082);
+  int fillW = map(secondsLeft, 0, 10, 0, 120);
+  if (fillW > 0) tft.fillRect(20, 133, fillW, 3, COLOR_ERROR);
+
+  // --- RIGHT ZONE --- V icons at same position as displaySettings, text to their left
+  uint16_t colCyan = tft.color565(0, 229, 255);
+  int rx = 294;  // same as settings screen
+
+  // BTN2 (top physical button) — ✓ at y≈31, same coords as settings
+  for (int i = 0; i <= 1; i++) {
+    tft.drawLine(rx - 5, 31 + i, rx - 1, 36 + i, colCyan);
+    tft.drawLine(rx - 1, 36 + i, rx + 5, 25 + i, colCyan);
+  }
+  tft.setTextDatum(MR_DATUM);
   tft.setTextColor(COLOR_TEXT);
   tft.setTextSize(1);
-  tft.drawString("Could not connect to:", SCREEN_W / 2, 65);
-  tft.setTextColor(COLOR_ACCENT);
-  tft.drawString(ssid, SCREEN_W / 2, 85);
-  
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("[1] Open setup page", SCREEN_W / 2, 120);
-  tft.drawString("[2] Retry connection", SCREEN_W / 2, 140);
-  tft.drawString("Auto-retry in 10s...", SCREEN_W / 2, SCREEN_H - 10);
+  tft.drawString("Open setup page", rx - 12, 31);
+
+  // BTN1 (bottom physical button) — ✓ at y≈143, same zone as settings triangles
+  for (int i = 0; i <= 1; i++) {
+    tft.drawLine(rx - 5, 139 + i, rx - 1, 144 + i, colCyan);
+    tft.drawLine(rx - 1, 144 + i, rx + 5, 132 + i, colCyan);
+  }
+  tft.setTextDatum(MR_DATUM);
+  tft.setTextColor(COLOR_TEXT);
+  tft.drawString("Retry connection", rx - 12, 141);
 }
 
 //
