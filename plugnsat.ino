@@ -138,12 +138,6 @@ void setup() {
 
   loadConfig();
   ledcWrite(38, 255);
-
-  // ===== TEST SCREEN — DELETE BEFORE COMMIT =====
-  displayWiFiFailed(tft, "MyHomeNetwork", 7);
-  delay(8000);
-  // ===== END TEST =====
-
   displaySplash(tft);
   delay(5000);
   ledcWrite(38, config.brightness);
