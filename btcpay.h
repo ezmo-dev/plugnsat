@@ -62,6 +62,7 @@ bool btcpayCreateInvoice(
   
   JsonObject checkout = doc["checkout"].to<JsonObject>();
   JsonArray methods = checkout["paymentMethods"].to<JsonArray>();
+  methods.add("BTC-LN");
   methods.add("BTC-LNURL");
   checkout["expirationMinutes"] = INVOICE_EXPIRY_MIN;
   checkout["monitoringMinutes"] = INVOICE_EXPIRY_MIN;

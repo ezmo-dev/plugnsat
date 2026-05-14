@@ -544,7 +544,8 @@ void displayError(TFT_eSPI &tft, String ip, int secondsLeft) {
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ERROR);
   tft.setTextSize(2);
-  tft.drawString("Server error", lcx, 130);
+  tft.drawString("Server", lcx, 122);
+  tft.drawString("error", lcx, 143);
 
   // --- RIGHT ZONE ---
   tft.setTextDatum(MC_DATUM);
