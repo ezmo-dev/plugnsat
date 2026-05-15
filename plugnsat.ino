@@ -357,37 +357,36 @@ void showCurrentQR() {
 }
 
 void generateAndShowQR() {
-  displayGenerating(tft);
+  for (int attempt = 0; attempt < 3; attempt++) {
+    displayGenerating(tft);
 
-  String invoiceId, lnurl;
+    String invoiceId, lnurl;
 
-  bool ok = btcpayCreateInvoice(
-    config.btcpayUrl, config.btcpayApiKey,
-    config.btcpayStoreId, config.priceSats,
-    invoiceId, lnurl
-  );
+    bool ok = btcpayCreateInvoice(
+      config.btcpayUrl, config.btcpayApiKey,
+      config.btcpayStoreId, config.priceSats,
+      invoiceId, lnurl
+    );
 
-  if (ok && lnurl.length() > 0) {
-    currentInvoiceId = invoiceId;
-    currentLnurl = lnurl;
-    invoiceCreatedAt = millis();
-    lastPollTime = millis();
-    consecutiveErrors = 0;
+    if (ok && lnurl.length() > 0) {
+      currentInvoiceId = invoiceId;
+      currentLnurl = lnurl;
+      invoiceCreatedAt = millis();
+      lastPollTime = millis();
+      consecutiveErrors = 0;
 
-    showCurrentQR();
+      showCurrentQR();
 
-    Serial.println("QR ready. Invoice: " + invoiceId + " (" + String(lnurl.length()) + " chars)");
-  } else {
-    consecutiveErrors++;
-    
-    if (consecutiveErrors >= 3) {
-      currentState = STATE_ERROR;
-      errorStartTime = millis();
-    } else {
-      delay(2000);
-      generateAndShowQR();  // Retry (max 3x via recursion)
+      Serial.println("QR ready. Invoice: " + invoiceId + " (" + String(lnurl.length()) + " chars)");
+      return;
     }
+
+    consecutiveErrors++;
+    delay(2000);
   }
+
+  currentState = STATE_ERROR;
+  errorStartTime = millis();
 }
 
 //
