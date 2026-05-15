@@ -86,6 +86,8 @@ unsigned long lastPollTime     = 0;
 int consecutiveErrors = 0;
 unsigned long errorStartTime = 0;
 unsigned long shellyOfflineStartTime = 0;
+unsigned long paidStartTime = 0;
+bool paidShellyTriggered = false;
 
 // Session stats
 int paymentCount = 0;
@@ -318,6 +320,10 @@ void loopQRDisplay() {
     
     if (status == "Settled" || status == "Processing") {
       Serial.println("*** PAYMENT RECEIVED ***");
+      paidStartTime = millis();
+      paidShellyTriggered = false;
+      paymentCount++;
+      ledcWrite(BACKLIGHT_PIN, 255);
       currentState = STATE_PAID;
       return;
     }
@@ -389,30 +395,31 @@ void generateAndShowQR() {
 //
 
 void loopPaid() {
-  paymentCount++;
-
-  // Max brightness for paid screen
-  ledcWrite(BACKLIGHT_PIN, 255);
-
-  bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
-  if (!shellyOk) {
-    Serial.println("Shelly offline at payment — showing offline screen");
-    shellyOfflineStartTime = millis();
-    currentState = STATE_SHELLY_OFFLINE;
-    return;
-  }
-  Serial.println("Shelly ON for " + String(config.activationDuration) + "s");
-
-  for (int s = config.activationDuration; s > 0; s--) {
-    displayPaid(tft, paymentCount, config.priceSats, s, config.activationDuration);
-    delay(1000);
+  if (!paidShellyTriggered) {
+    paidShellyTriggered = true;
+    bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
+    if (!shellyOk) {
+      Serial.println("Shelly offline at payment — showing offline screen");
+      shellyOfflineStartTime = millis();
+      currentState = STATE_SHELLY_OFFLINE;
+      return;
+    }
+    Serial.println("Shelly ON for " + String(config.activationDuration) + "s");
   }
 
-  // Restore brightness
-  ledcWrite(BACKLIGHT_PIN, config.brightness);
+  int secondsLeft = max(0, config.activationDuration - (int)((millis() - paidStartTime) / 1000));
 
-  // Back to QR automatically
-  generateAndShowQR();
+  static int lastDisplayedSecond = -1;
+  if (secondsLeft != lastDisplayedSecond) {
+    lastDisplayedSecond = secondsLeft;
+    displayPaid(tft, paymentCount, config.priceSats, secondsLeft, config.activationDuration);
+  }
+
+  if (millis() - paidStartTime >= (unsigned long)config.activationDuration * 1000) {
+    lastDisplayedSecond = -1;
+    ledcWrite(BACKLIGHT_PIN, config.brightness);
+    generateAndShowQR();
+  }
 }
 
 //
