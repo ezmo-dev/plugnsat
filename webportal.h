@@ -643,7 +643,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%WIFI_SSID%",   config.wifiSsid);
   html.replace("%WIFI_PASS%",   config.wifiPass);
   html.replace("%BTCPAY_URL%",  config.btcpayUrl);
-  html.replace("%BTCPAY_KEY%",  config.btcpayApiKey);
+  html.replace("%BTCPAY_KEY%",  config.btcpayApiKey.length() > 0 ? "********" : "");
   html.replace("%BTCPAY_STORE%", config.btcpayStoreId);
   html.replace("%SHELLY_HOST%", config.shellyHost);
   html.replace("%PRICE_SATS%",  String(config.priceSats));
@@ -666,7 +666,8 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.wifiSsid           = server.arg("wifi_ssid");
     config.wifiPass           = server.arg("wifi_pass");
     config.btcpayUrl          = server.arg("btcpay_url");
-    config.btcpayApiKey       = server.arg("btcpay_key");
+    String newApiKey = server.arg("btcpay_key");
+    if (newApiKey.length() > 0 && newApiKey != "********") config.btcpayApiKey = newApiKey;
     config.btcpayStoreId      = server.arg("btcpay_store");
     config.shellyHost         = server.arg("shelly_host");
     config.priceSats          = server.arg("price_sats").toInt();
