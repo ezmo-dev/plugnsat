@@ -14,7 +14,7 @@
 - [X] Info tooltips on web portal fields
 - [X] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
 - [ ] First test video
-- [ ] Documentation structure: create outline with all major sections
+- [X] Documentation structure: create outline with all major sections
 - [ ] README v1 on GitHub
 - [ ] Full code cleanup before moving forward
 

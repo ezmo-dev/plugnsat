@@ -192,51 +192,58 @@ void displayGenerating(TFT_eSPI &tft) {
 }
 
 //
+// QR RENDER UTILITY
+//
+
+struct QRResult { int qrPixW; int qrPixH; };
+
+// Returns the rendered pixel side length without initialising a full QRCode object.
+// Used by callers that need to compute position before rendering.
+static int qrSide(const String &data, int maxH) {
+  String d = data; d.toUpperCase();
+  int version = (d.length() < 50) ? 3 : (d.length() < 85) ? 5 :
+                (d.length() < 120) ? 6 : (d.length() < 180) ? 8 : QR_VERSION;
+  int qrSize  = 4 * version + 17;
+  int ps      = maxH / qrSize;
+  if (ps < 1) ps = 1;
+  return qrSize * ps;
+}
+
+// Renders a QR code at (x, y) top-left, constrained to maxH pixels tall.
+QRResult renderQR(TFT_eSPI &tft, String data, int x, int y, int maxH) {
+  data.toUpperCase();
+  int version = (data.length() < 50) ? 3 : (data.length() < 85) ? 5 :
+                (data.length() < 120) ? 6 : (data.length() < 180) ? 8 : QR_VERSION;
+
+  QRCode qrcode;
+  uint8_t qrcodeData[qrcode_getBufferSize(version)];
+  qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, data.c_str());
+
+  int qrSize    = qrcode.size;
+  int pixelSize = maxH / qrSize;
+  if (pixelSize < 1) pixelSize = 1;
+  int qrPixW = qrSize * pixelSize;
+  int qrPixH = qrSize * pixelSize;
+
+  for (int row = 0; row < qrSize; row++) {
+    for (int col = 0; col < qrSize; col++) {
+      if (qrcode_getModule(&qrcode, col, row)) {
+        tft.fillRect(x + col * pixelSize, y + row * pixelSize, pixelSize, pixelSize, TFT_WHITE);
+      }
+    }
+  }
+  return {qrPixW, qrPixH};
+}
+
+//
 // QR CODE (main screen - stays displayed permanently)
 //
 
 void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
   tft.fillScreen(TFT_BLACK);
   
-  // Uppercase for alphanumeric QR encoding (smaller QR)
-  String qrData = data;
-  qrData.toUpperCase();
-  
-  // Pick QR version based on data length
-  int version;
-  if (qrData.length() < 50) version = 3;
-  else if (qrData.length() < 85) version = 5;
-  else if (qrData.length() < 120) version = 6;
-  else if (qrData.length() < 180) version = 8;
-  else version = QR_VERSION;
-  
-  QRCode qrcode;
-  uint8_t qrcodeData[qrcode_getBufferSize(version)];
-  qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qrData.c_str());
-  
-  int qrSize = qrcode.size;
-
-  int pixelSize = (SCREEN_H - 2) / qrSize;
-  if (pixelSize < 1) pixelSize = 1;
-
-  int qrPixelW = qrSize * pixelSize;
-  int qrPixelH = qrSize * pixelSize;
-
-  int qrX = (SCREEN_W - qrPixelW) / 2;
-  int qrY = (SCREEN_H - qrPixelH) / 2;
-  
-  for (int y = 0; y < qrSize; y++) {
-    for (int x = 0; x < qrSize; x++) {
-      if (qrcode_getModule(&qrcode, x, y)) {
-        tft.fillRect(
-          qrX + x * pixelSize,
-          qrY + y * pixelSize,
-          pixelSize, pixelSize,
-          TFT_WHITE
-        );
-      }
-    }
-  }
+  int side = qrSide(data, SCREEN_H - 2);
+  renderQR(tft, data, (SCREEN_W - side) / 2, (SCREEN_H - side) / 2, SCREEN_H - 2);
 }
   
 //
@@ -246,38 +253,13 @@ void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
 void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceName, bool showName, bool showPrice) {
   tft.fillScreen(TFT_BLACK);
 
-  String qrData = data;
-  qrData.toUpperCase();
-
-  int version;
-  if (qrData.length() < 50)       version = 3;
-  else if (qrData.length() < 85)  version = 5;
-  else if (qrData.length() < 120) version = 6;
-  else if (qrData.length() < 180) version = 8;
-  else                             version = QR_VERSION;
-
-  QRCode qrcode;
-  uint8_t qrcodeData[qrcode_getBufferSize(version)];
-  qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qrData.c_str());
-
-  int qrSize    = qrcode.size;
-  int pixelSize = (SCREEN_H - 2) / qrSize;
-  if (pixelSize < 1) pixelSize = 1;
-  int qrPixW = qrSize * pixelSize;
-  int qrPixH = qrSize * pixelSize;
-  int qrX = 7;
-  int qrY = (SCREEN_H - qrPixH) / 2;
-
-  for (int y = 0; y < qrSize; y++) {
-    for (int x = 0; x < qrSize; x++) {
-      if (qrcode_getModule(&qrcode, x, y)) {
-        tft.fillRect(qrX + x * pixelSize, qrY + y * pixelSize, pixelSize, pixelSize, TFT_WHITE);
-      }
-    }
-  }
+  int side        = qrSide(data, SCREEN_H - 2);
+  int qrX         = 7;
+  int qrY         = (SCREEN_H - side) / 2;
+  QRResult qrDim  = renderQR(tft, data, qrX, qrY, SCREEN_H - 2);
 
   // Right info panel — starts at the actual right edge of the QR (qrX + qrPixW)
-  int panelLeft = qrX + qrPixW;
+  int panelLeft = qrX + qrDim.qrPixW;
   int panelCX   = (panelLeft + SCREEN_W) / 2;
 
   uint16_t orange = tft.color565(247, 147, 26);
@@ -890,40 +872,14 @@ void displayDuration(TFT_eSPI &tft, int durationSeconds) {
 void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
   tft.fillScreen(COLOR_BG);
 
-  // QR code — slightly reduced, centered on full screen
-  String qr = (qrData.length() > 0) ? qrData : "PLUGNSAT";
-  qr.toUpperCase();
-
-  int version;
-  if (qr.length() < 50)       version = 3;
-  else if (qr.length() < 85)  version = 5;
-  else if (qr.length() < 120) version = 6;
-  else if (qr.length() < 180) version = 8;
-  else                         version = QR_VERSION;
-
-  QRCode qrcode;
-  uint8_t qrcodeData[qrcode_getBufferSize(version)];
-  qrcode_initText(&qrcode, qrcodeData, version, ECC_LOW, qr.c_str());
-
-  int qrSize  = qrcode.size;
-  int pixSize = (SCREEN_H - 2) / qrSize;
-  if (pixSize < 1) pixSize = 1;
-  int qrPixW = qrSize * pixSize;
-  int qrPixH = qrSize * pixSize;
-  int qrX    = (SCREEN_W - qrPixW) / 2;
-  int qrY    = (SCREEN_H - qrPixH) / 2;
-
-  for (int y = 0; y < qrSize; y++) {
-    for (int x = 0; x < qrSize; x++) {
-      if (qrcode_getModule(&qrcode, x, y)) {
-        tft.fillRect(qrX + x * pixSize, qrY + y * pixSize,
-                     pixSize, pixSize, TFT_WHITE);
-      }
-    }
-  }
+  String qr      = (qrData.length() > 0) ? qrData : "PLUGNSAT";
+  int side       = qrSide(qr, SCREEN_H - 2);
+  int qrX        = (SCREEN_W - side) / 2;
+  int qrY        = (SCREEN_H - side) / 2;
+  QRResult qrDim = renderQR(tft, qr, qrX, qrY, SCREEN_H - 2);
 
   // Center brightness bar between QR right edge and screen right edge
-  int cx = (qrX + qrPixW + SCREEN_W) / 2;
+  int cx = (qrX + qrDim.qrPixW + SCREEN_W) / 2;
 
   uint16_t colCyan = tft.color565(0, 229, 255);
   int rx = cx;  // icons centered above/below bar
