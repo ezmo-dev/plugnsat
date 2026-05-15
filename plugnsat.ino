@@ -294,7 +294,7 @@ void loopQRDisplay() {
     return;
   }
   
-  // Poll BTCPay every 2s
+  // BTCPay polling and Shelly activation
   if (millis() - lastPollTime > POLL_INTERVAL_MS) {
     lastPollTime = millis();
     

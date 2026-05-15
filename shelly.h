@@ -66,24 +66,4 @@ bool shellyIsOnline(String shellyHost) {
   return (code == 200);
 }
 
-// Get current power draw (watts)
-float shellyGetPower(String shellyHost) {
-  HTTPClient http;
-  String url = "http://" + shellyHost + "/rpc/Switch.GetStatus?id=0";
-  
-  if (!http.begin(url)) return -1.0;
-  http.setTimeout(3000);
-  
-  int code = http.GET();
-  if (code != 200) { http.end(); return -1.0; }
-  
-  String resp = http.getString();
-  http.end();
-  
-  JsonDocument doc;
-  if (deserializeJson(doc, resp)) return -1.0;
-  
-  return doc["apower"] | -1.0f;
-}
-
 #endif
