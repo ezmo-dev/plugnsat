@@ -123,7 +123,7 @@ void displaySplash(TFT_eSPI &tft) {
   // 3. "v0.1.0" pill badge - gold outline + gold text
   int pillY = line2Y + 27;
   tft.setTextColor(gold);
-  String ver = "v0.1.0";
+  String ver = "v" FIRMWARE_VERSION;
   int verW = tft.textWidth(ver);
   int pillPadX = 8;
   int pillPadY = 3;
@@ -618,7 +618,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   // Version top-right in gray
   tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
   tft.setTextColor(COLOR_GRAY);
-  tft.drawString("v0.1.0", SCREEN_W - 8, 12);
+  tft.drawString("v" FIRMWARE_VERSION, SCREEN_W - 8, 12);
 
   // Separator "─── Network ──────────────────"  (y=38, more room below header)
   tft.drawFastHLine(8, 34, SCREEN_W - 16, colOrange);

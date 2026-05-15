@@ -463,7 +463,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     <button type="submit" id="btn-save">Save and restart &rarr;</button>
   </form>
 
-  <p class="footer">v0.1.0 &middot; plugnsat.com &middot; open-source &middot; MIT</p>
+  <p class="footer">v%VERSION% &middot; plugnsat.com &middot; open-source &middot; MIT</p>
 
 </div>
 
@@ -652,6 +652,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%SETTINGS_PIN%",       config.pin);
   html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
+  html.replace("%VERSION%",            FIRMWARE_VERSION);
   return html;
 }
 
@@ -774,7 +775,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     doc["wifi"] = WiFi.SSID();
     doc["ip"] = WiFi.localIP().toString();
     doc["uptime"] = millis() / 1000;
-    doc["version"] = "0.2.0";
+    doc["version"] = FIRMWARE_VERSION;
     String json; serializeJson(doc, json);
     server.send(200, "application/json", json);
   });

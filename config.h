@@ -16,6 +16,7 @@
 #define POLL_INTERVAL_MS   5000      // Check payment every 5s (was 2s)
 #define QR_REFRESH_MS      285000    // Refresh QR at 4min45s (before 5min expiry)
 #define INVOICE_EXPIRY_MIN 5         // BTCPay invoice expiration
+#define FIRMWARE_VERSION   "0.1.0"
 
 // Display (T-Display S3 landscape)
 #define SCREEN_W 320

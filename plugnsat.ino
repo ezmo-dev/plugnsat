@@ -124,7 +124,7 @@ PlugNSatConfig config;
 void setup() {
   Serial.begin(115200);
   delay(500);
-  Serial.println("\n\n=== PlugNSat v0.2.0 ===");
+  Serial.println("\n\n=== PlugNSat v" FIRMWARE_VERSION " ===");
 
   tft.init();
   tft.setRotation(1);
