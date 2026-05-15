@@ -347,6 +347,14 @@ void loopQRDisplay() {
   }
 }
 
+void returnToQR() {
+  if (currentLnurl.length() > 0) {
+    showCurrentQR();
+  } else {
+    generateAndShowQR();
+  }
+}
+
 void showCurrentQR() {
   if (config.showName || config.showPrice) {
     displayQRWithInfo(tft, currentLnurl, config.priceSats, config.deviceName, config.showName, config.showPrice);
@@ -489,11 +497,7 @@ void loopInfo() {
     screenNeedsRedraw = false;
   }
   if (btn1Pressed || btn2Pressed) {
-    if (currentLnurl.length() > 0) {
-      showCurrentQR();
-    } else {
-      generateAndShowQR();
-    }
+    returnToQR();
   }
 }
 
@@ -504,11 +508,7 @@ void loopInfo() {
 void loopSettings() {
   // Auto-timeout 6s -> back to QR
   if (millis() - lastSettingsInput > MENU_TIMEOUT_MS) {
-    if (currentLnurl.length() > 0) {
-      showCurrentQR();
-    } else {
-      generateAndShowQR();
-    }
+    returnToQR();
     return;
   }
   if (screenNeedsRedraw) {
@@ -567,11 +567,7 @@ void loopBrightness() {
   // Auto-save and return to QR after 3s without input
   if (millis() - lastBrightnessInput > MENU_TIMEOUT_MS) {
     saveConfig();
-    if (currentLnurl.length() > 0) {
-      showCurrentQR();
-    } else {
-      generateAndShowQR();
-    }
+    returnToQR();
     return;
   }
   if (screenNeedsRedraw) {
@@ -599,11 +595,7 @@ void loopBrightness() {
 void loopPrice() {
   if (millis() - lastPriceInput > MENU_TIMEOUT_MS) {
     saveConfig();
-    if (currentLnurl.length() > 0) {
-      showCurrentQR();
-    } else {
-      generateAndShowQR();
-    }
+    returnToQR();
     return;
   }
   if (screenNeedsRedraw) {
@@ -631,11 +623,7 @@ void loopPrice() {
 void loopDuration() {
   if (millis() - lastDurationInput > MENU_TIMEOUT_MS) {
     saveConfig();
-    if (currentLnurl.length() > 0) {
-      showCurrentQR();
-    } else {
-      generateAndShowQR();
-    }
+    returnToQR();
     return;
   }
   if (screenNeedsRedraw) {
