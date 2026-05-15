@@ -576,7 +576,7 @@ void displayWiFiFailed(TFT_eSPI &tft, String ssid, int secondsLeft) {
 
   // --- RIGHT ZONE --- V icons at same position as displaySettings, text to their left
   uint16_t colCyan = tft.color565(0, 229, 255);
-  int rx = 294;  // same as settings screen
+  int rx = BTN_ICON_X;  // same as settings screen
 
   // BTN2 (top physical button) — ✓ at y≈31, same coords as settings
   for (int i = 0; i <= 1; i++) {
@@ -729,7 +729,7 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
   const int rectX = 8;
   const int rectW = SCREEN_W - 60;   // 260px, right edge at 268
   const int btnCX = rectX + rectW / 2; // 138 = horizontal center of button zone
-  const int rx    = 294;              // center of right margin (268..320)
+  const int rx    = BTN_ICON_X;       // center of right margin (268..320)
 
   for (int i = 0; i < 4; i++) {
     int cy = itemCY[i];
@@ -779,7 +779,7 @@ void displayPrice(TFT_eSPI &tft, int priceSats) {
 
   uint16_t colCyan = tft.color565(0, 229, 255);
   int cx = SCREEN_W / 2;
-  int rx = 294;
+  int rx = BTN_ICON_X;
 
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_ACCENT);
@@ -810,7 +810,7 @@ void displayDuration(TFT_eSPI &tft, int durationSeconds) {
 
   uint16_t colCyan = tft.color565(0, 229, 255);
   int cx = SCREEN_W / 2;
-  int rx = 294;
+  int rx = BTN_ICON_X;
 
   // Centered duration value
   tft.setTextDatum(MC_DATUM);
@@ -949,7 +949,7 @@ void displayPinEntry(TFT_eSPI &tft, int digits[], int digitIndex, bool wrongPin)
 
   // Right margin indicators — same positions as settings screen
   uint16_t colCyan = tft.color565(0, 229, 255);
-  int rx = 294;
+  int rx = BTN_ICON_X;
 
   for (int i = 0; i <= 1; i++) {
     tft.drawLine(rx - 5, 31 + i, rx - 1, 36 + i, colCyan);

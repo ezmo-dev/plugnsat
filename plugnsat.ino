@@ -128,8 +128,8 @@ void setup() {
 
   tft.init();
   tft.setRotation(1);
-  ledcAttach(38, 5000, 8);
-  ledcWrite(38, 40);
+  ledcAttach(BACKLIGHT_PIN, 5000, 8);
+  ledcWrite(BACKLIGHT_PIN, 40);
   tft.fillScreen(TFT_BLACK);
   tft.setSwapBytes(true);
   
@@ -137,10 +137,10 @@ void setup() {
   pinMode(BTN_2, INPUT_PULLUP);
 
   loadConfig();
-  ledcWrite(38, 255);
+  ledcWrite(BACKLIGHT_PIN, 255);
   displaySplash(tft);
   delay(5000);
-  ledcWrite(38, config.brightness);
+  ledcWrite(BACKLIGHT_PIN, config.brightness);
 
   if (config.wifiSsid.length() == 0 || config.btcpayUrl.length() == 0) {
     startAPMode();
@@ -392,7 +392,7 @@ void loopPaid() {
   paymentCount++;
 
   // Max brightness for paid screen
-  ledcWrite(38, 255);
+  ledcWrite(BACKLIGHT_PIN, 255);
 
   bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
   if (!shellyOk) {
@@ -409,7 +409,7 @@ void loopPaid() {
   }
 
   // Restore brightness
-  ledcWrite(38, config.brightness);
+  ledcWrite(BACKLIGHT_PIN, config.brightness);
 
   // Back to QR automatically
   generateAndShowQR();
@@ -420,7 +420,7 @@ void loopPaid() {
 //
 
 void loopError() {
-  ledcWrite(38, 255);
+  ledcWrite(BACKLIGHT_PIN, 255);
 
   int secondsLeft = max(0, 10 - (int)((millis() - errorStartTime) / 1000));
 
@@ -432,12 +432,12 @@ void loopError() {
 
   if (millis() - errorStartTime > 10000) {
     consecutiveErrors = 0;
-    ledcWrite(38, config.brightness);
+    ledcWrite(BACKLIGHT_PIN, config.brightness);
     generateAndShowQR();
     return;
   }
-  if (btn1Pressed) { ledcWrite(38, config.brightness); startAPMode(); }
-  if (btn2Pressed) { ledcWrite(38, config.brightness); consecutiveErrors = 0; generateAndShowQR(); }
+  if (btn1Pressed) { ledcWrite(BACKLIGHT_PIN, config.brightness); startAPMode(); }
+  if (btn2Pressed) { ledcWrite(BACKLIGHT_PIN, config.brightness); consecutiveErrors = 0; generateAndShowQR(); }
 }
 
 //
@@ -455,7 +455,7 @@ void loopShellyOffline() {
 
   if (btn1Pressed || btn2Pressed) {
     lastDisplayedSecond = -1;
-    ledcWrite(38, config.brightness);
+    ledcWrite(BACKLIGHT_PIN, config.brightness);
     generateAndShowQR();
     return;
   }
@@ -464,7 +464,7 @@ void loopShellyOffline() {
     lastDisplayedSecond = -1;
     if (shellyIsOnline(config.shellyHost)) {
       Serial.println("Shelly back online");
-      ledcWrite(38, config.brightness);
+      ledcWrite(BACKLIGHT_PIN, config.brightness);
       generateAndShowQR();
     } else {
       Serial.println("Shelly still offline, retrying in 10s");
@@ -497,7 +497,7 @@ void loopInfo() {
 
 void loopSettings() {
   // Auto-timeout 6s -> back to QR
-  if (millis() - lastSettingsInput > 6000) {
+  if (millis() - lastSettingsInput > MENU_TIMEOUT_MS) {
     if (currentLnurl.length() > 0) {
       showCurrentQR();
     } else {
@@ -559,7 +559,7 @@ void loopSettings() {
 
 void loopBrightness() {
   // Auto-save and return to QR after 3s without input
-  if (millis() - lastBrightnessInput > 6000) {
+  if (millis() - lastBrightnessInput > MENU_TIMEOUT_MS) {
     saveConfig();
     if (currentLnurl.length() > 0) {
       showCurrentQR();
@@ -575,13 +575,13 @@ void loopBrightness() {
   if (btn1Pressed) {
     lastBrightnessInput = millis();
     config.brightness = max(10, config.brightness - 10);
-    ledcWrite(38, config.brightness);
+    ledcWrite(BACKLIGHT_PIN, config.brightness);
     screenNeedsRedraw = true;
   }
   if (btn2Pressed) {
     lastBrightnessInput = millis();
     config.brightness = min(255, config.brightness + 10);
-    ledcWrite(38, config.brightness);
+    ledcWrite(BACKLIGHT_PIN, config.brightness);
     screenNeedsRedraw = true;
   }
 }
@@ -591,7 +591,7 @@ void loopBrightness() {
 //
 
 void loopPrice() {
-  if (millis() - lastPriceInput > 6000) {
+  if (millis() - lastPriceInput > MENU_TIMEOUT_MS) {
     saveConfig();
     if (currentLnurl.length() > 0) {
       showCurrentQR();
@@ -623,7 +623,7 @@ void loopPrice() {
 //
 
 void loopDuration() {
-  if (millis() - lastDurationInput > 6000) {
+  if (millis() - lastDurationInput > MENU_TIMEOUT_MS) {
     saveConfig();
     if (currentLnurl.length() > 0) {
       showCurrentQR();
@@ -783,7 +783,7 @@ void readButtons() {
   btn2WasDown = btn2Down;
   
   // Long press BTN_1 (3s) = AP mode from any state
-  if (btn1Down && (millis() - btn1DownTime > 3000)) {
+  if (btn1Down && (millis() - btn1DownTime > LONG_PRESS_MS)) {
     btn1DownTime = millis();  // Reset to avoid retriggering
     Serial.println("Long press -> AP mode");
     startAPMode();

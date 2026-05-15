@@ -17,6 +17,10 @@
 #define QR_REFRESH_MS      285000    // Refresh QR at 4min45s (before 5min expiry)
 #define INVOICE_EXPIRY_MIN 5         // BTCPay invoice expiration
 #define FIRMWARE_VERSION   "0.1.0"
+#define BACKLIGHT_PIN      38
+#define MENU_TIMEOUT_MS    6000
+#define LONG_PRESS_MS      3000
+#define BTN_ICON_X         294
 
 // Display (T-Display S3 landscape)
 #define SCREEN_W 320
