@@ -1,4 +1,4 @@
-# PlugNSat Firmware v0.1.0
+# PlugNSat
 
 ![cover](./assets/plugnsat-banner.png)
 An open-source Lightning Smart Plug Controller. Turn any device into a Bitcoin-powered machine!

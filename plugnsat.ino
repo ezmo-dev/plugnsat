@@ -1,7 +1,7 @@
 /*
  * PlugNSat - Main Firmware
  * Lightning Smart Plug Controller
- * Version: 0.1.0
+ * Version: see FIRMWARE_VERSION in config.h
  * Hardware: LilyGO T-Display S3 (ESP32-S3 + 1.9" LCD)
  * 
  * BASED ON:

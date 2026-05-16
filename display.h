@@ -120,7 +120,7 @@ void displaySplash(TFT_eSPI &tft) {
   int line2Y = line1Y + 22;
   tft.drawString("plugnsat.com", cx, line2Y);
  
-  // 3. "v0.1.0" pill badge - gold outline + gold text
+  // 3. version pill badge (FIRMWARE_VERSION) - gold outline + gold text
   int pillY = line2Y + 27;
   tft.setTextColor(gold);
   String ver = "v" FIRMWARE_VERSION;
