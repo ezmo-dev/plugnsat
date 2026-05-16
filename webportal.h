@@ -627,9 +627,26 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#FBFAF8;min-heigh
 </body></html>
 )rawliteral";
 
+String htmlEscape(const String &s) {
+  String out;
+  out.reserve(s.length());
+  for (int i = 0; i < (int)s.length(); i++) {
+    char c = s[i];
+    switch (c) {
+      case '&':  out += "&amp;";  break;
+      case '<':  out += "&lt;";   break;
+      case '>':  out += "&gt;";   break;
+      case '"':  out += "&quot;"; break;
+      case '\'': out += "&#39;";  break;
+      default:   out += c;        break;
+    }
+  }
+  return out;
+}
+
 String processSavedPage(PlugNSatConfig &config) {
   String html = String(SAVED_PAGE);
-  html.replace("%DEV_NAME%",   config.deviceName);
+  html.replace("%DEV_NAME%",   htmlEscape(config.deviceName));
   html.replace("%PRICE_SATS%", String(config.priceSats));
   html.replace("%DURATION%",   String(config.activationDuration));
   String ip = WiFi.localIP().toString();
@@ -640,15 +657,15 @@ String processSavedPage(PlugNSatConfig &config) {
 
 String processTemplate(PlugNSatConfig &config) {
   String html = String(HTML_PAGE);
-  html.replace("%WIFI_SSID%",   config.wifiSsid);
+  html.replace("%WIFI_SSID%",   htmlEscape(config.wifiSsid));
   html.replace("%WIFI_PASS%",   config.wifiPass.length() > 0 ? "********" : "");
-  html.replace("%BTCPAY_URL%",  config.btcpayUrl);
+  html.replace("%BTCPAY_URL%",  htmlEscape(config.btcpayUrl));
   html.replace("%BTCPAY_KEY%",  config.btcpayApiKey.length() > 0 ? "********" : "");
-  html.replace("%BTCPAY_STORE%", config.btcpayStoreId);
-  html.replace("%SHELLY_HOST%", config.shellyHost);
+  html.replace("%BTCPAY_STORE%", htmlEscape(config.btcpayStoreId));
+  html.replace("%SHELLY_HOST%", htmlEscape(config.shellyHost));
   html.replace("%PRICE_SATS%",  String(config.priceSats));
   html.replace("%DURATION%",    String(config.activationDuration));
-  html.replace("%DEV_NAME%",    config.deviceName);
+  html.replace("%DEV_NAME%",    htmlEscape(config.deviceName));
   html.replace("%SETTINGS_PIN%",       config.pin.length() > 0 ? "****" : "");
   html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
