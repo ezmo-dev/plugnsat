@@ -42,6 +42,7 @@
 #include "display.h"
 #include "btcpay.h"
 #include "shelly.h"
+#include "backend.h"
 #include "webportal.h"
 
 //
@@ -139,6 +140,7 @@ void setup() {
   pinMode(BTN_2, INPUT_PULLUP);
 
   loadConfig();
+  initBackend(config.backendType);
   ledcWrite(BACKLIGHT_PIN, 255);
   displaySplash(tft);
   delay(5000);
@@ -300,10 +302,7 @@ void loopQRDisplay() {
   if (millis() - lastPollTime > POLL_INTERVAL_MS) {
     lastPollTime = millis();
     
-    String status = btcpayCheckInvoice(
-      config.btcpayUrl, config.btcpayApiKey,
-      config.btcpayStoreId, currentInvoiceId
-    );
+    String status = backend.checkInvoice(config, currentInvoiceId);
     
     if (status == "ERROR") {
       consecutiveErrors++;
@@ -370,11 +369,7 @@ void generateAndShowQR() {
 
     String invoiceId, lnurl;
 
-    bool ok = btcpayCreateInvoice(
-      config.btcpayUrl, config.btcpayApiKey,
-      config.btcpayStoreId, config.priceSats,
-      invoiceId, lnurl
-    );
+    bool ok = backend.createInvoice(config, config.priceSats, invoiceId, lnurl);
 
     if (ok && lnurl.length() > 0) {
       currentInvoiceId = invoiceId;
@@ -803,6 +798,7 @@ void loadConfig() {
   config.pin                = prefs.getString("settings_pin", "");
   config.showName           = prefs.getBool("show_name",  false);
   config.showPrice          = prefs.getBool("show_price", false);
+  config.backendType        = (BackendType)prefs.getInt("backend", 0);
   prefs.end();
 }
 
@@ -821,5 +817,6 @@ void saveConfig() {
   prefs.putString("settings_pin", config.pin);
   prefs.putBool("show_name",      config.showName);
   prefs.putBool("show_price",     config.showPrice);
+  prefs.putInt("backend",         (int)config.backendType);
   prefs.end();
 }

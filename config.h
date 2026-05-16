@@ -39,6 +39,12 @@
 #define COLOR_QR_BG    TFT_WHITE
 #define COLOR_GRAY     0x7BEF
 
+// Backend selection
+enum BackendType {
+  BACKEND_BTCPAY = 0,
+  BACKEND_BLINK  = 1
+};
+
 // Config struct
 struct PlugNSatConfig {
   String wifiSsid;
@@ -54,6 +60,7 @@ struct PlugNSatConfig {
   String pin;              // 4-digit PIN to protect Price/Duration (empty = disabled)
   bool showName;           // Show device name on QR screen
   bool showPrice;          // Show price on QR screen
+  BackendType backendType; // Lightning backend (default: BTCPay)
 };
 
 #endif
