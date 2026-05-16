@@ -641,7 +641,7 @@ String processSavedPage(PlugNSatConfig &config) {
 String processTemplate(PlugNSatConfig &config) {
   String html = String(HTML_PAGE);
   html.replace("%WIFI_SSID%",   config.wifiSsid);
-  html.replace("%WIFI_PASS%",   config.wifiPass);
+  html.replace("%WIFI_PASS%",   config.wifiPass.length() > 0 ? "********" : "");
   html.replace("%BTCPAY_URL%",  config.btcpayUrl);
   html.replace("%BTCPAY_KEY%",  config.btcpayApiKey.length() > 0 ? "********" : "");
   html.replace("%BTCPAY_STORE%", config.btcpayStoreId);
@@ -649,7 +649,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%PRICE_SATS%",  String(config.priceSats));
   html.replace("%DURATION%",    String(config.activationDuration));
   html.replace("%DEV_NAME%",    config.deviceName);
-  html.replace("%SETTINGS_PIN%",       config.pin);
+  html.replace("%SETTINGS_PIN%",       config.pin.length() > 0 ? "****" : "");
   html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
   html.replace("%VERSION%",            FIRMWARE_VERSION);
@@ -664,7 +664,8 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   
   server.on("/save", HTTP_POST, [&config, &server]() {
     config.wifiSsid           = server.arg("wifi_ssid");
-    config.wifiPass           = server.arg("wifi_pass");
+    String newWifiPass = server.arg("wifi_pass");
+    if (newWifiPass != "********") config.wifiPass = newWifiPass;
     config.btcpayUrl          = server.arg("btcpay_url");
     String newApiKey = server.arg("btcpay_key");
     if (newApiKey.length() > 0 && newApiKey != "********") config.btcpayApiKey = newApiKey;
@@ -678,7 +679,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     String newPin             = server.arg("settings_pin");
     if (newPin.length() == 0) {
       config.pin = "";
-    } else if (newPin.length() == 4) {
+    } else if (newPin.length() == 4 && newPin != "****") {
       bool allDigits = true;
       for (int i = 0; i < 4; i++) { if (!isDigit(newPin[i])) { allDigits = false; break; } }
       if (allDigits) config.pin = newPin;
