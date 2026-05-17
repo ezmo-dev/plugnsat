@@ -15,7 +15,7 @@
 #include "btcpay.h"
 
 typedef bool   (*CreateInvoiceFn)(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL);
-typedef String (*CheckInvoiceFn) (PlugNSatConfig &config, String invoiceId);
+typedef String (*CheckInvoiceFn) (PlugNSatConfig &config, const String &invoiceId);
 
 struct BackendInterface {
   CreateInvoiceFn createInvoice;
@@ -30,7 +30,7 @@ bool btcpayCreateInvoiceWrapper(PlugNSatConfig &config, int amountSats, String &
   return btcpayCreateInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, amountSats, outInvoiceId, outLNURL);
 }
 
-String btcpayCheckInvoiceWrapper(PlugNSatConfig &config, String invoiceId) {
+String btcpayCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId) {
   return btcpayCheckInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, invoiceId);
 }
 
@@ -41,7 +41,7 @@ bool blinkCreateInvoicePlaceholder(PlugNSatConfig &config, int amountSats, Strin
   return false;
 }
 
-String blinkCheckInvoicePlaceholder(PlugNSatConfig &config, String invoiceId) {
+String blinkCheckInvoicePlaceholder(PlugNSatConfig &config, const String &invoiceId) {
   Serial.println("Blink: not implemented yet");
   return "ERROR";
 }
