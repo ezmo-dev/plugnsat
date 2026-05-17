@@ -114,6 +114,9 @@ unsigned long apModeStartTime = 0;
 // WiFi monitoring
 unsigned long lastWifiCheck = 0;
 
+// Heap monitoring
+unsigned long lastHeapLog = 0;
+
 // Display
 bool screenNeedsRedraw = true;
 
@@ -290,7 +293,12 @@ bool ensureWiFi() {
 
 void loopQRDisplay() {
   if (!ensureWiFi()) return;
-  
+
+  if (millis() - lastHeapLog > 300000) {
+    lastHeapLog = millis();
+    Serial.println("Heap free: " + String(ESP.getFreeHeap()) + " bytes");
+  }
+
   // Auto-refresh QR before expiry (4min 45s = 285000ms)
   if (millis() - invoiceCreatedAt > QR_REFRESH_MS) {
     Serial.println("QR refresh (expiry prevention)");
