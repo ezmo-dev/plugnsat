@@ -402,6 +402,7 @@ void loopPaid() {
     bool shellyOk = shellySwitchOn(config.shellyHost, config.activationDuration);
     if (!shellyOk) {
       Serial.println("Shelly offline at payment — showing offline screen");
+      ledcWrite(BACKLIGHT_PIN, config.brightness);
       shellyOfflineStartTime = millis();
       currentState = STATE_SHELLY_OFFLINE;
       return;
