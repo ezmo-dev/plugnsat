@@ -808,6 +808,7 @@ void loadConfig() {
   config.showName           = prefs.getBool("show_name",  false);
   config.showPrice          = prefs.getBool("show_price", false);
   config.backendType        = (BackendType)prefs.getInt("backend", 0);
+  config.portalPassword     = prefs.getString("portal_pw", "");
   prefs.end();
 }
 
@@ -827,5 +828,6 @@ void saveConfig() {
   prefs.putBool("show_name",      config.showName);
   prefs.putBool("show_price",     config.showPrice);
   prefs.putInt("backend",         (int)config.backendType);
+  prefs.putString("portal_pw",    config.portalPassword);
   prefs.end();
 }

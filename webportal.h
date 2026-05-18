@@ -23,6 +23,8 @@
 
 void saveConfig();  // Defined in main .ino
 
+static bool portalAuthEnabled = false;
+
 const char HTML_PAGE[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html>
@@ -458,6 +460,9 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <label>Settings PIN (4 digits) <span class="tip" data-tip="If set, this 4-digit PIN is required to change Price and Duration directly on the device. Leave empty to disable.">i</span></label>
       <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Optional" inputmode="numeric" pattern="[0-9]{0,4}">
       <div class="hint">Protects Price and Duration settings on the device</div>
+      <label>Portal Password <span class="tip" data-tip="If set, the web portal will require this password to access (username: admin). Leave empty to disable. Authentication is always disabled in AP setup mode so you can recover access.">i</span></label>
+      <input type="password" name="portal_pw" value="%PORTAL_PW%" placeholder="Optional">
+      <div class="hint">Protects this web portal on WiFi (username: admin)</div>
     </div>
 
     <button type="submit" id="btn-save">Save and restart &rarr;</button>
@@ -627,6 +632,15 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#FBFAF8;min-heigh
 </body></html>
 )rawliteral";
 
+bool checkPortalAuth(WebServer &server, PlugNSatConfig &config) {
+  if (!portalAuthEnabled || config.portalPassword.length() == 0) return true;
+  if (!server.authenticate("admin", config.portalPassword.c_str())) {
+    server.requestAuthentication();
+    return false;
+  }
+  return true;
+}
+
 String htmlEscape(const String &s) {
   String out;
   out.reserve(s.length());
@@ -670,16 +684,20 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
   html.replace("%VERSION%",            FIRMWARE_VERSION);
+  html.replace("%PORTAL_PW%",          config.portalPassword.length() > 0 ? "********" : "");
   return html;
 }
 
 void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &prefs) {
-  
+  portalAuthEnabled = (WiFi.getMode() == WIFI_STA);
+
   server.on("/", HTTP_GET, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
     server.send(200, "text/html", processTemplate(config));
   });
   
   server.on("/save", HTTP_POST, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
     config.wifiSsid           = server.arg("wifi_ssid");
     String newWifiPass = server.arg("wifi_pass");
     if (newWifiPass != "********") config.wifiPass = newWifiPass;
@@ -702,6 +720,15 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
       if (allDigits) config.pin = newPin;
     }
 
+    String newPortalPw = server.arg("portal_pw");
+    if (newPortalPw == "********") {
+      // preserve existing password
+    } else if (newPortalPw.length() == 0) {
+      config.portalPassword = "";
+    } else {
+      config.portalPassword = newPortalPw;
+    }
+
     if (config.priceSats < 1) config.priceSats = 100;
     if (config.activationDuration < 1) config.activationDuration = 60;
     if (config.deviceName.length() == 0) config.deviceName = "PlugNSat";
@@ -716,7 +743,8 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     ESP.restart();
   });
 
-  server.on("/test-shelly", HTTP_GET, [&server]() {
+  server.on("/test-shelly", HTTP_GET, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
     String host = server.arg("host");
     if (host.length() == 0) {
       server.send(400, "application/json", "{\"ok\":false}");
@@ -741,6 +769,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   });
 
   server.on("/test-payment", HTTP_GET, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
     HTTPClient http;
     String url = "http://" + config.shellyHost
                  + "/rpc/switch.set?id=0&on=true&toggle_after="
@@ -762,7 +791,8 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     }
   });
 
-  server.on("/api/scan-shelly", HTTP_GET, [&server]() {
+  server.on("/api/scan-shelly", HTTP_GET, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
     Serial.println("mDNS scan starting...");
     int n = MDNS.queryService("http", "tcp");
     Serial.println("mDNS scan found: " + String(n) + " services total");
