@@ -1,7 +1,7 @@
 /*
  * PlugNSat - Configuration
  * 
- * Global instuctions, constants, timing with the QRcode et config structure
+ * Global constants, timing, QR code settings, and config structure
  * 
  * License: MIT © 2026
  * Author: ezmo-dev (PlugNSat)
