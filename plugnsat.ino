@@ -315,7 +315,7 @@ void loopQRDisplay() {
     if (status == "ERROR") {
       consecutiveErrors++;
       Serial.println("Poll error #" + String(consecutiveErrors));
-      if (consecutiveErrors >= 10) {
+      if (consecutiveErrors >= 60) {
         displayError(tft, WiFi.localIP().toString(), 5);
         delay(5000);
         ESP.restart();
@@ -372,6 +372,19 @@ void showCurrentQR() {
 }
 
 void generateAndShowQR() {
+  if (currentInvoiceId.length() > 0) {
+    String status = backend.checkInvoice(config, currentInvoiceId);
+    if (status == "Settled" || status == "Processing") {
+      Serial.println("*** PAYMENT DETECTED before QR refresh ***");
+      paidStartTime = millis();
+      paidShellyTriggered = false;
+      paymentCount++;
+      ledcWrite(BACKLIGHT_PIN, 255);
+      currentState = STATE_PAID;
+      return;
+    }
+  }
+
   for (int attempt = 0; attempt < 3; attempt++) {
     displayGenerating(tft);
 
