@@ -77,7 +77,7 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 4. Enter your WiFi credentials (same network as the Shelly)
 5. Enter your BTCPay Server URL, API key, and Store ID
 6. Click **Scan network** to auto-discover your Shelly, or type its hostname/IP manually
-7. Set your price in sats, activation duration in seconds, and optionally a 4-digit PIN to protect these settings on the device
+7. Set your price in sats, activation duration in seconds, optionally a 4-digit PIN to protect these settings on the device, and optionally a portal password to protect this web page (username: admin)
 8. Click **Save and restart**
 9. The device connects to WiFi and the QR code appears. You're live!
 
@@ -109,6 +109,7 @@ plugnsat.ino   Main sketch, state machine, WiFi, buttons
 config.h       Constants, colors, config struct
 display.h      All screen rendering (splash, QR, paid, error, info, settings, brightness, AP)
 btcpay.h       BTCPay Server API (create invoice, check status)
+backend.h      Lightning backend abstraction layer (BTCPay, Blink stubs)
 shelly.h       Shelly local HTTP API (switch on/off, status)
 webportal.h    Web config page (HTML/CSS/JS served by ESP32)
 qrcode.h       QR code generation library header (by Richard Moore)
@@ -122,10 +123,10 @@ All files go in the same folder. Arduino IDE compiles them together.
 - WiFi disconnects > auto reconnect, QR regenerated
 - BTCPay unreachable > retry 3x, then error screen, auto-retry 10s
 - Invoice expires > new QR generated silently
-- Shelly offline > payment still accepted, warning shown
+- Shelly offline > warning shown, payment stays pending (not settled), auto-retry every 10s until Shelly is back — no money lost
 - Shelly hostname (mDNS .local) supported to avoid DHCP IP changes
 - "Scan network" button in the web portal auto-discovers Shelly devices via mDNS (no IP needed)
-- 10+ consecutive errors > ESP32 restarts itself
+- 60+ consecutive poll errors (5 min) > ESP32 restarts itself
 - Long press BTN1 from any screen > AP setup mode
 
 ## License
