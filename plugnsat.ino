@@ -36,6 +36,7 @@
 #include <Preferences.h>
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
+#include <esp_task_wdt.h>
 #include <TFT_eSPI.h>
 #include "qrcode.h"
 #include "config.h"
@@ -130,6 +131,14 @@ PlugNSatConfig config;
 void setup() {
   Serial.begin(115200);
   delay(500);
+  // Hardware watchdog: restart if loop() blocked for 30s
+  esp_task_wdt_config_t wdt_config = {
+    .timeout_ms    = 30000,
+    .idle_core_mask = 0,
+    .trigger_panic  = true
+  };
+  esp_task_wdt_init(&wdt_config);
+  esp_task_wdt_add(NULL);
   Serial.println("\n\n=== PlugNSat v" FIRMWARE_VERSION " ===");
 
   tft.init();
@@ -213,6 +222,7 @@ void loop() {
       break;
   }
   
+  esp_task_wdt_reset();
   delay(10);
 }
 
