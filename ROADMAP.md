@@ -1,4 +1,4 @@
-### v0.1 (current)
+### v0.1 — Released
 - [x] Basic prototype: LNURL QR, BTCPay polling, Shelly activation
 - [x] Web portal configuration
 - [x] Auto QR refresh before invoice expiry
@@ -16,9 +16,9 @@
 - [X] First test video
 - [X] Documentation structure: create outline with all major sections
 - [X] README v1 on GitHub
-- [ ] Full code cleanup before moving forward
+- [X] Full code cleanup before moving forward
 
-### v0.2 - Blink integration and enclosures
+### v0.2 — Blink integration and enclosures (current)
 - [ ] Blink wallet API integration
 - [ ] Backend choice on web portal: BTCPay or Blink
 - [ ] Web portal adapts fields based on backend choice

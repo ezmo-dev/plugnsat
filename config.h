@@ -16,7 +16,7 @@
 #define POLL_INTERVAL_MS   5000      // Check payment every 5s (was 2s)
 #define QR_REFRESH_MS      285000    // Refresh QR at 4min45s (before 5min expiry)
 #define INVOICE_EXPIRY_MIN 5         // BTCPay invoice expiration
-#define FIRMWARE_VERSION   "0.1.0"
+#define FIRMWARE_VERSION   "0.2.0"
 #define BACKLIGHT_PIN      38
 #define MENU_TIMEOUT_MS    6000
 #define LONG_PRESS_MS      3000
