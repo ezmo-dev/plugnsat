@@ -22,6 +22,11 @@
 #include <TFT_eSPI.h>
 #include "config.h"
 
+// Pre-computed RGB565 colors (avoid recalculating in every function)
+#define COLOR_ORANGE_D  0xF483  // tft.color565(247, 147, 26) — verified: (30<<11)|(36<<5)|3
+#define COLOR_CYAN_D    0x073F  // tft.color565(0, 229, 255)  — verified: (0<<11)|(57<<5)|31
+#define COLOR_YELLOW_D  0xFEA0  // tft.color565(255, 215, 0)  — verified: (31<<11)|(53<<5)|0
+
 // Pixel font bitmaps (5 wide × 7 tall) and lightning bolt (5 wide × 10 tall)
 static const uint8_t font_P[] = {0xF0,0x88,0x88,0xF0,0x80,0x80,0x80};
 static const uint8_t font_L[] = {0x80,0x80,0x80,0x80,0x80,0x80,0xF8};
