@@ -504,7 +504,13 @@ void loopShellyOffline() {
   if (millis() - shellyOfflineStartTime > 10000) {
     lastDisplayedSecond = -1;
     if (shellyIsOnline(config.shellyHost)) {
-      Serial.println("Shelly back online");
+      Serial.println("Shelly back online, retrying activation");
+      bool ok = shellySwitchOn(config.shellyHost, config.activationDuration);
+      if (ok) {
+        Serial.println("Shelly ON for " + String(config.activationDuration) + "s (retry after offline)");
+      } else {
+        Serial.println("Shelly retry failed, continuing anyway");
+      }
       ledcWrite(BACKLIGHT_PIN, config.brightness);
       generateAndShowQR();
     } else {

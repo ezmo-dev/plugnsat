@@ -13,9 +13,9 @@
 - [X] Better error messages and info indicators on all screens
 - [X] Info tooltips on web portal fields
 - [X] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
-- [ ] First test video
+- [X] First test video
 - [X] Documentation structure: create outline with all major sections
-- [ ] README v1 on GitHub
+- [X] README v1 on GitHub
 - [ ] Full code cleanup before moving forward
 
 ### v0.2 - Blink integration and enclosures
