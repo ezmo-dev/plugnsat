@@ -830,6 +830,8 @@ void loadConfig() {
   config.showName           = prefs.getBool("show_name",  false);
   config.showPrice          = prefs.getBool("show_price", false);
   config.backendType        = (BackendType)prefs.getInt("backend", 0);
+  if (config.backendType < 0 || config.backendType >= BACKEND_COUNT)
+    config.backendType = BACKEND_BTCPAY;
   config.portalPassword     = prefs.getString("portal_pw", "");
   prefs.end();
 }

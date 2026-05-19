@@ -42,7 +42,8 @@
 // Backend selection
 enum BackendType {
   BACKEND_BTCPAY = 0,
-  BACKEND_BLINK  = 1
+  BACKEND_BLINK  = 1,
+  BACKEND_COUNT // Always last, thanks! =)
 };
 
 // Config struct
