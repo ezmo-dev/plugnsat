@@ -123,7 +123,7 @@ All files go in the same folder. Arduino IDE compiles them together.
 - WiFi disconnects > auto reconnect, QR regenerated
 - BTCPay unreachable > retry 3x, then error screen, auto-retry 10s
 - Invoice expires > new QR generated silently
-- Shelly offline > warning shown, payment stays pending (not settled), auto-retry every 10s until Shelly is back — no money lost
+- Shelly offline during payment > "Shelly not found" warning screen > auto-retry every 10s > when Shelly comes back online: paid screen with full countdown + activation command sent with full duration > payment is confirmed regardless of Shelly status
 - Shelly hostname (mDNS .local) supported to avoid DHCP IP changes
 - "Scan network" button in the web portal auto-discovers Shelly devices via mDNS (no IP needed)
 - 60+ consecutive poll errors (5 min) > ESP32 restarts itself
