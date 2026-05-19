@@ -462,13 +462,14 @@ void loopError() {
   }
 
   if (millis() - errorStartTime > 10000) {
+    lastDisplayedSecond = -1;
     consecutiveErrors = 0;
     ledcWrite(BACKLIGHT_PIN, config.brightness);
     generateAndShowQR();
     return;
   }
-  if (btn1Pressed) { ledcWrite(BACKLIGHT_PIN, config.brightness); startAPMode(); }
-  if (btn2Pressed) { ledcWrite(BACKLIGHT_PIN, config.brightness); consecutiveErrors = 0; generateAndShowQR(); }
+  if (btn1Pressed) { lastDisplayedSecond = -1; ledcWrite(BACKLIGHT_PIN, config.brightness); startAPMode(); }
+  if (btn2Pressed) { lastDisplayedSecond = -1; ledcWrite(BACKLIGHT_PIN, config.brightness); consecutiveErrors = 0; generateAndShowQR(); }
 }
 
 //
