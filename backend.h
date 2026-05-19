@@ -22,6 +22,8 @@ struct BackendInterface {
   CheckInvoiceFn  checkInvoice;
 };
 
+// Global instance - only include backend.h from plugnsat.ino.
+// If included from multiple .cpp files, change to extern + definition in .ino.-- ;)
 BackendInterface backend;
 
 // --- BTCPay wrappers ---
