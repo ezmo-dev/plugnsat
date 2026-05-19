@@ -817,6 +817,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   });
 
   server.on("/api/status", HTTP_GET, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
     JsonDocument doc;
     doc["device"] = config.deviceName;
     doc["price"] = config.priceSats;
