@@ -735,7 +735,17 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     if (config.btcpayUrl.endsWith("/")) {
       config.btcpayUrl = config.btcpayUrl.substring(0, config.btcpayUrl.length() - 1);
     }
-    
+    if (config.priceSats > 1000000) config.priceSats = 1000000;
+    if (config.activationDuration > 86400) config.activationDuration = 86400;
+    if ((int)config.deviceName.length() > 40)
+      config.deviceName = config.deviceName.substring(0, 40);
+    if ((int)config.wifiSsid.length() > 64)
+      config.wifiSsid = config.wifiSsid.substring(0, 64);
+    if ((int)config.btcpayUrl.length() > 200)
+      config.btcpayUrl = config.btcpayUrl.substring(0, 200);
+    if ((int)config.shellyHost.length() > 80)
+      config.shellyHost = config.shellyHost.substring(0, 80);
+
     saveConfig();
     
     server.send(200, "text/html", processSavedPage(config));
