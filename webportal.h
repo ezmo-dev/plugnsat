@@ -746,7 +746,10 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   server.on("/test-shelly", HTTP_GET, [&config, &server]() {
     if (!checkPortalAuth(server, config)) return;
     String host = server.arg("host");
-    if (host.length() == 0) {
+    if (host.length() == 0 || host.length() > 80
+        || host.indexOf("/") >= 0
+        || host.indexOf("http") >= 0
+        || host.indexOf("\\") >= 0) {
       server.send(400, "application/json", "{\"ok\":false}");
       return;
     }
