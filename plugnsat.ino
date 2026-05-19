@@ -36,7 +36,6 @@
 #include <Preferences.h>
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
-#include <esp_task_wdt.h>
 #include <TFT_eSPI.h>
 #include "qrcode.h"
 #include "config.h"
@@ -162,19 +161,6 @@ void setup() {
 //
 
 void loop() {
-  // Hardware watchdog armed once loop() starts — setup() is intentionally excluded
-  static bool wdtInitialized = false;
-  if (!wdtInitialized) {
-    esp_task_wdt_config_t wdt_config = {
-      .timeout_ms     = 30000,
-      .idle_core_mask = 0,
-      .trigger_panic  = true
-    };
-    esp_task_wdt_init(&wdt_config);
-    esp_task_wdt_add(NULL);
-    wdtInitialized = true;
-  }
-
   server.handleClient();
   readButtons();
 
@@ -227,7 +213,6 @@ void loop() {
       break;
   }
   
-  esp_task_wdt_reset();
   delay(10);
 }
 
@@ -513,11 +498,13 @@ void loopShellyOffline() {
       bool ok = shellySwitchOn(config.shellyHost, config.activationDuration);
       if (ok) {
         Serial.println("Shelly ON for " + String(config.activationDuration) + "s (retry after offline)");
-      } else {
-        Serial.println("Shelly retry failed, continuing anyway");
       }
-      ledcWrite(BACKLIGHT_PIN, config.brightness);
-      generateAndShowQR();
+      lastDisplayedSecond = -1;
+      paidStartTime = millis();
+      paidShellyTriggered = true;
+      currentInvoiceId = "";
+      ledcWrite(BACKLIGHT_PIN, 255);
+      currentState = STATE_PAID;
     } else {
       Serial.println("Shelly still offline, retrying in 10s");
       shellyOfflineStartTime = millis();
