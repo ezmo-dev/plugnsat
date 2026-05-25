@@ -79,7 +79,7 @@ AppState currentState = STATE_CONNECTING;
 
 // Invoice tracking
 String currentInvoiceId = "";
-String currentLnurl     = "";
+String currentQRData     = "";
 unsigned long invoiceCreatedAt = 0;
 unsigned long lastPollTime     = 0;
 
@@ -362,7 +362,7 @@ void loopQRDisplay() {
 }
 
 void returnToQR() {
-  if (currentLnurl.length() > 0) {
+  if (currentQRData.length() > 0) {
     showCurrentQR();
   } else {
     generateAndShowQR();
@@ -371,9 +371,9 @@ void returnToQR() {
 
 void showCurrentQR() {
   if (config.showName || config.showPrice) {
-    displayQRWithInfo(tft, currentLnurl, config.priceSats, config.deviceName, config.showName, config.showPrice);
+    displayQRWithInfo(tft, currentQRData, config.priceSats, config.deviceName, config.showName, config.showPrice);
   } else {
-    displayQR(tft, currentLnurl, config.priceSats, config.deviceName);
+    displayQR(tft, currentQRData, config.priceSats, config.deviceName);
   }
   currentState = STATE_QR_DISPLAY;
 }
@@ -401,7 +401,7 @@ void generateAndShowQR() {
 
     if (ok && lnurl.length() > 0) {
       currentInvoiceId = invoiceId;
-      currentLnurl = lnurl;
+      currentQRData = lnurl;
       invoiceCreatedAt = millis();
       lastPollTime = millis();
       consecutiveErrors = 0;
@@ -511,6 +511,7 @@ void loopShellyOffline() {
       paidStartTime = millis();
       paidShellyTriggered = true;
       currentInvoiceId = "";
+      currentQRData = "";
       ledcWrite(BACKLIGHT_PIN, 255);
       currentState = STATE_PAID;
     } else {
@@ -604,7 +605,7 @@ void loopBrightness() {
     return;
   }
   if (screenNeedsRedraw) {
-    displayBrightness(tft, config.brightness, currentLnurl);
+    displayBrightness(tft, config.brightness, currentQRData);
     screenNeedsRedraw = false;
   }
   if (btn1Pressed) {
