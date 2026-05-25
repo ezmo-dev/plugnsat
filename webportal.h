@@ -406,6 +406,15 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     </div>
 
     <div class="sec">
+      <h2>Lightning Backend</h2>
+      <label>Backend <span class="tip" data-tip="Choose your Lightning payment backend. BTCPay Server requires your own instance. Blink is a hosted wallet service (blink.sv).">i</span></label>
+      <select name="backend" id="backend-sel" onchange="toggleBackend()">
+        <option value="0" %BACKEND_BTCPAY_SEL%>BTCPay Server</option>
+        <option value="1" %BACKEND_BLINK_SEL%>Blink</option>
+      </select>
+    </div>
+
+    <div class="sec" id="sec-btcpay">
       <h2>BTCPay Server</h2>
       <label>Server URL <span class="tip" data-tip="The full URL of your BTCPay Server instance, without trailing slash. Example: https://btcpay.mydomain.com">i</span></label>
       <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="e.g. https://btcpay.mydomain.com">
@@ -415,6 +424,15 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       <div class="hint">Permissions: cancreateinvoice, canviewinvoices</div>
       <label>Store ID <span class="tip" data-tip="Found in BTCPay Server: Settings > General. It's the long alphanumeric string in the URL when viewing your store.">i</span></label>
       <input type="text" name="btcpay_store" value="%BTCPAY_STORE%">
+    </div>
+
+    <div class="sec" id="sec-blink" style="display:none">
+      <h2>Blink Wallet</h2>
+      <label>API Key <span class="tip" data-tip="Generate it on dashboard.blink.sv under API Keys. Starts with blink_.">i</span></label>
+      <input type="password" name="blink_key" value="%BLINK_KEY%">
+      <div class="hint">Starts with blink_</div>
+      <label>BTC Wallet ID <span class="tip" data-tip="Found on dashboard.blink.sv. Run the Me query in the API playground (api.blink.sv/graphql) to see your wallet IDs.">i</span></label>
+      <input type="text" name="blink_wid" value="%BLINK_WID%">
     </div>
 
     <div class="sec">
@@ -551,6 +569,12 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       el.style.color=d.ok?'#4caf50':'#f44336';
     }).catch(function(){el.innerHTML='Error';el.style.color='#f44336'});
   }
+  function toggleBackend(){
+    var v=document.getElementById('backend-sel').value;
+    document.getElementById('sec-btcpay').style.display=(v==='0')?'':'none';
+    document.getElementById('sec-blink').style.display=(v==='1')?'':'none';
+  }
+  document.addEventListener('DOMContentLoaded',toggleBackend);
   </script>
 </body>
 </html>
@@ -676,6 +700,10 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%BTCPAY_URL%",  htmlEscape(config.btcpayUrl));
   html.replace("%BTCPAY_KEY%",  config.btcpayApiKey.length() > 0 ? "********" : "");
   html.replace("%BTCPAY_STORE%", htmlEscape(config.btcpayStoreId));
+  html.replace("%BACKEND_BTCPAY_SEL%", config.backendType == BACKEND_BTCPAY ? "selected" : "");
+  html.replace("%BACKEND_BLINK_SEL%",  config.backendType == BACKEND_BLINK  ? "selected" : "");
+  html.replace("%BLINK_KEY%",          config.blinkApiKey.length() > 0 ? "********" : "");
+  html.replace("%BLINK_WID%",          htmlEscape(config.blinkWalletId));
   html.replace("%SHELLY_HOST%", htmlEscape(config.shellyHost));
   html.replace("%PRICE_SATS%",  String(config.priceSats));
   html.replace("%DURATION%",    String(config.activationDuration));
@@ -705,6 +733,12 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     String newApiKey = server.arg("btcpay_key");
     if (newApiKey.length() > 0 && newApiKey != "********") config.btcpayApiKey = newApiKey;
     config.btcpayStoreId      = server.arg("btcpay_store");
+    String newBlinkKey = server.arg("blink_key");
+    if (newBlinkKey.length() > 0 && newBlinkKey != "********") config.blinkApiKey = newBlinkKey;
+    config.blinkWalletId      = server.arg("blink_wid");
+    config.backendType = (BackendType)server.arg("backend").toInt();
+    if (config.backendType < 0 || config.backendType >= BACKEND_COUNT)
+      config.backendType = BACKEND_BTCPAY;
     config.shellyHost         = server.arg("shelly_host");
     config.priceSats          = server.arg("price_sats").toInt();
     config.activationDuration = server.arg("duration").toInt();
