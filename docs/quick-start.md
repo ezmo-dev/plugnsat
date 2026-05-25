@@ -40,3 +40,20 @@ PlugNSat needs a Lightning backend to create invoices and detect payments. You h
 **Pick one and follow the matching section below.** You can always switch later from the web portal.
 
 ---
+
+### Option A: Set up with Blink (recommended for beginners)
+
+1. Download the **Blink wallet** ([iOS](https://apps.apple.com/app/blink-bitcoin-beach-wallet/id1531383905) / [Android](https://play.google.com/store/apps/details?id=com.galoyapp))
+2. Create an account and verify your phone number
+3. Go to **Settings > API Keys** in the Blink app or on [dashboard.blink.sv](https://dashboard.blink.sv)
+4. Create a new API key and copy it
+
+![Blink API key Dashboard](images/blink-api-key-dashboard.png)
+![Blink API key Creation](images/blink-api-key-create.png)
+
+5. Save your API key in a secure location (password vault) and keep it handy for step 4
+6. Keep your wallet ID in a safe place (such as a password manager) and have it handy for Step 4 as well
+
+![Blink Wallet ID](images/blink-wallet-id.png)
+
+---
