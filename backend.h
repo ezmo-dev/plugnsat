@@ -13,6 +13,7 @@
 
 #include "config.h"
 #include "btcpay.h"
+#include "blink.h"
 
 typedef bool   (*CreateInvoiceFn)(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL);
 typedef String (*CheckInvoiceFn) (PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload);
@@ -36,16 +37,15 @@ String btcpayCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId
   return btcpayCheckInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, invoiceId);
 }
 
-// --- Blink stubs ---
+// --- Blink wrappers ---
 
-bool blinkCreateInvoicePlaceholder(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL) {
-  Serial.println("Blink: not implemented yet");
-  return false;
+bool blinkCreateInvoiceWrapper(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL) {
+  return blinkCreateInvoice(config.blinkApiKey, config.blinkWalletId, amountSats, outInvoiceId, outLNURL);
 }
 
-String blinkCheckInvoicePlaceholder(PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload) {
-  Serial.println("Blink: not implemented yet");
-  return "ERROR";
+String blinkCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload) {
+  // Blink uses the paymentRequest (in invoicePayload / currentQRData) for status checks
+  return blinkCheckInvoice(config.blinkApiKey, invoicePayload);
 }
 
 // --- Init ---
@@ -53,8 +53,8 @@ String blinkCheckInvoicePlaceholder(PlugNSatConfig &config, const String &invoic
 void initBackend(BackendType type) {
   switch (type) {
     case BACKEND_BLINK:
-      backend.createInvoice = blinkCreateInvoicePlaceholder;
-      backend.checkInvoice  = blinkCheckInvoicePlaceholder;
+      backend.createInvoice = blinkCreateInvoiceWrapper;
+      backend.checkInvoice  = blinkCheckInvoiceWrapper;
       break;
     case BACKEND_BTCPAY:
     default:
