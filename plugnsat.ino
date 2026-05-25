@@ -317,7 +317,7 @@ void loopQRDisplay() {
   if (millis() - lastPollTime > POLL_INTERVAL_MS) {
     lastPollTime = millis();
     
-    String status = backend.checkInvoice(config, currentInvoiceId);
+    String status = backend.checkInvoice(config, currentInvoiceId, currentQRData);
     
     if (status == "ERROR") {
       consecutiveErrors++;
@@ -380,7 +380,7 @@ void showCurrentQR() {
 
 void generateAndShowQR() {
   if (currentInvoiceId.length() > 0) {
-    String status = backend.checkInvoice(config, currentInvoiceId);
+    String status = backend.checkInvoice(config, currentInvoiceId, currentQRData);
     if (status == "Settled" || status == "Processing") {
       Serial.println("*** PAYMENT DETECTED before QR refresh ***");
       paidStartTime = millis();
@@ -829,6 +829,8 @@ void loadConfig() {
   config.btcpayUrl          = prefs.getString("btcpay_url", "");
   config.btcpayApiKey       = prefs.getString("btcpay_key", "");
   config.btcpayStoreId      = prefs.getString("btcpay_store", "");
+  config.blinkApiKey        = prefs.getString("blink_key", "");
+  config.blinkWalletId      = prefs.getString("blink_wid", "");
   config.shellyHost         = prefs.getString("shelly_ip", "");
   config.priceSats          = prefs.getInt("price_sats", 100);
   config.activationDuration = prefs.getInt("duration", 60);
@@ -851,6 +853,8 @@ void saveConfig() {
   prefs.putString("btcpay_url",   config.btcpayUrl);
   prefs.putString("btcpay_key",   config.btcpayApiKey);
   prefs.putString("btcpay_store", config.btcpayStoreId);
+  prefs.putString("blink_key",    config.blinkApiKey);
+  prefs.putString("blink_wid",    config.blinkWalletId);
   prefs.putString("shelly_ip",    config.shellyHost);
   prefs.putInt("price_sats",      config.priceSats);
   prefs.putInt("duration",        config.activationDuration);

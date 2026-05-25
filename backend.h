@@ -15,7 +15,7 @@
 #include "btcpay.h"
 
 typedef bool   (*CreateInvoiceFn)(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL);
-typedef String (*CheckInvoiceFn) (PlugNSatConfig &config, const String &invoiceId);
+typedef String (*CheckInvoiceFn) (PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload);
 
 struct BackendInterface {
   CreateInvoiceFn createInvoice;
@@ -32,18 +32,18 @@ bool btcpayCreateInvoiceWrapper(PlugNSatConfig &config, int amountSats, String &
   return btcpayCreateInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, amountSats, outInvoiceId, outLNURL);
 }
 
-String btcpayCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId) {
+String btcpayCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload) {
   return btcpayCheckInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, invoiceId);
 }
 
-// --- Blink stubs (not implemented yet) ---
+// --- Blink stubs ---
 
 bool blinkCreateInvoicePlaceholder(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL) {
   Serial.println("Blink: not implemented yet");
   return false;
 }
 
-String blinkCheckInvoicePlaceholder(PlugNSatConfig &config, const String &invoiceId) {
+String blinkCheckInvoicePlaceholder(PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload) {
   Serial.println("Blink: not implemented yet");
   return "ERROR";
 }
