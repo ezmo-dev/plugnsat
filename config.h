@@ -22,12 +22,15 @@
 #define LONG_PRESS_MS      3000
 #define BTN_ICON_X         294
 
+// Blink API
+#define BLINK_GRAPHQL_URL "https://api.blink.sv/graphql"
+
 // Display (T-Display S3 landscape)
 #define SCREEN_W 320
 #define SCREEN_H 170
 
 // QR code
-#define QR_VERSION 10  // LNURL mode uses verson 5-6 (~115 chars) -> For LED screen (impossible to scan BOLT11 QR due to the reflections) 
+#define QR_VERSION 10  // LNURL mode uses verson 5-6 (~115 chars)
                       
 // Colors
 #define COLOR_BG       TFT_BLACK
@@ -53,6 +56,8 @@ struct PlugNSatConfig {
   String btcpayUrl;        // Instance URL, e.g. https://btcpay.mydomain.com"
   String btcpayApiKey;
   String btcpayStoreId;
+  String blinkApiKey;       // Blink API key (starts with blink_)
+  String blinkWalletId;     // Blink BTC wallet ID
   String shellyHost;        // IP address or mDNS hostname, e.g. 192.168.1.42 or shellyplugsg3-xxxxxxxxxxxx.local
   int priceSats;           // Price per activation
   int activationDuration;  // Seconds relay stays ON after payment
