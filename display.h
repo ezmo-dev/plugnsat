@@ -189,12 +189,25 @@ void displayGenerating(TFT_eSPI &tft) {
 
 struct QRResult { int qrPixW; int qrPixH; };
 
+// Single source of truth for QR version selection.
+// Picks the smallest version whose alphanumeric ECC_LOW capacity fits the data,
+// maximising pixel-per-module on the 170px screen.
+// Capacity reference (alphanumeric, ECC_LOW):
+//   v3=77  v5=154  v6=195  v8=279  v9=335  v10=395
+static int qrVersionForLength(int len) {
+  if (len <  50) return 3;
+  if (len <  85) return 5;
+  if (len < 120) return 6;
+  if (len < 180) return 8;
+  if (len < 335) return 9;
+  return QR_VERSION;
+}
+
 // Returns the rendered pixel side length without initialising a full QRCode object.
 // Used by callers that need to compute position before rendering.
 static int qrSide(const String &data, int maxH) {
   String d = data; d.toUpperCase();
-  int version = (d.length() < 50) ? 3 : (d.length() < 85) ? 5 :
-                (d.length() < 120) ? 6 : (d.length() < 180) ? 8 : QR_VERSION;
+  int version = qrVersionForLength(d.length());
   int qrSize  = 4 * version + 17;
   int ps      = maxH / qrSize;
   if (ps < 1) ps = 1;
@@ -204,8 +217,7 @@ static int qrSide(const String &data, int maxH) {
 // Renders a QR code at (x, y) top-left, constrained to maxH pixels tall.
 QRResult renderQR(TFT_eSPI &tft, String data, int x, int y, int maxH) {
   data.toUpperCase();
-  int version = (data.length() < 50) ? 3 : (data.length() < 85) ? 5 :
-                (data.length() < 120) ? 6 : (data.length() < 180) ? 8 : QR_VERSION;
+  int version = qrVersionForLength(data.length());
 
   QRCode qrcode;
   uint8_t qrcodeData[qrcode_getBufferSize(version)];
