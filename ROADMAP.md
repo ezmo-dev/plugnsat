@@ -19,7 +19,7 @@
 - [X] Full code cleanup before moving forward
 
 ### v0.2 — Blink integration and enclosures (current)
-- [ ] Blink wallet API integration
+- [X] Blink wallet API integration
 - [ ] Backend choice on web portal: BTCPay or Blink
 - [ ] Web portal adapts fields based on backend choice
 - [ ] Update info indicators on web portal for both backends

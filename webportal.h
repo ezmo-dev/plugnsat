@@ -177,6 +177,12 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       -webkit-appearance: none;
       appearance: none;
     }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2390939B' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
     input[type="number"] { font-variant-numeric: tabular-nums; }
     input::placeholder { color: var(--pn-fg-3); }
     input:hover, select:hover { border-color: #C2BCAE; }
@@ -392,7 +398,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       </svg>
     </div>
     <h1>Configure your <span class="accent">PlugNSat</span>.</h1>
-    <p class="sub">Four steps. About two minutes.</p>
+    <p class="sub">Four steps. Two minutes.</p>
   </header>
 
   <form action="/save" method="POST">
@@ -412,27 +418,25 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
         <option value="0" %BACKEND_BTCPAY_SEL%>BTCPay Server</option>
         <option value="1" %BACKEND_BLINK_SEL%>Blink</option>
       </select>
-    </div>
-
-    <div class="sec" id="sec-btcpay">
-      <h2>BTCPay Server</h2>
-      <label>Server URL <span class="tip" data-tip="The full URL of your BTCPay Server instance, without trailing slash. Example: https://btcpay.mydomain.com">i</span></label>
-      <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="e.g. https://btcpay.mydomain.com">
-      <div class="hint">No trailing slash</div>
-      <label>API Key <span class="tip" data-tip="Generate it in BTCPay Server: Account > API Keys. Required permissions: cancreateinvoice, canviewinvoices, canuselightningnode.">i</span></label>
-      <input type="password" name="btcpay_key" value="%BTCPAY_KEY%">
-      <div class="hint">Permissions: cancreateinvoice, canviewinvoices</div>
-      <label>Store ID <span class="tip" data-tip="Found in BTCPay Server: Settings > General. It's the long alphanumeric string in the URL when viewing your store.">i</span></label>
-      <input type="text" name="btcpay_store" value="%BTCPAY_STORE%">
-    </div>
-
-    <div class="sec" id="sec-blink" style="display:none">
-      <h2>Blink Wallet</h2>
-      <label>API Key <span class="tip" data-tip="Generate it on dashboard.blink.sv under API Keys. Starts with blink_.">i</span></label>
-      <input type="password" name="blink_key" value="%BLINK_KEY%">
-      <div class="hint">Starts with blink_</div>
-      <label>BTC Wallet ID <span class="tip" data-tip="Found on dashboard.blink.sv. Run the Me query in the API playground (api.blink.sv/graphql) to see your wallet IDs.">i</span></label>
-      <input type="text" name="blink_wid" value="%BLINK_WID%">
+      <div id="sec-btcpay">
+        <div class="hint" style="margin-bottom:8px; font-weight:500; color:var(--pn-fg-2);">BTCPay Server settings</div>
+        <label>Server URL <span class="tip" data-tip="The full URL of your BTCPay Server instance, without trailing slash. Example: https://btcpay.mydomain.com">i</span></label>
+        <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="e.g. https://btcpay.mydomain.com">
+        <div class="hint">No trailing slash</div>
+        <label>API Key <span class="tip" data-tip="Generate it in BTCPay Server: Account > API Keys. Required permissions: cancreateinvoice, canviewinvoices, canuselightningnode.">i</span></label>
+        <input type="password" name="btcpay_key" value="%BTCPAY_KEY%">
+        <div class="hint">Permissions: cancreateinvoice, canviewinvoices</div>
+        <label>Store ID <span class="tip" data-tip="Found in BTCPay Server: Settings > General. It's the long alphanumeric string in the URL when viewing your store.">i</span></label>
+        <input type="text" name="btcpay_store" value="%BTCPAY_STORE%">
+      </div>
+      <div id="sec-blink">
+        <div class="hint" style="margin-bottom:8px; font-weight:500; color:var(--pn-fg-2);">Blink Wallet settings</div>
+        <label>API Key <span class="tip" data-tip="Generate it on dashboard.blink.sv under API Keys. Starts with blink_.">i</span></label>
+        <input type="password" name="blink_key" value="%BLINK_KEY%">
+        <div class="hint">Starts with blink_</div>
+        <label>BTC Wallet ID <span class="tip" data-tip="Found on dashboard.blink.sv. Run the Me query in the API playground (api.blink.sv/graphql) to see your wallet IDs.">i</span></label>
+        <input type="text" name="blink_wid" value="%BLINK_WID%">
+      </div>
     </div>
 
     <div class="sec">
@@ -571,8 +575,15 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   }
   function toggleBackend(){
     var v=document.getElementById('backend-sel').value;
-    document.getElementById('sec-btcpay').style.display=(v==='0')?'':'none';
-    document.getElementById('sec-blink').style.display=(v==='1')?'':'none';
+    var bp=document.getElementById('sec-btcpay');
+    var bl=document.getElementById('sec-blink');
+    var show=v==='0'?bp:bl;
+    var hide=v==='0'?bl:bp;
+    show.style.display='';
+    show.style.borderTop='1px solid var(--pn-border)';
+    show.style.marginTop='16px';
+    show.style.paddingTop='16px';
+    hide.style.display='none';
   }
   document.addEventListener('DOMContentLoaded',toggleBackend);
   </script>
