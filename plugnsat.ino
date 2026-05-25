@@ -149,7 +149,14 @@ void setup() {
   delay(5000);
   ledcWrite(BACKLIGHT_PIN, config.brightness);
 
-  if (config.wifiSsid.length() == 0 || config.btcpayUrl.length() == 0) {
+  bool hasBackendConfig = false;
+  if (config.backendType == BACKEND_BTCPAY) {
+    hasBackendConfig = config.btcpayUrl.length() > 0 && config.btcpayApiKey.length() > 0;
+  } else if (config.backendType == BACKEND_BLINK) {
+    hasBackendConfig = config.blinkApiKey.length() > 0 && config.blinkWalletId.length() > 0;
+  }
+
+  if (config.wifiSsid.length() == 0 || !hasBackendConfig) {
     startAPMode();
   } else {
     connectToWiFi();
