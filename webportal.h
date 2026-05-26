@@ -294,6 +294,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       width: 240px;
       text-align: left;
       line-height: 1.45;
+      white-space: pre-line;
       opacity: 0;
       pointer-events: none;
       transition: opacity .15s ease;
@@ -413,7 +414,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Lightning Backend</h2>
-      <label>Backend <span class="tip" data-tip="Choose your Lightning payment backend. BTCPay Server requires your own instance. Blink is a hosted wallet service (blink.sv).">i</span></label>
+      <label>Backend <span class="tip" data-tip="How you receive Lightning payments.&#10;- BTCPay Server: you run your own server, full control, no middleman.&#10;- Blink: ready-to-use wallet, no server needed, sign up at blink.sv.">i</span></label>
       <select name="backend" id="backend-sel" onchange="toggleBackend()">
         <option value="0" %BACKEND_BTCPAY_SEL%>BTCPay Server</option>
         <option value="1" %BACKEND_BLINK_SEL%>Blink</option>
@@ -423,18 +424,18 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
         <label>Server URL <span class="tip" data-tip="The full URL of your BTCPay Server instance, without trailing slash. Example: https://btcpay.mydomain.com">i</span></label>
         <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="e.g. https://btcpay.mydomain.com">
         <div class="hint">No trailing slash</div>
-        <label>API Key <span class="tip" data-tip="Generate it in BTCPay Server: Account > API Keys. Required permissions: cancreateinvoice, canviewinvoices, canuselightningnode.">i</span></label>
+        <label>API Key <span class="tip" data-tip="A secret key that lets PlugNSat create and check invoices on your BTCPay Server. Generate one in Account > API Keys with these permissions:&#10;- cancreateinvoice&#10;- canviewinvoices&#10;- canuselightningnode">i</span></label>
         <input type="password" name="btcpay_key" value="%BTCPAY_KEY%">
         <div class="hint">Permissions: cancreateinvoice, canviewinvoices</div>
-        <label>Store ID <span class="tip" data-tip="Found in BTCPay Server: Settings > General. It's the long alphanumeric string in the URL when viewing your store.">i</span></label>
+        <label>Store ID <span class="tip" data-tip="Identifies which store receives payments. Find it in your BTCPay Server under Settings > General, or in the URL bar when viewing your store.">i</span></label>
         <input type="text" name="btcpay_store" value="%BTCPAY_STORE%">
       </div>
       <div id="sec-blink">
         <div class="hint" style="margin-bottom:8px; font-weight:500; color:var(--pn-fg-2);">Blink Wallet settings</div>
-        <label>API Key <span class="tip" data-tip="Generate it on dashboard.blink.sv under API Keys. Starts with blink_.">i</span></label>
+        <label>API Key <span class="tip" data-tip="Lets PlugNSat create invoices on your Blink wallet. Generate one at dashboard.blink.sv under API Keys. It starts with blink_.">i</span></label>
         <input type="password" name="blink_key" value="%BLINK_KEY%">
         <div class="hint">Starts with blink_</div>
-        <label>BTC Wallet ID <span class="tip" data-tip="Found on dashboard.blink.sv. Run the Me query in the API playground (api.blink.sv/graphql) to see your wallet IDs.">i</span></label>
+        <label>BTC Wallet ID <span class="tip" data-tip="Which wallet receives the sats. Find it on dashboard.blink.sv.">i</span></label>
         <input type="text" name="blink_wid" value="%BLINK_WID%">
       </div>
     </div>
