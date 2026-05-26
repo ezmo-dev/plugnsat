@@ -399,7 +399,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       </svg>
     </div>
     <h1>Configure your <span class="accent">PlugNSat</span>.</h1>
-    <p class="sub">Four steps. Two minutes.</p>
+    <p class="sub">Five steps. Two minutes.</p>
   </header>
 
   <form action="/save" method="POST">
@@ -480,6 +480,10 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       </label>
       <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
       <div id="tpst" class="hint" style="margin-top:6px"></div>
+    </div>
+
+    <div class="sec">
+      <h2>Security</h2>
       <label>Settings PIN (4 digits) <span class="tip" data-tip="Prevents anyone from changing price or duration using the device buttons. 4 digits. Leave empty to skip.">i</span></label>
       <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Optional" inputmode="numeric" pattern="[0-9]{0,4}">
       <div class="hint">Protects Price and Duration settings on the device</div>
