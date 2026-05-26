@@ -20,7 +20,7 @@
 
 ### v0.2 — Blink integration and enclosures (current)
 - [X] Blink wallet API integration
-- [ ] Backend choice on web portal: BTCPay or Blink
+- [X] Backend choice on web portal: BTCPay or Blink
 - [ ] Web portal adapts fields based on backend choice
 - [ ] Update info indicators on web portal for both backends
 - [ ] Enclosure prototypes: desk stand, magnetic mount, wall mount

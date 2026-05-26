@@ -449,6 +449,8 @@ void loopPaid() {
   if (millis() - paidStartTime >= (unsigned long)config.activationDuration * 1000) {
     lastDisplayedSecond = -1;
     ledcWrite(BACKLIGHT_PIN, config.brightness);
+    currentInvoiceId = "";
+    currentQRData = "";
     generateAndShowQR();
   }
 }
