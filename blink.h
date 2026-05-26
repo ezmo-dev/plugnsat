@@ -42,7 +42,7 @@
 
 bool blinkCreateInvoice(
   String apiKey, String walletId,
-  int amountSats,
+  int amountSats, String deviceName,
   String &outInvoiceId, String &outLNURL
 ) {
   WiFiClientSecure client;
@@ -69,6 +69,7 @@ bool blinkCreateInvoice(
   JsonObject input = variables["input"].to<JsonObject>();
   input["walletId"] = walletId;
   input["amount"] = amountSats;
+  input["memo"] = "PlugNSat - " + deviceName + " - " + String(amountSats) + " sats";
 
   String body;
   serializeJson(doc, body);

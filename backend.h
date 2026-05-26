@@ -40,7 +40,7 @@ String btcpayCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId
 // --- Blink wrappers ---
 
 bool blinkCreateInvoiceWrapper(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL) {
-  return blinkCreateInvoice(config.blinkApiKey, config.blinkWalletId, amountSats, outInvoiceId, outLNURL);
+  return blinkCreateInvoice(config.blinkApiKey, config.blinkWalletId, amountSats, config.deviceName, outInvoiceId, outLNURL);
 }
 
 String blinkCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload) {
