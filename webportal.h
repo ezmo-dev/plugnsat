@@ -455,7 +455,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Device settings</h2>
-      <label>Name <span class="tip" data-tip="The name shown on the device screen and on this portal. Keep it short if you enable display.">i</span></label>
+      <label>Name <span class="tip" data-tip="The name shown on the device screen and on this page. Keep it short if you enable display.">i</span></label>
       <input type="text" name="dev_name" id="dev-name" value="%DEV_NAME%" placeholder="PlugNSat" oninput="validateName()">
       <div id="name-err" class="hint"></div>
       <label class="toggle">
@@ -484,12 +484,12 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Security</h2>
-      <label>Settings PIN (4 digits) <span class="tip" data-tip="Prevents anyone from changing price or duration using the device buttons. 4 digits. Leave empty to skip.">i</span></label>
+      <label>Device PIN (4 digits) <span class="tip" data-tip="Anyone near the PlugNSat can press its buttons to change price and duration. Set a 4-digit PIN to prevent this. Leave empty to skip.">i</span></label>
       <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Optional" inputmode="numeric" pattern="[0-9]{0,4}">
-      <div class="hint">Protects Price and Duration settings on the device</div>
-      <label>Portal Password <span class="tip" data-tip="Locks this settings page with a password (username: admin). Leave empty to skip. Always disabled in AP setup mode so you can recover access.">i</span></label>
+      <div class="hint">Prevents price and duration changes from the device buttons</div>
+      <label>Web Access Password <span class="tip" data-tip="Anyone on your WiFi network can open this page. Set a password to require login (username: admin). Leave empty to skip. Always disabled in setup mode so you never get locked out.">i</span></label>
       <input type="password" name="portal_pw" value="%PORTAL_PW%" placeholder="Optional">
-      <div class="hint">Protects this web portal on WiFi (username: admin)</div>
+      <div class="hint">Protects this configuration page on WiFi (username: admin)</div>
     </div>
 
     <button type="submit" id="btn-save">Save and restart &rarr;</button>
