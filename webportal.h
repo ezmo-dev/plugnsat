@@ -405,7 +405,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
   <form action="/save" method="POST">
 
     <div class="sec">
-      <h2>WiFi <span class="tip" data-tip="Your WiFi network name and password. The Shelly plug must be on the same network.">i</span></h2>
+      <h2>WiFi <span class="tip" data-tip="The WiFi network PlugNSat connects to. Your Shelly plug must be on the same network for them to communicate.">i</span></h2>
       <label>SSID</label>
       <input type="text" name="wifi_ssid" value="%WIFI_SSID%">
       <label>Password</label>
@@ -421,7 +421,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       </select>
       <div id="sec-btcpay">
         <div class="hint" style="margin-bottom:8px; font-weight:500; color:var(--pn-fg-2);">BTCPay Server settings</div>
-        <label>Server URL <span class="tip" data-tip="The full URL of your BTCPay Server instance, without trailing slash. Example: https://btcpay.mydomain.com">i</span></label>
+        <label>Server URL <span class="tip" data-tip="Where your BTCPay Server is hosted. Enter the full URL without trailing slash. Example: https://btcpay.mydomain.com">i</span></label>
         <input type="text" name="btcpay_url" value="%BTCPAY_URL%" placeholder="e.g. https://btcpay.mydomain.com">
         <div class="hint">No trailing slash</div>
         <label>API Key <span class="tip" data-tip="A secret key that lets PlugNSat create and check invoices on your BTCPay Server. Generate one in Account > API Keys with these permissions:&#10;- cancreateinvoice&#10;- canviewinvoices&#10;- canuselightningnode">i</span></label>
@@ -442,7 +442,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Shelly Plug</h2>
-      <label>Shelly hostname or IP <span class="tip" data-tip="Make sure the Shelly is plugged in, connected to the same WiFi, and set to Off (initial state). Use 'Scan network' to find it automatically.">i</span></label>
+      <label>Shelly hostname or IP <span class="tip" data-tip="The address of your Shelly plug on the local network. Make sure it is plugged in, on the same WiFi, and set to Off as its default state. Use Scan network to find it automatically.">i</span></label>
       <div id="scan-st" class="hint" style="margin-top:6px"></div>
       <select id="shelly-sel" style="display:none;margin-top:8px" onchange="selectShelly(this)"></select>
       <input type="text" name="shelly_host" id="shelly-host" value="%SHELLY_HOST%" placeholder="shellyplugsg3-xxxxxxxxxxxx.local">
@@ -455,7 +455,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Device settings</h2>
-      <label>Name <span class="tip" data-tip="Displayed on the device screen and on the web portal status page.">i</span></label>
+      <label>Name <span class="tip" data-tip="The name shown on the device screen and on this portal. Keep it short if you enable display.">i</span></label>
       <input type="text" name="dev_name" id="dev-name" value="%DEV_NAME%" placeholder="PlugNSat" oninput="validateName()">
       <div id="name-err" class="hint"></div>
       <label class="toggle">
@@ -465,11 +465,11 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       </label>
       <div class="row">
         <div>
-          <label>Price (satoshis) <span class="tip" data-tip="Amount in satoshis the customer pays to activate the plug.">i</span></label>
+          <label>Price (satoshis) <span class="tip" data-tip="How many sats a customer pays per activation. 1 sat = 0.00000001 BTC.">i</span></label>
           <input type="number" name="price_sats" value="%PRICE_SATS%" min="1" max="1000000">
         </div>
         <div>
-          <label>Duration (seconds) <span class="tip" data-tip="How long the Shelly stays on after payment, in seconds.">i</span></label>
+          <label>Duration (seconds) <span class="tip" data-tip="How long the plug stays on after each payment. 60 = one minute, 3600 = one hour.">i</span></label>
           <input type="number" name="duration" value="%DURATION%" min="1" max="86400">
         </div>
       </div>
@@ -480,10 +480,10 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       </label>
       <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
       <div id="tpst" class="hint" style="margin-top:6px"></div>
-      <label>Settings PIN (4 digits) <span class="tip" data-tip="If set, this 4-digit PIN is required to change Price and Duration directly on the device. Leave empty to disable.">i</span></label>
+      <label>Settings PIN (4 digits) <span class="tip" data-tip="Prevents anyone from changing price or duration using the device buttons. 4 digits. Leave empty to skip.">i</span></label>
       <input type="password" name="settings_pin" value="%SETTINGS_PIN%" maxlength="4" placeholder="Optional" inputmode="numeric" pattern="[0-9]{0,4}">
       <div class="hint">Protects Price and Duration settings on the device</div>
-      <label>Portal Password <span class="tip" data-tip="If set, the web portal will require this password to access (username: admin). Leave empty to disable. Authentication is always disabled in AP setup mode so you can recover access.">i</span></label>
+      <label>Portal Password <span class="tip" data-tip="Locks this settings page with a password (username: admin). Leave empty to skip. Always disabled in AP setup mode so you can recover access.">i</span></label>
       <input type="password" name="portal_pw" value="%PORTAL_PW%" placeholder="Optional">
       <div class="hint">Protects this web portal on WiFi (username: admin)</div>
     </div>
