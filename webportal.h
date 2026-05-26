@@ -336,6 +336,16 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     .toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
     .toggle-label { font-size: 13px; color: var(--pn-fg-2); font-weight: 500; }
     ::selection { background: rgba(247,147,26,.25); color: var(--pn-fg); }
+    .sec h2 { cursor: pointer; user-select: none; }
+    .chev { display: inline-block; width: 7px; height: 7px; border-right: 2px solid var(--pn-fg-3); border-bottom: 2px solid var(--pn-fg-3); transform: rotate(45deg); transition: transform .2s ease; margin-right: 9px; margin-bottom: 2px; vertical-align: middle; pointer-events: none; }
+    .sec.collapsed .chev { transform: rotate(-45deg); }
+    .sec-summary { display: none; font-size: 13px; color: var(--pn-fg-3); margin-top: 4px; }
+    .sec.collapsed .sec-summary { display: block; }
+    .sec.collapsed { border-left: 3px solid var(--pn-orange); }
+    .sec-body { overflow: hidden; max-height: 1000px; transition: max-height .3s ease; }
+    .sec.collapsed .sec-body { max-height: 0; }
+    .sec.collapsed h2 { margin-bottom: 0; }
+    .sec.collapsed h2::after { display: none; }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         transition-duration: .001ms !important;
@@ -590,7 +600,44 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     show.style.paddingTop='16px';
     hide.style.display='none';
   }
-  document.addEventListener('DOMContentLoaded',toggleBackend);
+  function getSummary(s,i){
+    if(i===0){var v=s.querySelector('[name=wifi_ssid]').value;return v||'Not configured';}
+    if(i===1){var sel=s.querySelector('[name=backend]');return sel.options[sel.selectedIndex].text;}
+    if(i===2){var v=s.querySelector('[name=shelly_host]').value;return v||'Not configured';}
+    if(i===3){var n=s.querySelector('[name=dev_name]').value||'Unnamed';var p=s.querySelector('[name=price_sats]').value;var d=s.querySelector('[name=duration]').value;return n+', '+p+' sats, '+d+'s';}
+    if(i===4){var pin=s.querySelector('[name=settings_pin]').value;var pw=s.querySelector('[name=portal_pw]').value;var r=[];if(pin)r.push('Device PIN set');if(pw)r.push('Web password set');return r.length?r.join(', '):'No PIN, no password';}
+    return '';
+  }
+  function initSections(){
+    var secs=document.querySelectorAll('.sec');
+    var saved={};
+    try{saved=JSON.parse(localStorage.getItem('plugnsat_sections')||'{}');}catch(e){}
+    secs.forEach(function(s,i){
+      var k='s'+i;
+      var h=s.querySelector('h2');
+      var body=document.createElement('div');
+      body.className='sec-body';
+      while(h.nextSibling){body.appendChild(h.nextSibling);}
+      s.appendChild(body);
+      var chev=document.createElement('span');
+      chev.className='chev';
+      h.insertBefore(chev,h.firstChild);
+      var sum=document.createElement('div');
+      sum.className='sec-summary';
+      h.after(sum);
+      if(saved[k]===false){s.classList.add('collapsed');sum.textContent=getSummary(s,i);}
+      h.addEventListener('click',function(){
+        s.classList.toggle('collapsed');
+        var collapsed=s.classList.contains('collapsed');
+        if(collapsed)sum.textContent=getSummary(s,i);
+        var st={};
+        try{st=JSON.parse(localStorage.getItem('plugnsat_sections')||'{}');}catch(e){}
+        st[k]=!collapsed;
+        localStorage.setItem('plugnsat_sections',JSON.stringify(st));
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded',function(){initSections();toggleBackend();});
   </script>
 </body>
 </html>
