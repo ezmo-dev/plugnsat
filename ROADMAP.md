@@ -22,7 +22,7 @@
 - [X] Blink wallet API integration
 - [X] Backend choice on web portal: BTCPay or Blink
 - [ ] Web portal adapts fields based on backend choice
-- [ ] Update info indicators on web portal for both backends
+- [X] Update info indicators on web portal for both backends
 - [ ] Enclosure prototypes: desk stand, magnetic mount, wall mount
 - [ ] Test prints for each enclosure
 - [ ] UI polish: review all screens for improvements and new integrations

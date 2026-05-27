@@ -57,3 +57,17 @@ PlugNSat needs a Lightning backend to create invoices and detect payments. You h
 ![Blink Wallet ID](images/blink-wallet-id.png)
 
 ---
+
+### Option B: Set up with BTCPay Server
+
+If you already have a BTCPay Server instance running with Lightning, you need three things:
+
+1. **Server URL** (e.g. `https://btcpay.yourdomain.com`)
+2. **Store ID**
+3. **API Key** with the right permissions
+
+#### Find your Store ID
+
+Your Store ID is the long string visible in the URL when you open your store in BTCPay Server. You can also find it in **Settings > Store Settings**.
+
+![BTCPay Store ID](images/btcpay-store-id.png)
