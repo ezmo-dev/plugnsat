@@ -30,7 +30,7 @@
 #define SCREEN_H 170
 
 // QR code
-#define QR_VERSION 10  // LNURL mode uses verson 5-6 (~115 chars)
+#define QR_VERSION 10  // Max fallback; actual version chosen per data length (v3-v9). Covers LNURL ~115 chars (BTCPay) and BOLT11 ~257 chars (Blink).
                       
 // Colors
 #define COLOR_BG       TFT_BLACK

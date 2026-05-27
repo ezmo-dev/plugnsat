@@ -1,6 +1,6 @@
 /*
  * PlugNSat - Shelly Plug Control
-
+ *
  * Local HTTP API for Shelly Gen2/Gen3 devices.
  * No firmware modification, no authentication needed on LAN.
  * 

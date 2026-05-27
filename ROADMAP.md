@@ -21,8 +21,13 @@
 ### v0.2 — Blink integration and enclosures (current)
 - [X] Blink wallet API integration
 - [X] Backend choice on web portal: BTCPay or Blink
-- [ ] Web portal adapts fields based on backend choice
-- [X] Update info indicators on web portal for both backends
+- [x] Web portal adapts fields based on backend choice
+- [x] Update info indicators on web portal for both backends
+- [x] Fix: infinite paid/activation loop after payment timer expires
+- [x] Add descriptive memo to Blink invoices (device name + amount)
+- [x] Merge Lightning Backend selector and credentials into a single configuration step
+- [x] Add collapsible accordion sections to configuration page with chevron, summary line, and state persistence
+- [x] Rewrite all configuration page tooltips for clarity
 - [ ] Enclosure prototypes: desk stand, magnetic mount, wall mount
 - [ ] Test prints for each enclosure
 - [ ] UI polish: review all screens for improvements and new integrations

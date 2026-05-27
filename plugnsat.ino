@@ -11,7 +11,7 @@
  * HARDWARE:
  * - LilyGO T-Display S3 (ESP32-S3 + ST7789 1.9" LCD)
  * - Shelly Plug S Gen3 (WiFi relay, CE certified, 2500W)
- * - BTCPay Server with Lightning (Phoenixd, LND, CLN)
+ * - Lightning backend: BTCPay Server (Phoenixd, LND, CLN) or Blink
  * 
  * WORKFLOW:
  *   1. First boot: Welcome screen, AP mode for setup via web browser (webportal)

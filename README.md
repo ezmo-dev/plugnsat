@@ -5,6 +5,7 @@ An open-source Lightning Smart Plug Controller. Turn any device into a Bitcoin-p
 
 PlugNSat is an ESP32-based controller that displays a Lightning invoice QR code on screen.
 When a customer pays, it triggers a CE-certified Shelly smart plug to power on any connected device (5V, 12V, 220V...) for a configurable duration and price.
+Supports BTCPay Server (self-hosted) and Blink (hosted wallet) as Lightning backends.
 
 Connect to WiFi, set your price in sats, and go!
 No modification to the target device needed.
@@ -75,7 +76,7 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 2. On your phone, connect to WiFi: `PlugNSat-Setup` (password: `plugnsat21`)
 3. Open `http://192.168.4.1` in your browser
 4. Enter your WiFi credentials (same network as the Shelly)
-5. Enter your BTCPay Server URL, API key, and Store ID
+5. Choose your Lightning backend (BTCPay Server or Blink) and fill in the corresponding credentials
 6. Click **Scan network** to auto-discover your Shelly, or type its hostname/IP manually
 7. Set your price in sats, activation duration in seconds, optionally a 4-digit PIN to protect these settings on the device, and optionally a portal password to protect this web page (username: admin)
 8. Click **Save and restart**
@@ -109,7 +110,8 @@ plugnsat.ino   Main sketch, state machine, WiFi, buttons
 config.h       Constants, colors, config struct
 display.h      All screen rendering (splash, QR, paid, error, info, settings, brightness, AP)
 btcpay.h       BTCPay Server API (create invoice, check status)
-backend.h      Lightning backend abstraction layer (BTCPay, Blink stubs)
+blink.h        Blink wallet GraphQL API (create invoice, check status)
+backend.h      Lightning backend abstraction layer (BTCPay Server, Blink)
 shelly.h       Shelly local HTTP API (switch on/off, status)
 webportal.h    Web config page (HTML/CSS/JS served by ESP32)
 qrcode.h       QR code generation library header (by Richard Moore)
@@ -121,7 +123,7 @@ All files go in the same folder. Arduino IDE compiles them together.
 ## Edge Cases Handled
 
 - WiFi disconnects > auto reconnect, QR regenerated
-- BTCPay unreachable > retry 3x, then error screen, auto-retry 10s
+- Backend unreachable > retry 3x, then error screen, auto-retry 10s
 - Invoice expires > new QR generated silently
 - Shelly offline during payment > "Shelly not found" warning screen > auto-retry every 10s > when Shelly comes back online: paid screen with full countdown + activation command sent with full duration > payment is confirmed regardless of Shelly status
 - Shelly hostname (mDNS .local) supported to avoid DHCP IP changes

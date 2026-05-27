@@ -1,6 +1,6 @@
 /*
  * PlugNSat - Display Module
- * All TFT screen rendering functions : screen flow
+ * All TFT screen rendering functions for screen flow
  * 
  * LIBRARIES:
  * - TFT_eSPI by Bodmer (display driver for ST7789)
