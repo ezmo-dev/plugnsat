@@ -71,3 +71,31 @@ If you already have a BTCPay Server instance running with Lightning, you need th
 Your Store ID is the long string visible in the URL when you open your store in BTCPay Server. You can also find it in **Settings > Store Settings**.
 
 ![BTCPay Store ID](images/btcpay-store-id.png)
+
+#### Create an API Key
+
+1. In BTCPay Server, go to **Account > Manage Account > API Keys**
+2. Click **Generate Key**
+3. Check exactly these permissions:
+   - `cancreateinvoice` (Create invoices)
+   - `canviewinvoices` (View invoices)
+   - `canuselightningnode` (Use the Lightning node)
+4. Click **Generate**
+5. **Copy the key immediately.** It will not be shown again.
+
+![BTCPay API Key](images/btcpay-api-key.png)
+![BTCPay API permissions](images/btcpay-api-permissions.png)
+
+> **Don't have a BTCPay Server yet?** You can set one up for free on your own server by following the [official deployment guide](https://docs.btcpayserver.org/Deployment/), or use a hosted solution like [LunaNode](https://launchbtcpay.lunanode.com/) or [Voltage](https://voltage.cloud/). You will also need a Lightning node connected (Phoenixd, LND, or CLN).
+
+#### Make sure Lightning is working
+
+In your BTCPay Server store, go to **Lightning > Settings** and make sure a Lightning node is connected and operational. You should see a green status indicator.
+
+While you are here, go to **Lightning > Settings** and make sure LNURL is enabled. PlugNSat uses LNURL to generate compact QR codes that are easier to scan on the small screen.
+
+![BTCPay Lightning setup](images/btcpay-lightning-setup.png)
+
+Keep the Server URL, Store ID, and API Key ready for Step 4.
+
+---
