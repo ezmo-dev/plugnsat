@@ -99,3 +99,51 @@ While you are here, go to **Lightning > Settings** and make sure LNURL is enable
 Keep the Server URL, Store ID, and API Key ready for Step 4.
 
 ---
+
+## Step 2 — Set up the Shelly Plug
+
+The Shelly Plug S Gen3 is the smart plug that PlugNSat controls. It handles the 220V switching safely, is CE-certified, and requires no modification.
+
+**Pairing the Shelly with the app**
+
+1. Download the **Shelly app** ([iOS](https://apps.apple.com/app/shelly-cloud/id1147164547) / [Android](https://play.google.com/store/apps/details?id=cloud.shelly.smartcontrol))
+2. Plug the Shelly into a wall outlet. It should flash blue.
+3. Make sure your phone is connected to Wi-Fi and that Bluetooth is enabled.
+4. Open the app and tap the blue "+" button at the bottom right.
+
+![Shelly app add device](images/shelly-app-add-device-1.png)
+
+5. Select "Add via Bluetooth".
+
+![Shelly app add device](images/shelly-app-add-device-2.png)
+
+6. Select your Shelly Plug. It should be detected automatically.
+
+![Shelly app add device](images/shelly-app-add-device-3.png)
+
+7. Confirm your Wi-Fi network is correct, then tap "Add device" and wait for the setup to finish.
+
+![Shelly app add device](images/shelly-app-add-device-4.png)
+![Shelly app add device](images/shelly-app-add-device-5.png)
+![Shelly app add device](images/shelly-app-add-device-6.png)
+
+8. Give your Shelly Plug a name so you can identify it if you have several.
+
+![Shelly app add device](images/shelly-app-add-device-7.png)
+![Shelly app add device](images/shelly-app-add-device-8.png)
+
+**Configuring the initial state**
+
+9. Go to the "All Devices" tab and tap your Shelly Plug.
+
+![Shelly app add device](images/shelly-app-initial-state-1.png)
+
+10. Scroll down to "Settings".
+11. Under "Input/Output settings", select: "Configure Shelly device to Turn OFF when it has power."
+12. Tap "Save".
+
+![Shelly app add device](images/shelly-app-initial-state-2.png)
+
+> **Important:** The Shelly must be on the same Wi-Fi network as your PlugNSat. If you have a dual-band router, make sure both devices are on the 2.4 GHz band.
+
+13. Plug your target device (lamp, coffee machine, charger, etc.) into the Shelly. It should stay off.
