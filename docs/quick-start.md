@@ -114,29 +114,29 @@ The Shelly Plug S Gen3 is the smart plug that PlugNSat controls. It handles the 
 4. Open the app and tap the blue "+" button at the bottom right. Select "Add via Bluetooth". Your Shelly Plug should be detected automatically.
 
 <p align="center">
-  <img src="images/shelly-app-add-device-1.png" alt="Shelly app home screen with the blue + button at the bottom right" width="280">
-  &nbsp;&nbsp;→&nbsp;&nbsp;
-  <img src="images/shelly-app-add-device-2.png" alt="Add via Bluetooth option selected in the Shelly app" width="280">
-  &nbsp;&nbsp;→&nbsp;&nbsp;
-  <img src="images/shelly-app-add-device-3.png" alt="Shelly Plug detected automatically via Bluetooth" width="280">
+  <img src="images/shelly-app-add-device-1.png" alt="Shelly app home screen with the blue + button at the bottom right" width="280" style="vertical-align: middle">
+  <span style="vertical-align: middle">&nbsp;&nbsp;→&nbsp;&nbsp;</span>
+  <img src="images/shelly-app-add-device-2.png" alt="Add via Bluetooth option selected in the Shelly app" width="280" style="vertical-align: middle">
+  <span style="vertical-align: middle">&nbsp;&nbsp;→&nbsp;&nbsp;</span>
+  <img src="images/shelly-app-add-device-3.png" alt="Shelly Plug detected automatically via Bluetooth" width="280" style="vertical-align: middle">
 </p>
 
 5. Confirm your Wi-Fi network is correct, then tap "Add device" and wait for the setup to finish.
 
 <p align="center">
-  <img src="images/shelly-app-add-device-4.png" alt="Wi-Fi network confirmation screen" width="280">
-  &nbsp;&nbsp;→&nbsp;&nbsp;
-  <img src="images/shelly-app-add-device-5.png" alt="Add device button to start the installation" width="280">
-  &nbsp;&nbsp;→&nbsp;&nbsp;
-  <img src="images/shelly-app-add-device-6.png" alt="Installation in progress screen" width="280">
+  <img src="images/shelly-app-add-device-4.png" alt="Wi-Fi network confirmation screen" width="280" style="vertical-align: middle">
+  <span style="vertical-align: middle">&nbsp;&nbsp;→&nbsp;&nbsp;</span>
+  <img src="images/shelly-app-add-device-5.png" alt="Add device button to start the installation" width="280" style="vertical-align: middle">
+  <span style="vertical-align: middle">&nbsp;&nbsp;→&nbsp;&nbsp;</span>
+  <img src="images/shelly-app-add-device-6.png" alt="Installation in progress screen" width="280" style="vertical-align: middle">
 </p>
 
 6. Give your Shelly Plug a name so you can identify it if you have several.
 
 <p align="center">
-  <img src="images/shelly-app-add-device-7.png" alt="Device naming screen in the Shelly app" width="280">
-  &nbsp;&nbsp;→&nbsp;&nbsp;
-  <img src="images/shelly-app-add-device-8.png" alt="Shelly Plug successfully added and visible in the device list" width="280">
+  <img src="images/shelly-app-add-device-7.png" alt="Device naming screen in the Shelly app" width="280" style="vertical-align: middle">
+  <span style="vertical-align: middle">&nbsp;&nbsp;→&nbsp;&nbsp;</span>
+  <img src="images/shelly-app-add-device-8.png" alt="Shelly Plug successfully added and visible in the device list" width="280" style="vertical-align: middle">
 </p>
 
 **Configuring the initial state**
