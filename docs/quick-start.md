@@ -111,38 +111,42 @@ The Shelly Plug S Gen3 is the smart plug that PlugNSat controls. It handles the 
 3. Make sure your phone is connected to Wi-Fi and that Bluetooth is enabled.
 4. Open the app and tap the blue "+" button at the bottom right.
 
-![Shelly app add device](images/shelly-app-add-device-1.png)
+<img src="images/shelly-app-add-device-1.png" width="280">
 
 5. Select "Add via Bluetooth".
 
-![Shelly app add device](images/shelly-app-add-device-2.png)
+<img src="images/shelly-app-add-device-2.png" width="280">
 
 6. Select your Shelly Plug. It should be detected automatically.
 
-![Shelly app add device](images/shelly-app-add-device-3.png)
+<img src="images/shelly-app-add-device-3.png" width="280">
 
 7. Confirm your Wi-Fi network is correct, then tap "Add device" and wait for the setup to finish.
 
-![Shelly app add device](images/shelly-app-add-device-4.png)
-![Shelly app add device](images/shelly-app-add-device-5.png)
-![Shelly app add device](images/shelly-app-add-device-6.png)
+<p>
+  <img src="images/shelly-app-add-device-4.png" width="280">
+  <img src="images/shelly-app-add-device-5.png" width="280">
+  <img src="images/shelly-app-add-device-6.png" width="280">
+</p>
 
 8. Give your Shelly Plug a name so you can identify it if you have several.
 
-![Shelly app add device](images/shelly-app-add-device-7.png)
-![Shelly app add device](images/shelly-app-add-device-8.png)
+<p>
+  <img src="images/shelly-app-add-device-7.png" width="280">
+  <img src="images/shelly-app-add-device-8.png" width="280">
+</p>
 
 **Configuring the initial state**
 
 9. Go to the "All Devices" tab and tap your Shelly Plug.
 
-![Shelly app add device](images/shelly-app-initial-state-1.png)
+<img src="images/shelly-app-initial-state-1.png" width="280">
 
 10. Scroll down to "Settings".
 11. Under "Input/Output settings", select: "Configure Shelly device to Turn OFF when it has power."
 12. Tap "Save".
 
-![Shelly app add device](images/shelly-app-initial-state-2.png)
+<img src="images/shelly-app-initial-state-2.png" width="280">
 
 > **Important:** The Shelly must be on the same Wi-Fi network as your PlugNSat. If you have a dual-band router, make sure both devices are on the 2.4 GHz band.
 
