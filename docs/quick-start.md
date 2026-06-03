@@ -150,4 +150,24 @@ The Shelly Plug S Gen3 is the smart plug that PlugNSat controls. It handles the 
 <img src="images/shelly-app-initial-state-2.png" alt="Input/Output settings with the Turn OFF option selected" width="280">
 
 9. Plug your target device (lamp, coffee machine, charger, etc.) into the Shelly. It should stay off.
- 
+
+---
+
+## Step 3 — Power on the PlugNSat
+
+1. Connect the PlugNSat to power using the USB-C cable
+2. The splash screen appears for a few seconds
+
+![Splash screen](images/plugnsat-screen-splash.png)
+
+3. On first boot (or after a factory reset), the device enters **AP Setup Mode** and shows three boxes on screen:
+
+![AP mode screen](images/plugnsat-screen-ap-mode.png)
+
+| Step | Value |
+|------|-------|
+| WiFi name | `PlugNSat-Setup` |
+| Password | `plugnsat21` |
+| URL | `http://192.168.4.1` |
+
+---
