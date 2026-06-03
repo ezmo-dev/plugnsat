@@ -171,3 +171,73 @@ The Shelly Plug S Gen3 is the smart plug that PlugNSat controls. It handles the 
 | URL | `http://192.168.4.1` |
 
 ---
+
+## Step 4 — Configure the PlugNSat
+
+1. On your phone or computer, open WiFi settings and connect to `PlugNSat-Setup` (password: `plugnsat21`)
+2. On the same device, open your browser and go to `http://192.168.4.1`
+3. The web portal opens with 5 sections to complete:
+   - WiFi
+   - Lightning Backend
+   - Shelly Plug
+   - Device Settings
+   - Security
+
+### Step 1 of 5: WiFi
+
+Enter the SSID and password of the WiFi network where the Shelly is connected.
+
+![Web portal Step 1](images/webportal-step1-wifi.png)
+
+### Step 2 of 5: Lightning Backend
+
+Select your backend (BTCPay Server or Blink), then enter the credentials from Step 1 of this guide.
+
+**BTCPay Server:**
+- **Server URL** (no trailing slash, e.g. `https://btcpay.yourdomain.com`)
+- **API Key** (the one you generated)
+- **Store ID** (the long string from your store settings)
+
+**Blink:**
+- **API Key** (starts with `blink_`, generated at dashboard.blink.sv)
+- **BTC Wallet ID** (find it on dashboard.blink.sv)
+
+![Web portal Step 2](images/webportal-step2-btcpay.png)
+![Web portal Step 2](images/webportal-step2-blink.png)
+
+### Step 3 of 5: Shelly Plug
+
+Click **Scan network** to automatically discover your Shelly on the local network. If it finds one, select it from the dropdown. Otherwise, type the Shelly hostname or IP address manually.
+
+![Web portal Step 3](images/webportal-step3-shelly.png)
+
+You can click **Test connection** to verify the PlugNSat can reach the Shelly.
+
+### Step 4 of 5: Device Settings
+
+- **Name**: a display name for your PlugNSat (up to 18 characters if shown on screen, up to 40 otherwise)
+- **Show name on QR screen**: toggle to display the name next to the QR code
+- **Price**: amount in satoshis the customer pays per activation
+- **Duration**: how many seconds the Shelly stays on after a payment
+- **Show price on QR screen**: toggle to display the price next to the QR code
+
+You can also click **Simulate payment (free)** to test that the Shelly activates correctly.
+
+![Web portal Step 4](images/webportal-step4-settings.png)
+
+### Step 5 of 5: Security
+
+Both fields are optional. Leave them empty to skip.
+
+- **Device PIN** (4 digits): prevents anyone near the device from changing the price and duration using the hardware buttons
+- **Web Access Password**: protects this configuration page with a login prompt (username: `admin`). Always disabled in setup mode so you can never get locked out.
+
+![Web portal Step 5](images/webportal-step5-security.png)
+
+4. Click **Save and restart**
+5. The PlugNSat reboots, connects to your WiFi, and the QR code appears on screen
+
+![QR code on screen](images/screen-qr-show-price-and-name.png)
+![QR code on screen](images/screen-full-qr.png)
+
+**You're live!** Customers can now scan and pay.
