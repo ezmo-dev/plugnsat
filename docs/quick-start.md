@@ -240,8 +240,8 @@ Both fields are optional. Leave them empty to skip.
 5. The PlugNSat reboots, connects to your WiFi, and the QR code appears on screen
 
 <p>
-  <img src="images/screen-qr-show-price-and-name.jpg" width="280">
-  <img src="images/screen-full-qr.jpg" width="280">
+  <img src="images/screen-qr-show-price-and-name.png" width="280">
+  <img src="images/screen-full-qr.png" width="280">
 </p>
 
 Left: name and price displayed. Right: QR code only (both toggles off).
