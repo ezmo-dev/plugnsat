@@ -187,7 +187,7 @@ The Shelly Plug S Gen3 is the smart plug that PlugNSat controls. It handles the 
 
 Enter the SSID and password of the WiFi network where the Shelly is connected.
 
-![Web portal Step 1](images/webportal-step1-wifi.png)
+<img src="images/webportal-step1-wifi.png" width="280">
 
 ### Step 2 of 5: Lightning Backend
 
@@ -202,14 +202,16 @@ Select your backend (BTCPay Server or Blink), then enter the credentials from St
 - **API Key** (starts with `blink_`, generated at dashboard.blink.sv)
 - **BTC Wallet ID** (find it on dashboard.blink.sv)
 
-![Web portal Step 2](images/webportal-step2-btcpay.png)
-![Web portal Step 2](images/webportal-step2-blink.png)
+<p>
+  <img src="images/webportal-step2-btcpay.png" width="280">
+  <img src="images/webportal-step2-blink.png" width="280">
+</p>
 
 ### Step 3 of 5: Shelly Plug
 
 Click **Scan network** to automatically discover your Shelly on the local network. If it finds one, select it from the dropdown. Otherwise, type the Shelly hostname or IP address manually.
 
-![Web portal Step 3](images/webportal-step3-shelly.png)
+<img src="images/webportal-step3-shelly.png" width="280">
 
 You can click **Test connection** to verify the PlugNSat can reach the Shelly.
 
@@ -223,7 +225,7 @@ You can click **Test connection** to verify the PlugNSat can reach the Shelly.
 
 You can also click **Simulate payment (free)** to test that the Shelly activates correctly.
 
-![Web portal Step 4](images/webportal-step4-settings.png)
+<img src="images/webportal-step4-settings.png" width="280">
 
 ### Step 5 of 5: Security
 
@@ -232,12 +234,16 @@ Both fields are optional. Leave them empty to skip.
 - **Device PIN** (4 digits): prevents anyone near the device from changing the price and duration using the hardware buttons
 - **Web Access Password**: protects this configuration page with a login prompt (username: `admin`). Always disabled in setup mode so you can never get locked out.
 
-![Web portal Step 5](images/webportal-step5-security.png)
+<img src="images/webportal-step5-security.png" width="280">
 
 4. Click **Save and restart**
 5. The PlugNSat reboots, connects to your WiFi, and the QR code appears on screen
 
-![QR code on screen](images/screen-qr-show-price-and-name.png)
-![QR code on screen](images/screen-full-qr.png)
+<p>
+  <img src="images/screen-qr-full.jpg" width="280">
+  <img src="images/screen-qr-minimal.jpg" width="280">
+</p>
+
+Left: name and price displayed. Right: QR code only (both toggles off).
 
 **You're live!** Customers can now scan and pay.
