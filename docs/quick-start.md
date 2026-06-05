@@ -247,3 +247,40 @@ Both fields are optional. Leave them empty to skip.
 Left: name and price displayed. Right: QR code only (both toggles off).
 
 **You're live!** Customers can now scan and pay.
+
+---
+
+## Step 5 — Test a payment
+
+### With a real wallet
+
+1. Open any Lightning wallet (Phoenix, Wallet of Satoshi, Cash App, Blink, etc.)
+2. Scan the QR code displayed on the PlugNSat
+3. Confirm and pay the invoice
+4. The PlugNSat shows the **PAID** screen with a countdown, and the Shelly turns on
+
+<img src="images/screen-paid.png" width="280">
+
+5. After the configured duration, the Shelly turns off automatically and a new QR code appears
+
+### With the simulator (free, no sats needed)
+
+If you want to test without spending sats:
+
+1. Connect to the same WiFi network as the PlugNSat
+2. Open your browser and go to `http://plugnsat.local`. On Windows, if the page does not load, use the IP address shown instead (press BTN1 > **Device Info**).
+3. In the **Device settings** section of the portal, click **Simulate payment (free)** — the Shelly should turn on.
+
+<img src="images/webportal-simulate.png" width="280">
+
+This triggers the Shelly just like a real payment, without creating a Lightning invoice.
+
+---
+
+## Next steps
+
+- Read the [User Manual](user-manual.md) to learn about all screens and button controls
+- Read the [Web Portal Reference](web-portal.md) for details on every configuration option
+- Check the [Troubleshooting guide](troubleshooting.md) if something doesn't work
+
+> Documentation is a work in progress. Some pages may not be available yet.
