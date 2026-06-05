@@ -10,17 +10,17 @@
 - [x] First 3D print case
 - [x] Web portal UI redesign (light theme, step-based layout)
 - [x] UI polish: paid screen, error screen, info screen, settings screen
-- [X] Better error messages and info indicators on all screens
-- [X] Info tooltips on web portal fields
-- [X] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
-- [X] First test video
-- [X] Documentation structure: create outline with all major sections
-- [X] README v1 on GitHub
-- [X] Full code cleanup before moving forward
+- [x] Better error messages and info indicators on all screens
+- [x] Info tooltips on web portal fields
+- [x] QR display modes: Show name/price toggles on QR screen (configurable via web portal)
+- [x] First test video
+- [x] Documentation structure: create outline with all major sections
+- [x] README v1 on GitHub
+- [x] Full code cleanup before moving forward
 
-### v0.2 — Blink integration and enclosures (current)
-- [X] Blink wallet API integration
-- [X] Backend choice on web portal: BTCPay or Blink
+### v0.2 — Blink integration, OTA, and enclosures (current)
+- [x] Blink wallet API integration
+- [x] Backend choice on web portal: BTCPay or Blink
 - [x] Web portal adapts fields based on backend choice
 - [x] Update info indicators on web portal for both backends
 - [x] Fix: infinite paid/activation loop after payment timer expires
@@ -28,55 +28,81 @@
 - [x] Merge Lightning Backend selector and credentials into a single configuration step
 - [x] Add collapsible accordion sections to configuration page with chevron, summary line, and state persistence
 - [x] Rewrite all configuration page tooltips for clarity
-- [ ] Enclosure prototypes: desk stand, magnetic mount, wall mount
-- [ ] Test prints for each enclosure
-- [ ] UI polish: review all screens for improvements and new integrations
-- [ ] Continue documentation: Blink guide, BTCPay guide
-
-### v0.3 - OTA, landing page, and beta testing (USB model)
 - [ ] OTA firmware updates via WiFi
 - [ ] "Check for updates" button in web portal
 - [ ] Auto-update option on boot
-- [ ] Finalize USB enclosures and publish STL files on GitHub
-- [ ] UI improvements on screen: price and device name alongside QR, WiFi signal indicator
+- [ ] Research and select the right LiPo battery model (capacity, connector, dimensions for enclosure)
+- [ ] Battery-powered prototype (LiPo integration with T-Display S3)
+- [ ] Power management: sleep mode, low battery indicator on screen
+- [ ] Battery level indicator on screen and web portal
+- [ ] Enclosure prototypes (USB and battery): desk stand, magnetic mount, wall mount
+- [ ] Test prints for each enclosure
+- [ ] General V0.2 audit: review all new features for correctness and consistency
+- [ ] Security audit: review all new features (portal auth, XSS, input validation)
+- [ ] Finish documentation: User Manual, Web Portal Reference, Troubleshooting (Quick Start done; needed for landing page)
+
+### v0.3 — Landing page and USB beta testing
+- [ ] Finalize USB and battery enclosures and publish STL files on GitHub
+- [ ] UI improvements on screen: price and device name alongside QR, WiFi signal indicator, battery level
 - [ ] Full design coherence review: screens, web portal, enclosures, docs
-- [ ] Landing page v1 on plugnsat.com
+- [ ] Landing page v1 on plugnsat.com (USB + battery)
 - [ ] Product photos for landing page: device, enclosures, screens, setup flow
 - [ ] Product video for landing page
 - [ ] Quick-start guide (printed in box)
 - [ ] Troubleshooting page
-- [ ] Beta testing USB model: send units to trusted people
+- [ ] Beta testing USB and battery models: send units to trusted people
 - [ ] Collect feedback on setup, documentation, enclosure, daily use
 - [ ] Code cleanup
 
-### v0.4 - Battery mode prototype
-- [ ] Battery-powered prototype (LiPo integration with T-Display S3)
-- [ ] Power management: sleep mode, low battery indicator on screen
-- [ ] Battery level indicator on screen and web portal
-- [ ] Fix issues reported by USB beta testers
+### v0.4 — Product finalization and packaging
+- [ ] Fix issues reported by beta testers
+- [ ] Finalize battery enclosures: desk stand, magnetic mount, wall mount
+- [ ] Packaging design: box, insert, printed quick-start guide, sticker
 - [ ] Update documentation and landing page with beta feedback
+- [ ] Product photos and video for USB and battery models
 
-### v0.5 - Battery enclosures, NFC prototype, and packaging
-- [ ] Enclosures for battery model: desk stand, magnetic mount, wall mount
-- [ ] Test prints for battery enclosures
-- [ ] STL files for battery enclosures on GitHub
+### v0.5 — Pre-launch and production ready
+- [ ] Market study: target segments, pricing per model, competitors
+- [ ] Pricing strategy finalized: USB, battery (kit vs pre-assembled)
+- [ ] Sales channels defined: plugnsat.com, conferences, resellers, partner shops
+- [ ] Landing page updated with final pricing and buy CTAs
+- [ ] Collect testimonials from beta testers for landing page
+- [ ] Full documentation site (docs.plugnsat.com)
+- [ ] CE compliance documentation package for resellers
+- [ ] Firmware changelog page on plugnsat.com
+- [ ] Packaging production ready
+- [ ] Stable, battle-tested product (USB and battery shipping reliably)
+
+### v0.6 — Community sharing
+- [ ] Share on Bitcoin communities: Twitter, Nostr, Telegram groups, forums
+- [ ] Share on Reddit: r/bitcoin, r/lightningnetwork, r/esp32
+- [ ] Present at local meetups
+- [ ] Post on Plan B Network, Stacker News
+- [ ] Collect feedback, testimonials, and early interest
+
+### v1.0 — Sales and distribution
+- [ ] Public sales on plugnsat.com: USB and battery (kit and pre-assembled)
+- [ ] Battery model to resellers (desk stand, magnetic mount, wall mount)
+- [ ] Contact Bitcoin shops and resellers
+- [ ] Send demo units to potential partners
+- [ ] Present at Bitcoin conferences
+- [ ] Explore distribution partnerships (hubs, coworking chains, event organizers)
+
+---
+ 
+## Post-v1.0 (conditional on sales traction)
+ 
+### NFC model
 - [ ] NFC module integration (PN532 or similar)
 - [ ] Tap-to-pay flow: NFC reads LNURL, wallet opens, pay
 - [ ] NFC + QR dual mode on screen
 - [ ] Enclosure prototypes for NFC model (antenna positioning)
-- [ ] Packaging design: box, insert, printed quick-start guide, sticker
-- [ ] Update documentation: battery mode guide, NFC setup guide
-- [ ] Beta testing battery model with trusted people
-
-### v0.6 - Finalization
 - [ ] Finalize NFC enclosures and publish STL files
 - [ ] Beta testing NFC model with trusted people
-- [ ] Finalize packaging for all models
-- [ ] Finalize all documentation
-- [ ] Update landing page with full product range (USB, battery, NFC)
-- [ ] Product photos and video for all three models
-
-### v0.7 - Multi-device support
+- [ ] Update documentation: NFC setup guide
+- [ ] Update landing page with NFC model
+- [ ] Product photos and video for NFC model
+### Multi-device support
 - [ ] New web portal section: device manager with "+" button to add PlugNSat units
 - [ ] Per-device configuration: name, price, duration, Shelly host
 - [ ] Device list view with status (online/offline, last payment, uptime)
@@ -84,39 +110,6 @@
 - [ ] Multi-device firmware support (one BTCPay store, multiple devices)
 - [ ] Multi-device documentation
 - [ ] Beta testing multi-device with hub managers and coworking spaces
-
-### v0.8 - Community sharing and final feedback
-- [ ] Share on Bitcoin communities: Twitter, Nostr, Telegram groups, forums
-- [ ] Share on Reddit: r/bitcoin, r/lightningnetwork, r/esp32
-- [ ] Present at local meetups
-- [ ] Post on Plan B Network, Stacker News
-- [ ] Collect feedback, testimonials, and early interest
-- [ ] Final round of beta testing with all three models
-- [ ] Fix all reported issues
-- [ ] All documentation reviewed and finalized
-
-### v0.9 - Pre-launch
-- [ ] Market study: target segments, pricing per model, competitors
-- [ ] Pricing strategy finalized: USB, battery, NFC (kit vs pre-assembled)
-- [ ] Sales channels defined: plugnsat.com, conferences, resellers, partner shops
-- [ ] Landing page updated with final pricing and buy CTAs
-- [ ] Packaging production ready
-- [ ] Collect testimonials from beta testers for landing page
-
-### v0.9.1 - Production ready
-- [ ] Full documentation site (docs.plugnsat.com)
-- [ ] CE compliance documentation package for resellers
-- [ ] Firmware changelog page on plugnsat.com
-- [ ] Stable, battle-tested product
-- [ ] All models shipping reliably
-
-### v1.0 - Sales and distribution
-- [ ] Public sales on plugnsat.com: kit and pre-assembled options
-- [ ] Contact Bitcoin shops and resellers
-- [ ] Send demo units to potential partners
-- [ ] Present at Bitcoin conferences
-- [ ] Explore distribution partnerships (hubs, coworking chains, event organizers)
-
 ### Future ideas
 - [ ] Sub-domain dashboard per client (client.plugnsat.com)
 - [ ] Usage statistics and payment history
@@ -128,11 +121,11 @@
 - [ ] White-label option (custom branding per client)
 - [ ] Optional OLED/AMOLED screen version for outdoor use
 - [ ] Wall-flush Shelly install behind drywall
-
 ### Product lineup
-- **PlugNSat USB** - Base model (USB-C powered, kit or pre-assembled)
-- **PlugNSat Battery** - Portable model (LiPo rechargeable, kit or pre-assembled)
-- **PlugNSat NFC** - Premium model (QR + tap-to-pay, USB-C or battery, kit or pre-assembled)
-- **Enclosures** - Desk stand, magnetic mount, wall mount (for each model)
+- **PlugNSat USB** - Base model (USB-C powered, kit or pre-assembled) — plugnsat.com only
+- **PlugNSat Battery** - Portable model (LiPo rechargeable, kit or pre-assembled) — plugnsat.com and resellers
+- **PlugNSat NFC** - Premium model (QR + tap-to-pay), post-v1.0 if sales follow
+- **Enclosures** - Desk stand, magnetic mount, wall mount
 - **Accessories** - Extra Shelly Plug S Gen3, replacement USB-C cables, sticker pack
 - **Free resources** - STL files on GitHub, online documentation, open-source firmware
+ 
