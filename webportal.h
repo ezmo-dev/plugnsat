@@ -506,7 +506,7 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     <button type="submit" id="btn-save">Save and restart &rarr;</button>
   </form>
 
-  <p class="footer">v%VERSION% &middot; plugnsat.com &middot; open-source &middot; MIT</p>
+  <div class="footer">PlugNSat v%VERSION% &nbsp;·&nbsp; <a href="/ota" style="color:var(--pn-orange);text-decoration:none;font-family:inherit;">Firmware update</a></div>
 
 </div>
 
