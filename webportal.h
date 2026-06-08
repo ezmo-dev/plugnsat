@@ -20,6 +20,7 @@
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include "config.h"
+#include <Update.h>
 
 void saveConfig();  // Defined in main .ino
 
