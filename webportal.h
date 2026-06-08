@@ -719,6 +719,173 @@ body{font-family:-apple-system,system-ui,sans-serif;background:#FBFAF8;min-heigh
 </body></html>
 )rawliteral";
 
+const char OTA_PAGE[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PlugNSat — Firmware Update</title>
+  <style>
+    :root {
+      --pn-orange: #F7931A;
+      --pn-bg: #FBFAF8;
+      --pn-surface: #FFFFFF;
+      --pn-fg: #0A0A0A;
+      --pn-fg-2: #535862;
+      --pn-fg-3: #90939B;
+      --pn-border: #EAE7E0;
+      --pn-border-2: #D9D5CB;
+      --pn-success: #1F8A5B;
+      --pn-success-soft: #E5F4EC;
+      --pn-danger: #C8372D;
+      --pn-danger-soft: #FBEAE7;
+      --pn-shadow-sm: 0 1px 2px rgba(10,10,10,.04), 0 0 0 1px rgba(10,10,10,.04);
+      --pn-r-card: 14px;
+      --pn-r-input: 8px;
+      --pn-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--pn-bg); color: var(--pn-fg); font-family: var(--pn-font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    .container { max-width: 480px; margin: 0 auto; padding: 24px 20px 40px; }
+    header { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 0 28px; text-align: center; }
+    h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+    h1 .accent { color: var(--pn-orange); }
+    .sub { margin: 0; font-size: 13px; color: var(--pn-fg-2); }
+    .card { background: var(--pn-surface); border-radius: var(--pn-r-card); box-shadow: var(--pn-shadow-sm); padding: 22px; margin-bottom: 16px; }
+    .card h2 { margin: 0 0 14px; font-size: 15px; font-weight: 600; color: var(--pn-fg); border-bottom: 1px solid var(--pn-border); padding-bottom: 10px; }
+    .version-line { font-size: 13px; color: var(--pn-fg-2); margin-bottom: 4px; }
+    .version-line span { font-weight: 600; color: var(--pn-fg); }
+    .drop-zone { border: 2px dashed var(--pn-border-2); border-radius: var(--pn-r-input); padding: 32px 20px; text-align: center; cursor: pointer; transition: border-color .15s ease, background .15s ease; margin: 14px 0; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--pn-orange); background: rgba(247,147,26,.04); }
+    .drop-zone input[type="file"] { display: none; }
+    .drop-label { font-size: 13px; color: var(--pn-fg-3); margin-top: 8px; }
+    .drop-label strong { color: var(--pn-fg); }
+    .file-name { font-size: 13px; color: var(--pn-fg-2); margin-top: 8px; font-weight: 500; display: none; }
+    .btn-flash { display: block; width: 100%; padding: 13px 20px; font-size: 15px; font-weight: 600; color: #0A0A0A; background: var(--pn-orange); border: none; border-radius: 10px; cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px rgba(247,147,26,.32); transition: background .12s ease; -webkit-appearance: none; appearance: none; }
+    .btn-flash:hover { background: #E8850F; }
+    .btn-flash:disabled { background: var(--pn-border-2); color: var(--pn-fg-3); box-shadow: none; cursor: not-allowed; }
+    .progress-wrap { display: none; margin-top: 14px; }
+    .progress-bar-bg { background: var(--pn-border); border-radius: 99px; height: 8px; overflow: hidden; }
+    .progress-bar { background: var(--pn-orange); height: 8px; width: 0%; border-radius: 99px; transition: width .2s ease; }
+    .progress-label { font-size: 12px; color: var(--pn-fg-3); margin-top: 6px; text-align: center; }
+    .alert { display: none; border-radius: var(--pn-r-input); padding: 12px 14px; font-size: 13px; margin-top: 14px; }
+    .alert-ok { background: var(--pn-success-soft); color: var(--pn-success); border: 1px solid #C8E6D2; }
+    .alert-err { background: var(--pn-danger-soft); color: var(--pn-danger); border: 1px solid #F5C6C3; }
+    .back { text-align: center; margin-top: 20px; font-size: 13px; color: var(--pn-fg-3); }
+    .back a { color: var(--pn-orange); text-decoration: none; font-weight: 500; }
+    .back a:hover { text-decoration: underline; }
+    .warning-box { background: #FFF8EC; border: 1px solid #FFD97A; border-radius: var(--pn-r-input); padding: 10px 14px; font-size: 12px; color: #7A5000; margin-bottom: 14px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Plug<span class="accent">N</span>Sat</h1>
+    <p class="sub">Firmware Update</p>
+  </header>
+
+  <div class="card">
+    <h2>Current firmware</h2>
+    <div class="version-line">Version: <span>%VERSION%</span></div>
+    <div class="version-line">Device: <span>%DEV_NAME%</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Upload new firmware</h2>
+    <div class="warning-box">The device will reboot after flashing. If the new firmware fails to connect to WiFi within 60 seconds, it will roll back automatically to the previous version.</div>
+    <div class="drop-zone" id="dz" onclick="document.getElementById('f').click()">
+      <input type="file" id="f" accept=".bin">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#90939B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+      <div class="drop-label"><strong>Click to select</strong> or drag and drop</div>
+      <div class="drop-label">.bin file only</div>
+    </div>
+    <div class="file-name" id="fn"></div>
+    <div class="progress-wrap" id="pw">
+      <div class="progress-bar-bg"><div class="progress-bar" id="pb"></div></div>
+      <div class="progress-label" id="pl">Uploading...</div>
+    </div>
+    <div class="alert alert-ok" id="ok">Firmware flashed successfully. Device is rebooting...</div>
+    <div class="alert alert-err" id="err"></div>
+    <button class="btn-flash" id="btn" disabled onclick="doFlash()">Flash firmware</button>
+  </div>
+
+  <div class="back"><a href="/">&larr; Back to settings</a></div>
+</div>
+<script>
+  var fileInput = document.getElementById('f');
+  var dz = document.getElementById('dz');
+  var fn = document.getElementById('fn');
+  var btn = document.getElementById('btn');
+  var pw = document.getElementById('pw');
+  var pb = document.getElementById('pb');
+  var pl = document.getElementById('pl');
+  var okBox = document.getElementById('ok');
+  var errBox = document.getElementById('err');
+  var selectedFile = null;
+
+  fileInput.addEventListener('change', function() {
+    if (fileInput.files.length > 0) {
+      selectedFile = fileInput.files[0];
+      fn.textContent = selectedFile.name + ' (' + (selectedFile.size / 1024).toFixed(1) + ' KB)';
+      fn.style.display = 'block';
+      btn.disabled = false;
+    }
+  });
+  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
+  dz.addEventListener('drop', function(e) {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    if (e.dataTransfer.files.length > 0) {
+      selectedFile = e.dataTransfer.files[0];
+      fn.textContent = selectedFile.name + ' (' + (selectedFile.size / 1024).toFixed(1) + ' KB)';
+      fn.style.display = 'block';
+      btn.disabled = false;
+    }
+  });
+
+  function doFlash() {
+    if (!selectedFile) return;
+    btn.disabled = true;
+    okBox.style.display = 'none';
+    errBox.style.display = 'none';
+    pw.style.display = 'block';
+    pb.style.width = '0%';
+    pl.textContent = 'Uploading...';
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/ota/upload', true);
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        var pct = Math.round(e.loaded / e.total * 100);
+        pb.style.width = pct + '%';
+        pl.textContent = 'Uploading... ' + pct + '%';
+      }
+    };
+    xhr.onload = function() {
+      pw.style.display = 'none';
+      if (xhr.status === 200) {
+        okBox.style.display = 'block';
+      } else {
+        errBox.textContent = 'Flash failed: ' + xhr.responseText;
+        errBox.style.display = 'block';
+        btn.disabled = false;
+      }
+    };
+    xhr.onerror = function() {
+      pw.style.display = 'none';
+      errBox.textContent = 'Upload error. Check your connection and try again.';
+      errBox.style.display = 'block';
+      btn.disabled = false;
+    };
+    var fd = new FormData();
+    fd.append('firmware', selectedFile, selectedFile.name);
+    xhr.send(fd);
+  }
+</script>
+</body>
+</html>
+)rawliteral";
+
 bool checkPortalAuth(WebServer &server, PlugNSatConfig &config) {
   if (!portalAuthEnabled || config.portalPassword.length() == 0) return true;
   if (!server.authenticate("admin", config.portalPassword.c_str())) {
