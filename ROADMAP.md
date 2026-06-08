@@ -29,7 +29,7 @@
 - [x] Add collapsible accordion sections to configuration page with chevron, summary line, and state persistence
 - [x] Rewrite all configuration page tooltips for clarity
 - [x] OTA Phase 1: partition scheme with two OTA slots, flash and reboot on the other slot, automatic rollback
-- [ ] OTA Phase 2: local Web OTA, upload a .bin from the portal (protected by portal password)
+- [x] OTA Phase 2: local Web OTA, upload a .bin from the portal (protected by portal password)
 - [ ] OTA Phase 3: firmware signing, RSA key pair, signature verified before any flash
 - [ ] OTA Phase 4: version check via GitHub Releases API, TLS validation with embedded root CA
 - [ ] OTA Phase 5: download and flash signed .bin from GitHub, opt-in via portal button

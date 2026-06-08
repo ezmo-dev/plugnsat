@@ -749,10 +749,10 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; background: var(--pn-bg); color: var(--pn-fg); font-family: var(--pn-font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
     .container { max-width: 480px; margin: 0 auto; padding: 24px 20px 40px; }
-    header { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 0 28px; text-align: center; }
-    h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
-    h1 .accent { color: var(--pn-orange); }
-    .sub { margin: 0; font-size: 13px; color: var(--pn-fg-2); }
+    header { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px 0 32px; text-align: center; }
+    .logo svg { display: block; width: 100%; max-width: 280px; margin: 0 auto; image-rendering: pixelated; image-rendering: crisp-edges; }
+    h1 { margin: 6px 0 0; font-size: 26px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; color: var(--pn-fg); }
+    h1 .accent { color: var(--pn-orange); font-weight: 700; }
     .card { background: var(--pn-surface); border-radius: var(--pn-r-card); box-shadow: var(--pn-shadow-sm); padding: 22px; margin-bottom: 16px; }
     .card h2 { margin: 0 0 14px; font-size: 15px; font-weight: 600; color: var(--pn-fg); border-bottom: 1px solid var(--pn-border); padding-bottom: 10px; }
     .version-line { font-size: 13px; color: var(--pn-fg-2); margin-bottom: 4px; }
@@ -782,8 +782,56 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
 <body>
 <div class="container">
   <header>
-    <h1>Plug<span class="accent">N</span>Sat</h1>
-    <p class="sub">Firmware Update</p>
+    <div class="logo" aria-label="PlugNSat">
+      <svg viewBox="0 0 245 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><rect id="p" width="4" height="4"/></defs>
+        <g fill="#F7931A">
+          <use href="#p" x="0" y="7"/><use href="#p" x="5" y="7"/><use href="#p" x="10" y="7"/><use href="#p" x="15" y="7"/>
+          <use href="#p" x="0" y="12"/><use href="#p" x="20" y="12"/>
+          <use href="#p" x="0" y="17"/><use href="#p" x="20" y="17"/>
+          <use href="#p" x="0" y="22"/><use href="#p" x="5" y="22"/><use href="#p" x="10" y="22"/><use href="#p" x="15" y="22"/>
+          <use href="#p" x="0" y="27"/><use href="#p" x="0" y="32"/><use href="#p" x="0" y="37"/>
+          <use href="#p" x="30" y="7"/><use href="#p" x="30" y="12"/><use href="#p" x="30" y="17"/><use href="#p" x="30" y="22"/><use href="#p" x="30" y="27"/><use href="#p" x="30" y="32"/>
+          <use href="#p" x="30" y="37"/><use href="#p" x="35" y="37"/><use href="#p" x="40" y="37"/><use href="#p" x="45" y="37"/><use href="#p" x="50" y="37"/>
+          <use href="#p" x="60" y="7"/><use href="#p" x="80" y="7"/><use href="#p" x="60" y="12"/><use href="#p" x="80" y="12"/>
+          <use href="#p" x="60" y="17"/><use href="#p" x="80" y="17"/><use href="#p" x="60" y="22"/><use href="#p" x="80" y="22"/>
+          <use href="#p" x="60" y="27"/><use href="#p" x="80" y="27"/><use href="#p" x="60" y="32"/><use href="#p" x="80" y="32"/>
+          <use href="#p" x="65" y="37"/><use href="#p" x="70" y="37"/><use href="#p" x="75" y="37"/>
+          <use href="#p" x="95" y="7"/><use href="#p" x="100" y="7"/><use href="#p" x="105" y="7"/>
+          <use href="#p" x="90" y="12"/><use href="#p" x="110" y="12"/><use href="#p" x="90" y="17"/>
+          <use href="#p" x="90" y="22"/><use href="#p" x="100" y="22"/><use href="#p" x="105" y="22"/><use href="#p" x="110" y="22"/>
+          <use href="#p" x="90" y="27"/><use href="#p" x="110" y="27"/><use href="#p" x="90" y="32"/><use href="#p" x="110" y="32"/>
+          <use href="#p" x="95" y="37"/><use href="#p" x="100" y="37"/><use href="#p" x="105" y="37"/>
+        </g>
+        <g fill="#FFD700">
+          <use href="#p" x="135" y="0"/><use href="#p" x="140" y="0"/><use href="#p" x="145" y="0"/>
+          <use href="#p" x="130" y="5"/><use href="#p" x="135" y="5"/><use href="#p" x="140" y="5"/>
+          <use href="#p" x="130" y="10"/><use href="#p" x="135" y="10"/><use href="#p" x="140" y="10"/>
+          <use href="#p" x="130" y="15"/><use href="#p" x="135" y="15"/>
+          <use href="#p" x="125" y="20"/><use href="#p" x="130" y="20"/><use href="#p" x="135" y="20"/><use href="#p" x="140" y="20"/><use href="#p" x="145" y="20"/>
+          <use href="#p" x="130" y="25"/><use href="#p" x="135" y="25"/><use href="#p" x="140" y="25"/>
+          <use href="#p" x="130" y="30"/><use href="#p" x="135" y="30"/>
+          <use href="#p" x="130" y="35"/>
+          <use href="#p" x="125" y="40"/><use href="#p" x="130" y="40"/>
+          <use href="#p" x="125" y="45"/>
+        </g>
+        <g fill="#00E5FF">
+          <use href="#p" x="165" y="7"/><use href="#p" x="170" y="7"/><use href="#p" x="175" y="7"/>
+          <use href="#p" x="160" y="12"/><use href="#p" x="180" y="12"/><use href="#p" x="160" y="17"/>
+          <use href="#p" x="165" y="22"/><use href="#p" x="170" y="22"/><use href="#p" x="175" y="22"/>
+          <use href="#p" x="180" y="27"/><use href="#p" x="160" y="32"/><use href="#p" x="180" y="32"/>
+          <use href="#p" x="165" y="37"/><use href="#p" x="170" y="37"/><use href="#p" x="175" y="37"/>
+          <use href="#p" x="195" y="7"/><use href="#p" x="200" y="7"/><use href="#p" x="205" y="7"/>
+          <use href="#p" x="190" y="12"/><use href="#p" x="210" y="12"/><use href="#p" x="190" y="17"/><use href="#p" x="210" y="17"/>
+          <use href="#p" x="190" y="22"/><use href="#p" x="195" y="22"/><use href="#p" x="200" y="22"/><use href="#p" x="205" y="22"/><use href="#p" x="210" y="22"/>
+          <use href="#p" x="190" y="27"/><use href="#p" x="210" y="27"/><use href="#p" x="190" y="32"/><use href="#p" x="210" y="32"/>
+          <use href="#p" x="190" y="37"/><use href="#p" x="210" y="37"/>
+          <use href="#p" x="220" y="7"/><use href="#p" x="225" y="7"/><use href="#p" x="230" y="7"/><use href="#p" x="235" y="7"/><use href="#p" x="240" y="7"/>
+          <use href="#p" x="230" y="12"/><use href="#p" x="230" y="17"/><use href="#p" x="230" y="22"/><use href="#p" x="230" y="27"/><use href="#p" x="230" y="32"/><use href="#p" x="230" y="37"/>
+        </g>
+      </svg>
+    </div>
+    <h1>Firmware <span class="accent">Update</span>.</h1>
   </header>
 
   <div class="card">
