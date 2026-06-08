@@ -1113,6 +1113,39 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     String json; serializeJson(doc, json);
     server.send(200, "application/json", json);
   });
+
+  server.on("/ota", HTTP_GET, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
+    server.send(200, "text/html", processOtaPage(config));
+  });
+
+  server.on("/ota/upload", HTTP_POST, [&server]() {
+    if (Update.hasError()) {
+      server.send(500, "text/plain", "Flash failed");
+    } else {
+      server.send(200, "text/plain", "OK");
+      delay(500);
+      ESP.restart();
+    }
+  }, [&server]() {
+    HTTPUpload &upload = server.upload();
+    if (upload.status == UPLOAD_FILE_START) {
+      Serial.println("OTA upload start: " + upload.filename);
+      if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+        Serial.println("OTA begin failed");
+      }
+    } else if (upload.status == UPLOAD_FILE_WRITE) {
+      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+        Serial.println("OTA write error");
+      }
+    } else if (upload.status == UPLOAD_FILE_END) {
+      if (Update.end(true)) {
+        Serial.println("OTA success: " + String(upload.totalSize) + " bytes");
+      } else {
+        Serial.println("OTA end failed");
+      }
+    }
+  });
 }
 
 #endif
