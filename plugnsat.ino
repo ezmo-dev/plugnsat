@@ -29,6 +29,11 @@
  * Author: ezmo-dev (PlugNSat)
  */
 
+// OTA NOTE (Arduino IDE):
+// Board: LilyGO T-Display S3
+// Partition Scheme: select "Custom" and point to partitions_ota.csv
+// Required for OTA Phase 1+. Do not use the default partition scheme.
+
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
