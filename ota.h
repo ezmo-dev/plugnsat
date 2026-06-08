@@ -13,7 +13,7 @@ static unsigned long _otaBootTime = 0;
 inline void otaInit() {
   const esp_partition_t* running = esp_ota_get_running_partition();
   esp_ota_img_states_t state;
-  if (esp_ota_get_state_info(running, &state) == ESP_OK &&
+  if (esp_ota_get_state_partition(running, &state) == ESP_OK &&
       state == ESP_OTA_IMG_PENDING_VERIFY) {
     _otaPendingVerify = true;
     _otaBootTime = millis();
