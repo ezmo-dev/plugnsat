@@ -42,7 +42,6 @@
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <TFT_eSPI.h>
-#include <esp_ota_ops.h>
 #include "qrcode.h"
 #include "config.h"
 #include "display.h"
@@ -50,6 +49,7 @@
 #include "shelly.h"
 #include "backend.h"
 #include "webportal.h"
+#include "ota.h"
 
 //
 // GLOBALS
@@ -134,12 +134,10 @@ PlugNSatConfig config;
 //
 
 void setup() {
+  otaInit();
   Serial.begin(115200);
   delay(500);
   Serial.println("\n\n=== PlugNSat v" FIRMWARE_VERSION " ===");
-
-  // Mark this firmware as valid so the bootloader does not roll back after an OTA update
-  esp_ota_mark_app_valid_cancel_rollback();
 
   tft.init();
   tft.setRotation(1);
@@ -177,6 +175,7 @@ void setup() {
 //
 
 void loop() {
+  otaTick();
   server.handleClient();
   readButtons();
 
@@ -251,6 +250,7 @@ void connectToWiFi() {
   
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("WiFi OK: " + WiFi.localIP().toString());
+    otaMarkValid();
     MDNS.begin("plugnsat");
     displayStatus(tft, "WiFi connected!", WiFi.localIP().toString());
     delay(1500);
