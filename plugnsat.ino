@@ -37,6 +37,7 @@
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <TFT_eSPI.h>
+#include <esp_ota_ops.h>
 #include "qrcode.h"
 #include "config.h"
 #include "display.h"
@@ -131,6 +132,9 @@ void setup() {
   Serial.begin(115200);
   delay(500);
   Serial.println("\n\n=== PlugNSat v" FIRMWARE_VERSION " ===");
+
+  // Mark this firmware as valid so the bootloader does not roll back after an OTA update
+  esp_ota_mark_app_valid_cancel_rollback();
 
   tft.init();
   tft.setRotation(1);

@@ -28,7 +28,12 @@
 - [x] Merge Lightning Backend selector and credentials into a single configuration step
 - [x] Add collapsible accordion sections to configuration page with chevron, summary line, and state persistence
 - [x] Rewrite all configuration page tooltips for clarity
-- [ ] OTA firmware updates via WiFi
+- [ ] OTA Phase 1: partition scheme with two OTA slots, flash and reboot on the other slot, automatic rollback
+- [ ] OTA Phase 2: local Web OTA, upload a .bin from the portal (protected by portal password)
+- [ ] OTA Phase 3: firmware signing, RSA key pair, signature verified before any flash
+- [ ] OTA Phase 4: version check via GitHub Releases API, TLS validation with embedded root CA
+- [ ] OTA Phase 5: download and flash signed .bin from GitHub, opt-in via portal button
+- [ ] OTA Phase 6: controlled deployment, release delay and staged rollout, optional auto-update on boot
 - [ ] "Check for updates" button in web portal
 - [ ] Auto-update option on boot
 - [ ] Research and select the right LiPo battery model (capacity, connector, dimensions for enclosure)
