@@ -946,6 +946,13 @@ String processTemplate(PlugNSatConfig &config) {
   return html;
 }
 
+String processOtaPage(PlugNSatConfig &config) {
+  String html = String(OTA_PAGE);
+  html.replace("%VERSION%",  FIRMWARE_VERSION);
+  html.replace("%DEV_NAME%", htmlEscape(config.deviceName));
+  return html;
+}
+
 void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &prefs) {
   portalAuthEnabled = (WiFi.getMode() == WIFI_STA);
 
