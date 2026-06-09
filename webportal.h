@@ -1205,6 +1205,21 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     server.send(200, "application/json", json);
   });
 
+  server.on("/api/check-update", HTTP_GET, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
+    OtaUpdateInfo info = otaCheckUpdate();
+    String json;
+    if (info.error.length() > 0) {
+      json = "{\"ok\":false,\"error\":\"" + info.error + "\"}";
+    } else {
+      json = "{\"ok\":true,\"available\":"
+             + String(info.available ? "true" : "false")
+             + ",\"current\":\"" + String(FIRMWARE_VERSION) + "\""
+             + ",\"latest\":\"" + info.latestVersion + "\"}";
+    }
+    server.send(200, "application/json", json);
+  });
+
   server.on("/ota", HTTP_GET, [&config, &server]() {
     if (!checkPortalAuth(server, config)) return;
     server.send(200, "text/html", processOtaPage(config));
