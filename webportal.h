@@ -777,6 +777,9 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
     .back a { color: var(--pn-orange); text-decoration: none; font-weight: 500; }
     .back a:hover { text-decoration: underline; }
     .warning-box { background: #FFF8EC; border: 1px solid #FFD97A; border-radius: var(--pn-r-input); padding: 10px 14px; font-size: 12px; color: #7A5000; margin-bottom: 14px; line-height: 1.5; }
+    .btn-check { font-size: 13px; font-weight: 500; color: var(--pn-fg); background: var(--pn-surface); border: 1px solid var(--pn-border-2); border-radius: var(--pn-r-input); padding: 8px 14px; cursor: pointer; font-family: inherit; transition: background .12s ease; -webkit-appearance: none; appearance: none; }
+    .btn-check:hover { background: var(--pn-sunk, #F4F2EE); }
+    .btn-check:disabled { color: var(--pn-fg-3); cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -838,6 +841,12 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
     <h2>Current firmware</h2>
     <div class="version-line">Version: <span>%VERSION%</span></div>
     <div class="version-line">Device: <span>%DEV_NAME%</span></div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button class="btn-check" id="btn-check" onclick="checkUpdate()">Check for updates</button>
+      <div id="update-status" style="font-size:13px;color:var(--pn-fg-3);"></div>
+    </div>
+    <div class="alert alert-ok" id="update-ok" style="display:none;margin-top:12px;"></div>
+    <div class="alert alert-err" id="update-err" style="display:none;margin-top:12px;"></div>
   </div>
 
   <div class="card">
@@ -964,6 +973,42 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
     fd.append('firmware',   fwFile,  fwFile.name);
     fd.append('signature',  sigFile, sigFile.name);
     xhr.send(fd);
+  }
+
+  function checkUpdate() {
+    var btn = document.getElementById('btn-check');
+    var status = document.getElementById('update-status');
+    var okBox = document.getElementById('update-ok');
+    var errBox = document.getElementById('update-err');
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+    status.textContent = '';
+    okBox.style.display = 'none';
+    errBox.style.display = 'none';
+    fetch('/api/check-update')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        btn.disabled = false;
+        btn.textContent = 'Check for updates';
+        if (!d.ok) {
+          errBox.textContent = 'Check failed: ' + d.error;
+          errBox.style.display = 'block';
+          return;
+        }
+        if (d.available) {
+          okBox.textContent = 'Version ' + d.latest
+            + ' is available. You are running ' + d.current + '.';
+          okBox.style.display = 'block';
+        } else {
+          status.textContent = 'You are up to date (' + d.current + ').';
+        }
+      })
+      .catch(function() {
+        btn.disabled = false;
+        btn.textContent = 'Check for updates';
+        errBox.textContent = 'Network error. Check your WiFi connection.';
+        errBox.style.display = 'block';
+      });
   }
 </script>
 </body>
