@@ -843,13 +843,19 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
   <div class="card">
     <h2>Upload new firmware</h2>
     <div class="warning-box">The device will reboot after flashing. If the new firmware fails to connect to WiFi within 60 seconds, it will roll back automatically to the previous version.</div>
-    <div class="drop-zone" id="dz" onclick="document.getElementById('f').click()">
-      <input type="file" id="f" accept=".bin">
+    <div class="drop-zone" id="dz-fw" onclick="document.getElementById('f-fw').click()">
+      <input type="file" id="f-fw" accept=".bin">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#90939B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-      <div class="drop-label"><strong>Click to select</strong> or drag and drop</div>
-      <div class="drop-label">.bin file only</div>
+      <div class="drop-label"><strong>Firmware</strong> — click or drag .bin</div>
     </div>
-    <div class="file-name" id="fn"></div>
+    <div class="file-name" id="fn-fw"></div>
+
+    <div class="drop-zone" id="dz-sig" onclick="document.getElementById('f-sig').click()" style="margin-top:10px">
+      <input type="file" id="f-sig" accept=".sig">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#90939B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="drop-label"><strong>Signature</strong> — click or drag .sig</div>
+    </div>
+    <div class="file-name" id="fn-sig"></div>
     <div class="progress-wrap" id="pw">
       <div class="progress-bar-bg"><div class="progress-bar" id="pb"></div></div>
       <div class="progress-label" id="pl">Uploading...</div>
@@ -862,39 +868,65 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
   <div class="back"><a href="/">&larr; Back to settings</a></div>
 </div>
 <script>
-  var fileInput = document.getElementById('f');
-  var dz = document.getElementById('dz');
-  var fn = document.getElementById('fn');
-  var btn = document.getElementById('btn');
-  var pw = document.getElementById('pw');
-  var pb = document.getElementById('pb');
-  var pl = document.getElementById('pl');
-  var okBox = document.getElementById('ok');
-  var errBox = document.getElementById('err');
-  var selectedFile = null;
+  var fwInput  = document.getElementById('f-fw');
+  var sigInput = document.getElementById('f-sig');
+  var dzFw     = document.getElementById('dz-fw');
+  var dzSig    = document.getElementById('dz-sig');
+  var fnFw     = document.getElementById('fn-fw');
+  var fnSig    = document.getElementById('fn-sig');
+  var btn      = document.getElementById('btn');
+  var pw       = document.getElementById('pw');
+  var pb       = document.getElementById('pb');
+  var pl       = document.getElementById('pl');
+  var okBox    = document.getElementById('ok');
+  var errBox   = document.getElementById('err');
+  var fwFile   = null;
+  var sigFile  = null;
 
-  fileInput.addEventListener('change', function() {
-    if (fileInput.files.length > 0) {
-      selectedFile = fileInput.files[0];
-      fn.textContent = selectedFile.name + ' (' + (selectedFile.size / 1024).toFixed(1) + ' KB)';
-      fn.style.display = 'block';
-      btn.disabled = false;
+  function checkReady() {
+    btn.disabled = !(fwFile && sigFile);
+  }
+
+  fwInput.addEventListener('change', function() {
+    if (fwInput.files.length > 0) {
+      fwFile = fwInput.files[0];
+      fnFw.textContent = fwFile.name + ' (' + (fwFile.size / 1024).toFixed(1) + ' KB)';
+      fnFw.style.display = 'block';
+      checkReady();
     }
   });
-  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
-  dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
-  dz.addEventListener('drop', function(e) {
-    e.preventDefault(); dz.classList.remove('drag-over');
-    if (e.dataTransfer.files.length > 0) {
-      selectedFile = e.dataTransfer.files[0];
-      fn.textContent = selectedFile.name + ' (' + (selectedFile.size / 1024).toFixed(1) + ' KB)';
-      fn.style.display = 'block';
-      btn.disabled = false;
+  sigInput.addEventListener('change', function() {
+    if (sigInput.files.length > 0) {
+      sigFile = sigInput.files[0];
+      fnSig.textContent = sigFile.name + ' (' + sigFile.size + ' bytes)';
+      fnSig.style.display = 'block';
+      checkReady();
     }
+  });
+
+  function setupDrop(dz, onFile) {
+    dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
+    dz.addEventListener('drop', function(e) {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files.length > 0) onFile(e.dataTransfer.files[0]);
+    });
+  }
+  setupDrop(dzFw, function(f) {
+    fwFile = f;
+    fnFw.textContent = f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+    fnFw.style.display = 'block';
+    checkReady();
+  });
+  setupDrop(dzSig, function(f) {
+    sigFile = f;
+    fnSig.textContent = f.name + ' (' + f.size + ' bytes)';
+    fnSig.style.display = 'block';
+    checkReady();
   });
 
   function doFlash() {
-    if (!selectedFile) return;
+    if (!fwFile || !sigFile) return;
     btn.disabled = true;
     okBox.style.display = 'none';
     errBox.style.display = 'none';
@@ -915,7 +947,9 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
       if (xhr.status === 200) {
         okBox.style.display = 'block';
       } else {
-        errBox.textContent = 'Flash failed: ' + xhr.responseText;
+        errBox.textContent = xhr.status === 403
+          ? 'Signature invalide — flash refuse.'
+          : 'Erreur ' + xhr.status + ': ' + xhr.responseText;
         errBox.style.display = 'block';
         btn.disabled = false;
       }
@@ -927,7 +961,8 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
       btn.disabled = false;
     };
     var fd = new FormData();
-    fd.append('firmware', selectedFile, selectedFile.name);
+    fd.append('firmware',   fwFile,  fwFile.name);
+    fd.append('signature',  sigFile, sigFile.name);
     xhr.send(fd);
   }
 </script>
@@ -1001,6 +1036,13 @@ String processOtaPage(PlugNSatConfig &config) {
   html.replace("%DEV_NAME%", htmlEscape(config.deviceName));
   return html;
 }
+
+static uint8_t* _otaFirmwareBuf = nullptr;
+static size_t   _otaFirmwareBufLen = 0;
+static uint8_t  _otaSigBuf[256];
+static size_t   _otaSigBufLen = 0;
+static bool     _otaFirmwareReady = false;
+static bool     _otaSigReady = false;
 
 void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &prefs) {
   portalAuthEnabled = (WiFi.getMode() == WIFI_STA);
@@ -1169,29 +1211,82 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   });
 
   server.on("/ota/upload", HTTP_POST, [&server]() {
-    if (Update.hasError()) {
-      server.send(500, "text/plain", "Flash failed");
-    } else {
-      server.send(200, "text/plain", "OK");
-      delay(500);
-      ESP.restart();
+    // Completion handler
+    if (!_otaFirmwareReady || !_otaSigReady) {
+      if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
+      server.send(400, "text/plain", "Missing firmware or signature file");
+      return;
     }
+
+    bool sigOk = otaVerifySignature(_otaFirmwareBuf, _otaFirmwareBufLen,
+                                     _otaSigBuf, _otaSigBufLen);
+    if (!sigOk) {
+      free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr;
+      _otaFirmwareReady = false; _otaSigReady = false;
+      server.send(403, "text/plain", "Invalid signature — flash refused");
+      return;
+    }
+
+    // Signature valid: flash the buffered firmware
+    if (!Update.begin(_otaFirmwareBufLen)) {
+      free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr;
+      server.send(500, "text/plain", "Flash begin failed");
+      return;
+    }
+    size_t written = Update.write(_otaFirmwareBuf, _otaFirmwareBufLen);
+    free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr;
+    _otaFirmwareReady = false; _otaSigReady = false;
+
+    if (written != _otaFirmwareBufLen || !Update.end(true)) {
+      server.send(500, "text/plain", "Flash write failed");
+      return;
+    }
+
+    Serial.println("OTA: flash complete, rebooting");
+    server.send(200, "text/plain", "OK");
+    delay(500);
+    ESP.restart();
+
   }, [&server]() {
+    // Upload handler — called for each chunk of each file part
     HTTPUpload &upload = server.upload();
-    if (upload.status == UPLOAD_FILE_START) {
-      Serial.println("OTA upload start: " + upload.filename);
-      if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
-        Serial.println("OTA begin failed");
+
+    if (upload.name == "firmware") {
+      if (upload.status == UPLOAD_FILE_START) {
+        Serial.println("OTA: receiving firmware: " + upload.filename);
+        _otaFirmwareReady = false;
+        if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
+        _otaFirmwareBufLen = 0;
+      } else if (upload.status == UPLOAD_FILE_WRITE) {
+        _otaFirmwareBuf = (uint8_t*)realloc(_otaFirmwareBuf,
+                                             _otaFirmwareBufLen + upload.currentSize);
+        if (!_otaFirmwareBuf) {
+          Serial.println("OTA: firmware buffer alloc failed");
+          return;
+        }
+        memcpy(_otaFirmwareBuf + _otaFirmwareBufLen,
+               upload.buf, upload.currentSize);
+        _otaFirmwareBufLen += upload.currentSize;
+      } else if (upload.status == UPLOAD_FILE_END) {
+        _otaFirmwareReady = true;
+        Serial.println("OTA: firmware buffered, " + String(_otaFirmwareBufLen) + " bytes");
       }
-    } else if (upload.status == UPLOAD_FILE_WRITE) {
-      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-        Serial.println("OTA write error");
-      }
-    } else if (upload.status == UPLOAD_FILE_END) {
-      if (Update.end(true)) {
-        Serial.println("OTA success: " + String(upload.totalSize) + " bytes");
-      } else {
-        Serial.println("OTA end failed");
+
+    } else if (upload.name == "signature") {
+      if (upload.status == UPLOAD_FILE_START) {
+        Serial.println("OTA: receiving signature: " + upload.filename);
+        _otaSigReady = false;
+        _otaSigBufLen = 0;
+      } else if (upload.status == UPLOAD_FILE_WRITE) {
+        if (_otaSigBufLen + upload.currentSize <= sizeof(_otaSigBuf)) {
+          memcpy(_otaSigBuf + _otaSigBufLen, upload.buf, upload.currentSize);
+          _otaSigBufLen += upload.currentSize;
+        } else {
+          Serial.println("OTA: signature buffer overflow");
+        }
+      } else if (upload.status == UPLOAD_FILE_END) {
+        _otaSigReady = true;
+        Serial.println("OTA: signature received, " + String(_otaSigBufLen) + " bytes");
       }
     }
   });
