@@ -7,6 +7,8 @@
 #include <mbedtls/md.h>
 #include <mbedtls/error.h>
 #include <WiFiClientSecure.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 #define OTA_ROLLBACK_TIMEOUT_MS 60000
 
@@ -34,6 +36,65 @@ DLmxYlLalGAuU2LGpHHMi8sxfHhVPGAX2u3CIFXBIDQKuM2Ypqk2nNqE3RSCVVQX
 7QdKVZqpOoSN3PE=
 -----END CERTIFICATE-----
 )cert";
+
+struct OtaUpdateInfo {
+  bool available;
+  String latestVersion;
+  String error;
+};
+
+inline OtaUpdateInfo otaCheckUpdate() {
+  OtaUpdateInfo result;
+  result.available = false;
+
+  WiFiClientSecure client;
+  client.setCACert(OTA_GITHUB_ROOT_CA);
+  client.setTimeout(10);
+
+  HTTPClient http;
+  if (!http.begin(client, "https://api.github.com/repos/ezmo-dev/plugnsat/releases/latest")) {
+    result.error = "HTTP begin failed";
+    return result;
+  }
+
+  http.addHeader("User-Agent", "PlugNSat/" FIRMWARE_VERSION);
+  http.addHeader("Accept", "application/vnd.github+json");
+
+  int code = http.GET();
+  if (code != 200) {
+    result.error = "HTTP " + String(code);
+    http.end();
+    return result;
+  }
+
+  String payload = http.getString();
+  http.end();
+
+  JsonDocument doc;
+  DeserializationError err = deserializeJson(doc, payload);
+  if (err) {
+    result.error = "JSON parse error";
+    return result;
+  }
+
+  String tag = doc["tag_name"] | "";
+  if (tag.length() == 0) {
+    result.error = "No tag_name in response";
+    return result;
+  }
+
+  if (tag.startsWith("v") || tag.startsWith("V")) {
+    tag = tag.substring(1);
+  }
+
+  result.latestVersion = tag;
+  result.available = (tag != String(FIRMWARE_VERSION));
+
+  Serial.println("OTA: current=" + String(FIRMWARE_VERSION)
+                 + " latest=" + tag
+                 + " available=" + String(result.available));
+  return result;
+}
 
 static const unsigned char OTA_PUBLIC_KEY_DER[] = {
   0x30, 0x82, 0x01, 0x22, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86,
