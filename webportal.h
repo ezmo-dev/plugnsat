@@ -780,6 +780,9 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
     .btn-check { font-size: 13px; font-weight: 500; color: var(--pn-fg); background: var(--pn-surface); border: 1px solid var(--pn-border-2); border-radius: var(--pn-r-input); padding: 8px 14px; cursor: pointer; font-family: inherit; transition: background .12s ease; -webkit-appearance: none; appearance: none; }
     .btn-check:hover { background: var(--pn-sunk, #F4F2EE); }
     .btn-check:disabled { color: var(--pn-fg-3); cursor: not-allowed; }
+    .btn-install { font-size: 13px; font-weight: 600; color: #0A0A0A; background: var(--pn-orange); border: none; border-radius: var(--pn-r-input); padding: 8px 14px; cursor: pointer; font-family: inherit; margin-left: 8px; transition: background .12s ease; -webkit-appearance: none; appearance: none; box-shadow: 0 2px 8px rgba(247,147,26,.28); }
+    .btn-install:hover { background: #E8850F; }
+    .btn-install:disabled { background: var(--pn-border-2); color: var(--pn-fg-3); box-shadow: none; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -975,6 +978,39 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
     xhr.send(fd);
   }
 
+  function installUpdate(version) {
+    var installBtn = document.getElementById('btn-install');
+    var okBox = document.getElementById('update-ok');
+    var errBox = document.getElementById('update-err');
+    if (installBtn) installBtn.disabled = true;
+    okBox.innerHTML = 'Downloading and flashing v' + version
+      + '... Do not close this page. The device will reboot automatically.';
+
+    fetch('/api/ota-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'version=' + encodeURIComponent(version)
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.ok) {
+          okBox.innerHTML = 'Update started. Device is downloading and will reboot.'
+            + ' This page will stop responding during the reboot. '
+            + ' Reconnect to <a href="/" style="color:var(--pn-orange)">plugnsat.local</a>'
+            + ' after reboot.';
+        } else {
+          errBox.textContent = 'Update failed: ' + d.error;
+          errBox.style.display = 'block';
+          if (installBtn) installBtn.disabled = false;
+        }
+      })
+      .catch(function() {
+        errBox.textContent = 'Network error during update.';
+        errBox.style.display = 'block';
+        if (installBtn) installBtn.disabled = false;
+      });
+  }
+
   function checkUpdate() {
     var btn = document.getElementById('btn-check');
     var status = document.getElementById('update-status');
@@ -996,8 +1032,11 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
           return;
         }
         if (d.available) {
-          okBox.textContent = 'Version ' + d.latest
-            + ' is available. You are running ' + d.current + '.';
+          okBox.innerHTML = 'Version <strong>' + d.latest + '</strong> is available.'
+            + ' You are running ' + d.current + '.'
+            + ' <button class="btn-install" id="btn-install"'
+            + ' onclick="installUpdate(\'' + d.latest + '\')">'
+            + 'Install update</button>';
           okBox.style.display = 'block';
         } else {
           status.textContent = 'You are up to date (' + d.current + ').';
