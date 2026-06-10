@@ -1265,6 +1265,40 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     server.send(200, "application/json", json);
   });
 
+  server.on("/api/ota-update", HTTP_POST, [&config, &server]() {
+    if (!checkPortalAuth(server, config)) return;
+
+    String version = server.arg("version");
+    if (version.length() == 0 || version.length() > 20) {
+      server.send(400, "application/json",
+                  "{\"ok\":false,\"error\":\"Missing or invalid version\"}");
+      return;
+    }
+
+    // Validate version format: digits and dots only
+    for (size_t i = 0; i < version.length(); i++) {
+      char c = version.charAt(i);
+      if (!isDigit(c) && c != '.') {
+        server.send(400, "application/json",
+                    "{\"ok\":false,\"error\":\"Invalid version format\"}");
+        return;
+      }
+    }
+
+    Serial.println("OTA: starting auto-update to v" + version);
+    server.send(200, "application/json", "{\"ok\":true,\"status\":\"downloading\"}");
+
+    // Download and flash runs after response is sent
+    OtaFlashResult flash = otaDownloadAndFlash(version);
+    if (flash.success) {
+      Serial.println("OTA: rebooting into new firmware");
+      delay(500);
+      ESP.restart();
+    } else {
+      Serial.println("OTA: auto-update failed: " + flash.error);
+    }
+  });
+
   server.on("/ota", HTTP_GET, [&config, &server]() {
     if (!checkPortalAuth(server, config)) return;
     server.send(200, "text/html", processOtaPage(config));
