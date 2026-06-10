@@ -160,6 +160,146 @@ inline bool otaVerifySignature(const uint8_t* firmwareData, size_t firmwareLen,
   return true;
 }
 
+struct OtaFlashResult {
+  bool success;
+  String error;
+};
+
+inline OtaFlashResult otaDownloadAndFlash(const String& version) {
+  OtaFlashResult result;
+  result.success = false;
+
+  String base = "https://github.com/ezmo-dev/plugnsat/releases/download/v"
+                + version + "/";
+  String binUrl = base + "firmware.bin";
+  String sigUrl = base + "firmware.bin.sig";
+
+  WiFiClientSecure client;
+  client.setCACert(OTA_GITHUB_ROOT_CA);
+  client.setTimeout(60);
+
+  // --- Download .sig first (small, 256 bytes) ---
+  HTTPClient http;
+  Serial.println("OTA: downloading sig from " + sigUrl);
+  if (!http.begin(client, sigUrl)) {
+    result.error = "Sig HTTP begin failed";
+    return result;
+  }
+  http.addHeader("User-Agent", "PlugNSat/" FIRMWARE_VERSION);
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+  int sigCode = http.GET();
+  if (sigCode != 200) {
+    result.error = "Sig download failed: HTTP " + String(sigCode);
+    http.end();
+    return result;
+  }
+
+  static uint8_t sigBuf[256];
+  size_t sigLen = 0;
+  WiFiClient* sigStream = http.getStreamPtr();
+  unsigned long sigTimeout = millis() + 5000;
+  while (sigLen < sizeof(sigBuf) && millis() < sigTimeout) {
+    if (sigStream->available()) {
+      sigBuf[sigLen++] = sigStream->read();
+    }
+  }
+  http.end();
+  Serial.println("OTA: sig received, " + String(sigLen) + " bytes");
+
+  if (sigLen == 0) {
+    result.error = "Sig empty";
+    return result;
+  }
+
+  // --- Download .bin into heap ---
+  Serial.println("OTA: downloading firmware from " + binUrl);
+  WiFiClientSecure client2;
+  client2.setCACert(OTA_GITHUB_ROOT_CA);
+  client2.setTimeout(60);
+  HTTPClient http2;
+
+  if (!http2.begin(client2, binUrl)) {
+    result.error = "Bin HTTP begin failed";
+    return result;
+  }
+  http2.addHeader("User-Agent", "PlugNSat/" FIRMWARE_VERSION);
+  http2.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+  int binCode = http2.GET();
+  if (binCode != 200) {
+    result.error = "Bin download failed: HTTP " + String(binCode);
+    http2.end();
+    return result;
+  }
+
+  int contentLen = http2.getSize();
+  Serial.println("OTA: firmware size: " + String(contentLen) + " bytes");
+
+  if (contentLen <= 0 || contentLen > 1900000) {
+    result.error = "Invalid firmware size: " + String(contentLen);
+    http2.end();
+    return result;
+  }
+
+  uint8_t* binBuf = (uint8_t*)malloc(contentLen);
+  if (!binBuf) {
+    result.error = "malloc failed for firmware buffer";
+    http2.end();
+    return result;
+  }
+
+  WiFiClient* binStream = http2.getStreamPtr();
+  size_t binLen = 0;
+  unsigned long binTimeout = millis() + 60000;
+  while ((int)binLen < contentLen && millis() < binTimeout) {
+    if (binStream->available()) {
+      int chunk = binStream->readBytes(binBuf + binLen,
+                  min((size_t)binStream->available(),
+                      (size_t)(contentLen - binLen)));
+      binLen += chunk;
+    }
+    yield();
+  }
+  http2.end();
+  Serial.println("OTA: firmware downloaded, " + String(binLen) + " bytes");
+
+  if ((int)binLen != contentLen) {
+    free(binBuf);
+    result.error = "Download incomplete: got " + String(binLen)
+                   + " expected " + String(contentLen);
+    return result;
+  }
+
+  // --- Verify signature ---
+  bool sigOk = otaVerifySignature(binBuf, binLen, sigBuf, sigLen);
+  if (!sigOk) {
+    free(binBuf);
+    result.error = "Signature invalid — flash refused";
+    return result;
+  }
+
+  // --- Flash ---
+  Serial.println("OTA: signature valid, flashing...");
+  if (!Update.begin(binLen)) {
+    free(binBuf);
+    result.error = "Update.begin failed";
+    return result;
+  }
+
+  size_t written = Update.write(binBuf, binLen);
+  free(binBuf);
+
+  if (written != binLen || !Update.end(true)) {
+    result.error = "Flash write failed";
+    return result;
+  }
+
+  Serial.println("OTA: flash complete");
+  result.success = true;
+  return result;
+}
+
 static bool _otaValid = false;
 static bool _otaPendingVerify = false;
 static unsigned long _otaBootTime = 0;
