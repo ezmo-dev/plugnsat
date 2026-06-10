@@ -9,6 +9,7 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <Update.h>
 
 #define OTA_ROLLBACK_TIMEOUT_MS 60000
 
