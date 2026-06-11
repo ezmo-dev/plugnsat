@@ -68,6 +68,7 @@ struct PlugNSatConfig {
   bool showPrice;          // Show price on QR screen
   BackendType backendType; // Lightning backend (default: BTCPay)
   String portalPassword;   // HTTP Basic Auth for web portal (empty = no auth)
+  bool autoUpdate;         // Check GitHub and auto-install on boot (default: false)
 };
 
 #endif
