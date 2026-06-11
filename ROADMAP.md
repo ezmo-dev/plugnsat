@@ -33,10 +33,10 @@
 - [x] OTA Phase 3: firmware signing, RSA key pair, signature verified before any flash
 - [x] OTA Phase 4: version check via GitHub Releases API, TLS validation with embedded root CA
 - [x] OTA Phase 5: download and flash signed .bin from GitHub, opt-in via portal button
-- [ ] OTA Phase 6: controlled deployment, release delay and staged rollout, optional auto-update on boot
+- [x] OTA Phase 6: controlled deployment, release delay and staged rollout, optional auto-update on boot
 - [x] Research and select the right LiPo battery model (capacity, connector, dimensions for enclosure)
-- [ ] "Check for updates" button in web portal
-- [ ] Auto-update option on boot
+- [x] "Check for updates" button in web portal
+- [x] Auto-update option on boot
 - [ ] Battery-powered prototype (LiPo integration with T-Display S3)
 - [ ] Power management: sleep mode, low battery indicator on screen
 - [ ] Battery level indicator on screen and web portal
