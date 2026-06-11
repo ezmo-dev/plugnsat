@@ -1157,6 +1157,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.deviceName         = server.arg("dev_name");
     config.showName  = server.arg("show_name")  == "1";
     config.showPrice = server.arg("show_price") == "1";
+    config.autoUpdate = server.hasArg("auto_update");
     String newPin             = server.arg("settings_pin");
     if (newPin.length() == 0) {
       config.pin = "";
