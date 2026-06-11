@@ -947,20 +947,8 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
         </g>
       </svg>
     </div>
-    <h1>Firmware <span class="accent">Update</span>.</h1>
+    <h1>Firmware <span class="accent">Update</span> <span style="font-size:16px;font-weight:400;color:var(--pn-fg-3);">(dev)</span>.</h1>
   </header>
-
-  <div class="card">
-    <h2>Current firmware</h2>
-    <div class="version-line">Version: <span>%VERSION%</span></div>
-    <div class="version-line">Device: <span>%DEV_NAME%</span></div>
-    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <button class="btn-check" id="btn-check" onclick="checkUpdate()">Check for updates</button>
-      <div id="update-status" style="font-size:13px;color:var(--pn-fg-3);"></div>
-    </div>
-    <div class="alert alert-ok" id="update-ok" style="display:none;margin-top:12px;"></div>
-    <div class="alert alert-err" id="update-err" style="display:none;margin-top:12px;"></div>
-  </div>
 
   <div class="card">
     <h2>Upload new firmware</h2>
@@ -1088,77 +1076,6 @@ const char OTA_PAGE[] PROGMEM = R"rawliteral(
     xhr.send(fd);
   }
 
-  function installUpdate(version) {
-    var installBtn = document.getElementById('btn-install');
-    var okBox = document.getElementById('update-ok');
-    var errBox = document.getElementById('update-err');
-    if (installBtn) installBtn.disabled = true;
-    okBox.innerHTML = 'Downloading and flashing v' + version
-      + '... Do not close this page. The device will reboot automatically.';
-
-    fetch('/api/ota-update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'version=' + encodeURIComponent(version)
-    })
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        if (d.ok) {
-          okBox.innerHTML = 'Update started. Device is downloading and will reboot.'
-            + ' This page will stop responding during the reboot. '
-            + ' Reconnect to <a href="/" style="color:var(--pn-orange)">plugnsat.local</a>'
-            + ' after reboot.';
-        } else {
-          errBox.textContent = 'Update failed: ' + d.error;
-          errBox.style.display = 'block';
-          if (installBtn) installBtn.disabled = false;
-        }
-      })
-      .catch(function() {
-        errBox.textContent = 'Network error during update.';
-        errBox.style.display = 'block';
-        if (installBtn) installBtn.disabled = false;
-      });
-  }
-
-  function checkUpdate() {
-    var btn = document.getElementById('btn-check');
-    var status = document.getElementById('update-status');
-    var okBox = document.getElementById('update-ok');
-    var errBox = document.getElementById('update-err');
-    btn.disabled = true;
-    btn.textContent = 'Checking...';
-    status.textContent = '';
-    okBox.style.display = 'none';
-    errBox.style.display = 'none';
-    fetch('/api/check-update')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        btn.disabled = false;
-        btn.textContent = 'Check for updates';
-        if (!d.ok) {
-          errBox.textContent = 'Check failed: ' + d.error;
-          errBox.style.display = 'block';
-          return;
-        }
-        if (d.available) {
-          okBox.innerHTML = '<div>Version <strong>' + d.latest + '</strong> is available.'
-            + ' You are running ' + d.current + '.</div>'
-            + '<button class="btn-install" id="btn-install"'
-            + ' onclick="installUpdate(\'' + d.latest + '\')">'
-            + 'Install update</button>';
-          okBox.style.display = 'block';
-        } else {
-          status.textContent = 'You are up to date (' + d.current + ').';
-        }
-      })
-      .catch(function() {
-        btn.disabled = false;
-        btn.textContent = 'Check for updates';
-        errBox.textContent = 'Network error. Check your WiFi connection.';
-        errBox.style.display = 'block';
-      });
-  }
 </script>
 </body>
 </html>
