@@ -504,6 +504,21 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     </div>
 
     <button type="submit" id="btn-save">Save and restart &rarr;</button>
+
+    <div class="card" style="margin-top:18px;">
+      <h2>Firmware</h2>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:10px;">
+        <input type="checkbox" name="auto_update" id="auto_update" %AUTO_UPDATE_CHECKED% style="margin-top:3px;flex-shrink:0;">
+        <span>
+          <strong style="font-size:14px;">Auto-update on boot</strong><br>
+          <span style="font-size:12px;color:var(--pn-fg-2,#535862);">When enabled, the device checks for a new firmware version every time it restarts and installs it automatically. Leave unchecked to stay in full control and update manually.</span>
+        </span>
+      </label>
+      <div style="font-size:12px;color:var(--pn-fg-3,#90939B);margin-bottom:14px;border-top:1px solid var(--pn-border,#EAE7E0);padding-top:12px;">
+        Manual update: check and install a new version yourself, only needed when auto-update is off.
+      </div>
+      <a href="/ota" class="btn-firmware" style="display:inline-block;text-decoration:none;text-align:center;font-size:14px;font-weight:600;color:#0A0A0A;background:var(--pn-orange,#F7931A);border-radius:10px;padding:11px 18px;box-shadow:0 4px 12px rgba(247,147,26,.28);">Firmware update</a>
+    </div>
   </form>
 
   <div class="footer">PlugNSat v%VERSION% &nbsp;·&nbsp; <a href="/ota" style="color:var(--pn-orange);text-decoration:none;font-family:inherit;">Firmware update</a></div>
