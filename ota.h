@@ -24,6 +24,27 @@ struct OtaUpdateInfo {
   String error;
 };
 
+inline bool otaParseVersion(const String& v, int& major, int& minor, int& patch) {
+  major = minor = patch = 0;
+  int firstDot = v.indexOf('.');
+  if (firstDot < 0) return false;
+  int secondDot = v.indexOf('.', firstDot + 1);
+  if (secondDot < 0) return false;
+  major = v.substring(0, firstDot).toInt();
+  minor = v.substring(firstDot + 1, secondDot).toInt();
+  patch = v.substring(secondDot + 1).toInt();
+  return true;
+}
+
+inline bool otaIsNewer(const String& remote, const String& current) {
+  int rMaj, rMin, rPat, cMaj, cMin, cPat;
+  if (!otaParseVersion(remote, rMaj, rMin, rPat)) return false;
+  if (!otaParseVersion(current, cMaj, cMin, cPat)) return false;
+  if (rMaj != cMaj) return rMaj > cMaj;
+  if (rMin != cMin) return rMin > cMin;
+  return rPat > cPat;
+}
+
 inline OtaUpdateInfo otaCheckUpdate() {
   OtaUpdateInfo result;
   result.available = false;
@@ -70,7 +91,8 @@ inline OtaUpdateInfo otaCheckUpdate() {
   }
 
   result.latestVersion = tag;
-  result.available = (tag != String(FIRMWARE_VERSION));
+  // Compare: available only if remote version is strictly newer (semver)
+  result.available = otaIsNewer(tag, String(FIRMWARE_VERSION));
 
   Serial.println("OTA: current=" + String(FIRMWARE_VERSION)
                  + " latest=" + tag
