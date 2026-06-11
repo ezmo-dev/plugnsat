@@ -854,6 +854,7 @@ void loadConfig() {
   if (config.backendType < 0 || config.backendType >= BACKEND_COUNT)
     config.backendType = BACKEND_BTCPAY;
   config.portalPassword     = prefs.getString("portal_pw", "");
+  config.autoUpdate         = prefs.getBool("auto_update", false);
   prefs.end();
 }
 
@@ -876,5 +877,6 @@ void saveConfig() {
   prefs.putBool("show_price",     config.showPrice);
   prefs.putInt("backend",         (int)config.backendType);
   prefs.putString("portal_pw",    config.portalPassword);
+  prefs.putBool("auto_update",    config.autoUpdate);
   prefs.end();
 }
