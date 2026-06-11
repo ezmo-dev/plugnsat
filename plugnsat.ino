@@ -255,6 +255,28 @@ void connectToWiFi() {
     displayStatus(tft, "WiFi connected!", WiFi.localIP().toString());
     delay(1500);
 
+    // Auto-update on boot (opt-in)
+    if (config.autoUpdate) {
+      displayStatus(tft, "Checking updates...", "");
+      OtaUpdateInfo upd = otaCheckUpdate();
+      if (upd.error.length() == 0 && upd.available) {
+        Serial.println("OTA: auto-update on boot to v" + upd.latestVersion);
+        displayStatus(tft, "Updating...", "v" + upd.latestVersion);
+        OtaFlashResult fr = otaDownloadAndFlash(upd.latestVersion);
+        if (fr.success) {
+          Serial.println("OTA: boot auto-update success, rebooting");
+          delay(500);
+          ESP.restart();
+        } else {
+          Serial.println("OTA: boot auto-update failed: " + fr.error);
+          // Continue normal boot on failure
+        }
+      } else {
+        Serial.println("OTA: no boot update (err=" + upd.error
+                       + " avail=" + String(upd.available) + ")");
+      }
+    }
+
     setupWebPortal(server, config, prefs);
     server.begin();
 
