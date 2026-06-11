@@ -1124,6 +1124,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%SETTINGS_PIN%",       config.pin.length() > 0 ? "****" : "");
   html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
+  html.replace("%AUTO_UPDATE_CHECKED%", config.autoUpdate ? "checked" : "");
   html.replace("%VERSION%",            FIRMWARE_VERSION);
   html.replace("%PORTAL_PW%",          config.portalPassword.length() > 0 ? "********" : "");
   return html;
