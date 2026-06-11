@@ -31,8 +31,9 @@
 
 // OTA NOTE (Arduino IDE):
 // Board: LilyGO T-Display S3
-// Partition Scheme: select "Custom" and point to partitions_ota.csv
-// Required for OTA Phase 1+. Do not use the default partition scheme.
+// Partition Scheme: select "Minimal SPIFFS (1.9MB APP with OTA/128KB SPIFFS)"
+// This provides two OTA app slots required for firmware updates.
+// Do not use a "No OTA" partition scheme.
 
 #include <WiFi.h>
 #include <HTTPClient.h>

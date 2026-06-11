@@ -39,7 +39,7 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 4. Board: ESP32S3 Dev Module
 5. USB CDC On Boot: Enabled
 6. Flash Size: 16MB
-7. Partition: Huge APP (3MB No OTA)
+7. Partition Scheme: Minimal SPIFFS (1.9MB APP with OTA/128KB SPIFFS)
 8. PSRAM: OPI PSRAM
 
 ### Libraries (Sketch > Include Library > Manage Libraries)
@@ -116,6 +116,7 @@ shelly.h       Shelly local HTTP API (switch on/off, status)
 webportal.h    Web config page (HTML/CSS/JS served by ESP32)
 qrcode.h       QR code generation library header (by Richard Moore)
 qrcode.c       QR code generation library source
+ota.h          OTA system: rollback guard, RSA signature verification, GitHub update check and download
 ```
 
 All files go in the same folder. Arduino IDE compiles them together.
