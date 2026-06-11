@@ -670,75 +670,84 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       });
     });
   }
-  function toggleUpdateBtn(){
-    var cb=document.getElementById('auto_update');
-    var mu=document.getElementById('manual-update');
-    if(mu) mu.style.display=cb.checked?'none':'';
+  function toggleUpdateBtn() {
+    var cb = document.getElementById('auto_update');
+    var box = document.getElementById('manual-update');
+    if (!cb || !box) return;
+    box.style.display = cb.checked ? 'none' : 'block';
   }
-  function installUpdate(version){
-    var installBtn=document.getElementById('btn-install');
-    var okBox=document.getElementById('update-ok');
-    var errBox=document.getElementById('update-err');
-    if(installBtn) installBtn.disabled=true;
-    okBox.innerHTML='Downloading and flashing v'+version+'... Do not close this page. The device will reboot automatically.';
-    fetch('/api/ota-update',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'version='+encodeURIComponent(version)})
-      .then(function(r){return r.json();})
-      .then(function(d){
-        if(d.ok){
-          okBox.innerHTML='Update started. Device is downloading and will reboot.'
-            +' This page will stop responding during the reboot. '
-            +' Reconnect to <a href="/" style="color:var(--pn-orange)">plugnsat.local</a>'
-            +' after reboot.';
-        } else {
-          errBox.textContent='Update failed: '+d.error;
-          errBox.style.display='block';
-          if(installBtn) installBtn.disabled=false;
-        }
-      })
-      .catch(function(){
-        errBox.textContent='Network error during update.';
-        errBox.style.display='block';
-        if(installBtn) installBtn.disabled=false;
-      });
-  }
-  function checkUpdate(){
-    var btn=document.getElementById('btn-check');
-    var status=document.getElementById('update-status');
-    var okBox=document.getElementById('update-ok');
-    var errBox=document.getElementById('update-err');
-    btn.disabled=true;
-    btn.textContent='Checking...';
-    status.textContent='';
-    okBox.style.display='none';
-    errBox.style.display='none';
+
+  function checkUpdate() {
+    var btn = document.getElementById('btn-check');
+    var status = document.getElementById('update-status');
+    var okBox = document.getElementById('update-ok');
+    var errBox = document.getElementById('update-err');
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+    status.textContent = '';
+    okBox.style.display = 'none';
+    errBox.style.display = 'none';
     fetch('/api/check-update')
-      .then(function(r){return r.json();})
-      .then(function(d){
-        btn.disabled=false;
-        btn.textContent='Check for updates';
-        if(!d.ok){
-          errBox.textContent='Check failed: '+d.error;
-          errBox.style.display='block';
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        btn.disabled = false;
+        btn.textContent = 'Check for updates';
+        if (!d.ok) {
+          errBox.textContent = 'Check failed: ' + d.error;
+          errBox.style.display = 'block';
           return;
         }
-        if(d.available){
-          okBox.innerHTML='<div>Version <strong>'+d.latest+'</strong> is available.'
-            +' You are running '+d.current+'.</div>'
-            +'<button class="btn-install" id="btn-install"'
-            +' onclick="installUpdate(\''+d.latest+'\')">'
-            +'Install update</button>';
-          okBox.style.display='block';
+        if (d.available) {
+          okBox.innerHTML = '<div>Version <strong>' + d.latest + '</strong> is available.'
+            + ' You are running ' + d.current + '.</div>'
+            + '<button type="button" class="btn-install" id="btn-install"'
+            + ' onclick="installUpdate(\'' + d.latest + '\')">Install update</button>';
+          okBox.style.display = 'block';
         } else {
-          status.textContent='You are up to date ('+d.current+').';
+          status.textContent = 'You are up to date (' + d.current + ').';
         }
       })
-      .catch(function(){
-        btn.disabled=false;
-        btn.textContent='Check for updates';
-        errBox.textContent='Network error. Check your WiFi connection.';
-        errBox.style.display='block';
+      .catch(function() {
+        btn.disabled = false;
+        btn.textContent = 'Check for updates';
+        errBox.textContent = 'Network error. Check your WiFi connection.';
+        errBox.style.display = 'block';
       });
   }
+
+  function installUpdate(version) {
+    var installBtn = document.getElementById('btn-install');
+    var okBox = document.getElementById('update-ok');
+    var errBox = document.getElementById('update-err');
+    if (installBtn) installBtn.disabled = true;
+    okBox.innerHTML = 'Downloading and flashing v' + version
+      + '... Do not close this page. The device will reboot automatically.';
+    fetch('/api/ota-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'version=' + encodeURIComponent(version)
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.ok) {
+          okBox.innerHTML = 'Update started. The device is downloading and will reboot.'
+            + ' This page will stop responding during the reboot.'
+            + ' Reconnect to plugnsat.local after reboot.';
+        } else {
+          errBox.textContent = 'Update failed: ' + d.error;
+          errBox.style.display = 'block';
+          if (installBtn) installBtn.disabled = false;
+        }
+      })
+      .catch(function() {
+        errBox.textContent = 'Network error during update.';
+        errBox.style.display = 'block';
+        if (installBtn) installBtn.disabled = false;
+      });
+  }
+
+  // Set initial visibility of the manual update section on page load
+  toggleUpdateBtn();
   document.addEventListener('DOMContentLoaded',function(){initSections();toggleBackend();toggleUpdateBtn();});
   </script>
 </body>
