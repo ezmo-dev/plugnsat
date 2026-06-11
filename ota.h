@@ -10,33 +10,13 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <Update.h>
+#include <esp_crt_bundle.h>
 
 #define OTA_ROLLBACK_TIMEOUT_MS 60000
 
-static const char OTA_GITHUB_ROOT_CA[] PROGMEM = R"cert(
------BEGIN CERTIFICATE-----
-MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh
-MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3
-d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD
-QTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT
-MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j
-b20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIANBAQEA7+qS
-aS6LJUzBBDuiX7xJwGiGYalDFoqpnelqCLHF2xEDcPbVoFX5BPxLvAPDwSCE5Gx
-p+U7cFrI2QBMlPhFrAlCqeUe52CgFJIlX9E/I8cXTWepKdp6BWCMT3jVjmV8JXN
-bRF39SMBhTCYsGHBhBrF6n98nNJi2lzVNqWilL/5JphqS5r+/WXK4qkJdtGzP4b3
-m18JqFSJEnHHWqOH2P0jZSMR7Xmxexi9PxrRGLkJC6uT2xOQQSw85ZKWJJyUuSBF
-VHMxD7o8bNpEJQk5ecrjr0IVVMvZg1iUfW7E0U2lXJpVyU/nqlzB8tGFkx21M7W
-xBX7ekDjXd9L+fJ+CzJh0wIDAQABo2IwYDAdBgNVHQ4EFgQUA95QNVbRTLtm8KPi
-GxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUwDwYDVR0T
-AQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAYYwDQYJKoZIhvcNAQEFBQADggEBAMucN
-6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/EsrhMAtudXH/vTBH1jLuG2cenTnmCmrE
-bXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg06O/nVsJ8dWO4EeQe2lj+yKU/EqE6
-RA6wPpFdS1p2ztFXVIMxPwkWpMVtqzPFIXjcTNVQ0HTbFSPmW1bVdLEy00HvJHbz
-hnABElRXIGMXNLFe8ky2eRtfblMajOLgMTDWcB2B5YlKi5Gf/RpAM6dlHbMdVZ9o
-DLmxYlLalGAuU2LGpHHMi8sxfHhVPGAX2u3CIFXBIDQKuM2Ypqk2nNqE3RSCVVQX
-7QdKVZqpOoSN3PE=
------END CERTIFICATE-----
-)cert";
+extern const uint8_t x509_crt_imported_bundle_bin_start[] asm("_binary_x509_crt_bundle_start");
+extern const uint8_t x509_crt_imported_bundle_bin_end[]   asm("_binary_x509_crt_bundle_end");
+
 
 struct OtaUpdateInfo {
   bool available;
@@ -49,7 +29,8 @@ inline OtaUpdateInfo otaCheckUpdate() {
   result.available = false;
 
   WiFiClientSecure client;
-  client.setCACert(OTA_GITHUB_ROOT_CA);
+  client.setCACertBundle(x509_crt_imported_bundle_bin_start,
+                         x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start);
   client.setTimeout(10);
 
   HTTPClient http;
@@ -161,6 +142,32 @@ inline bool otaVerifySignature(const uint8_t* firmwareData, size_t firmwareLen,
   return true;
 }
 
+inline bool otaVerifySignatureFromHash(const uint8_t* hash, size_t hashLen,
+                                        const uint8_t* sigData, size_t sigLen) {
+  mbedtls_pk_context pk;
+  mbedtls_pk_init(&pk);
+
+  int ret = mbedtls_pk_parse_public_key(&pk, OTA_PUBLIC_KEY_DER, OTA_PUBLIC_KEY_DER_LEN);
+  if (ret != 0) {
+    Serial.println("OTA: public key parse failed");
+    mbedtls_pk_free(&pk);
+    return false;
+  }
+
+  ret = mbedtls_pk_verify(&pk, MBEDTLS_MD_SHA256, hash, hashLen, sigData, sigLen);
+  mbedtls_pk_free(&pk);
+
+  if (ret != 0) {
+    char errbuf[64];
+    mbedtls_strerror(ret, errbuf, sizeof(errbuf));
+    Serial.println("OTA: signature invalid: " + String(errbuf));
+    return false;
+  }
+
+  Serial.println("OTA: signature valid");
+  return true;
+}
+
 struct OtaFlashResult {
   bool success;
   String error;
@@ -176,7 +183,8 @@ inline OtaFlashResult otaDownloadAndFlash(const String& version) {
   String sigUrl = base + "firmware.bin.sig";
 
   WiFiClientSecure client;
-  client.setCACert(OTA_GITHUB_ROOT_CA);
+  client.setCACertBundle(x509_crt_imported_bundle_bin_start,
+                         x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start);
   client.setTimeout(60);
 
   // --- Download .sig first (small, 256 bytes) ---
@@ -213,10 +221,11 @@ inline OtaFlashResult otaDownloadAndFlash(const String& version) {
     return result;
   }
 
-  // --- Download .bin into heap ---
+  // --- Download .bin and stream directly to flash partition ---
   Serial.println("OTA: downloading firmware from " + binUrl);
   WiFiClientSecure client2;
-  client2.setCACert(OTA_GITHUB_ROOT_CA);
+  client2.setCACertBundle(x509_crt_imported_bundle_bin_start,
+                          x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start);
   client2.setTimeout(60);
   HTTPClient http2;
 
@@ -243,56 +252,75 @@ inline OtaFlashResult otaDownloadAndFlash(const String& version) {
     return result;
   }
 
-  uint8_t* binBuf = (uint8_t*)malloc(contentLen);
-  if (!binBuf) {
-    result.error = "malloc failed for firmware buffer";
+  // Begin OTA flash with the known size
+  if (!Update.begin(contentLen)) {
+    result.error = "Update.begin failed";
     http2.end();
     return result;
   }
 
+  // Set up streaming SHA256
+  mbedtls_md_context_t shaCtx;
+  mbedtls_md_init(&shaCtx);
+  mbedtls_md_setup(&shaCtx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 0);
+  mbedtls_md_starts(&shaCtx);
+
   WiFiClient* binStream = http2.getStreamPtr();
-  size_t binLen = 0;
-  unsigned long binTimeout = millis() + 60000;
-  while ((int)binLen < contentLen && millis() < binTimeout) {
-    if (binStream->available()) {
-      int chunk = binStream->readBytes(binBuf + binLen,
-                  min((size_t)binStream->available(),
-                      (size_t)(contentLen - binLen)));
-      binLen += chunk;
+  uint8_t chunk[1024];
+  int totalRead = 0;
+  unsigned long binTimeout = millis() + 90000;
+
+  while (totalRead < contentLen && millis() < binTimeout) {
+    size_t avail = binStream->available();
+    if (avail > 0) {
+      size_t toRead = (avail > sizeof(chunk)) ? sizeof(chunk) : avail;
+      if ((int)(totalRead + toRead) > contentLen) {
+        toRead = contentLen - totalRead;
+      }
+      int r = binStream->readBytes(chunk, toRead);
+      if (r > 0) {
+        // Write to flash
+        if (Update.write(chunk, r) != (size_t)r) {
+          Update.abort();
+          mbedtls_md_free(&shaCtx);
+          http2.end();
+          result.error = "Flash write error during stream";
+          return result;
+        }
+        // Update hash
+        mbedtls_md_update(&shaCtx, chunk, r);
+        totalRead += r;
+      }
     }
     yield();
   }
   http2.end();
-  Serial.println("OTA: firmware downloaded, " + String(binLen) + " bytes");
+  Serial.println("OTA: firmware streamed, " + String(totalRead) + " bytes");
 
-  if ((int)binLen != contentLen) {
-    free(binBuf);
-    result.error = "Download incomplete: got " + String(binLen)
-                   + " expected " + String(contentLen);
+  if (totalRead != contentLen) {
+    Update.abort();
+    mbedtls_md_free(&shaCtx);
+    result.error = "Download incomplete: " + String(totalRead)
+                   + "/" + String(contentLen);
     return result;
   }
 
-  // --- Verify signature ---
-  bool sigOk = otaVerifySignature(binBuf, binLen, sigBuf, sigLen);
+  // Finalize hash
+  uint8_t hash[32];
+  mbedtls_md_finish(&shaCtx, hash);
+  mbedtls_md_free(&shaCtx);
+
+  // Verify signature against the streamed hash BEFORE committing the flash
+  bool sigOk = otaVerifySignatureFromHash(hash, sizeof(hash), sigBuf, sigLen);
   if (!sigOk) {
-    free(binBuf);
-    result.error = "Signature invalid — flash refused";
+    Update.abort();
+    result.error = "Signature invalid - flash aborted";
     return result;
   }
 
-  // --- Flash ---
-  Serial.println("OTA: signature valid, flashing...");
-  if (!Update.begin(binLen)) {
-    free(binBuf);
-    result.error = "Update.begin failed";
-    return result;
-  }
-
-  size_t written = Update.write(binBuf, binLen);
-  free(binBuf);
-
-  if (written != binLen || !Update.end(true)) {
-    result.error = "Flash write failed";
+  // Commit the flash
+  if (!Update.end(true)) {
+    result.error = "Update.end failed";
     return result;
   }
 
