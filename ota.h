@@ -64,6 +64,13 @@ inline OtaUpdateInfo otaCheckUpdate() {
   http.addHeader("Accept", "application/vnd.github+json");
 
   int code = http.GET();
+  if (code == 404) {
+    // No release published yet: device is considered up to date, not an error.
+    result.available = false;
+    http.end();
+    Serial.println("OTA: no release found (404), up to date");
+    return result;
+  }
   if (code != 200) {
     result.error = "HTTP " + String(code);
     http.end();
