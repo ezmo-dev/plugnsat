@@ -353,6 +353,17 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
         animation-duration: .001ms !important;
       }
     }
+    .card { background: var(--pn-surface); border-radius: var(--pn-r-card); box-shadow: var(--pn-shadow-sm); padding: 22px; }
+    .card h2 { margin: 0 0 14px; font-size: 15px; font-weight: 600; color: var(--pn-fg); }
+    .alert { border-radius: var(--pn-r-input); padding: 12px 14px; font-size: 13px; margin-top: 14px; }
+    .alert-ok { background: var(--pn-success-soft); color: var(--pn-success); border: 1px solid #C8E6D2; }
+    .alert-err { background: var(--pn-danger-soft); color: var(--pn-danger); border: 1px solid #F5C6C3; }
+    .btn-check { font-size: 13px; font-weight: 500; color: var(--pn-fg); background: var(--pn-surface); border: 1px solid var(--pn-border-2); border-radius: var(--pn-r-input); padding: 8px 14px; cursor: pointer; font-family: inherit; transition: background .12s ease; -webkit-appearance: none; appearance: none; }
+    .btn-check:hover { background: var(--pn-sunk); }
+    .btn-check:disabled { color: var(--pn-fg-3); cursor: not-allowed; }
+    .btn-install { display: inline-block; font-size: 13px; font-weight: 600; color: #0A0A0A; background: var(--pn-orange); border: none; border-radius: var(--pn-r-input); padding: 8px 14px; cursor: pointer; font-family: inherit; margin-top: 12px; transition: background .12s ease; -webkit-appearance: none; appearance: none; box-shadow: 0 2px 8px rgba(247,147,26,.28); }
+    .btn-install:hover { background: var(--pn-orange-hover); }
+    .btn-install:disabled { background: var(--pn-border-2); color: var(--pn-fg-3); box-shadow: none; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -506,22 +517,28 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     <button type="submit" id="btn-save">Save and restart &rarr;</button>
 
     <div class="card" style="margin-top:18px;">
-      <h2>Firmware</h2>
+      <h2 style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
+        <span>Firmware update</span>
+        <span style="font-size:12px;font-weight:400;color:var(--pn-fg-3,#90939B);">current v%VERSION%</span>
+      </h2>
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:10px;">
-        <input type="checkbox" name="auto_update" id="auto_update" %AUTO_UPDATE_CHECKED% style="margin-top:3px;flex-shrink:0;">
+        <input type="checkbox" name="auto_update" id="auto_update" %AUTO_UPDATE_CHECKED% onchange="toggleUpdateBtn()" style="margin-top:3px;flex-shrink:0;">
         <span>
           <strong style="font-size:14px;">Auto-update on boot</strong><br>
           <span style="font-size:12px;color:var(--pn-fg-2,#535862);">When enabled, the device checks for a new firmware version every time it restarts and installs it automatically. Leave unchecked to stay in full control and update manually.</span>
         </span>
       </label>
-      <div style="font-size:12px;color:var(--pn-fg-3,#90939B);margin-bottom:14px;border-top:1px solid var(--pn-border,#EAE7E0);padding-top:12px;">
-        Manual update: check and install a new version yourself, only needed when auto-update is off.
+
+      <div id="manual-update" style="border-top:1px solid var(--pn-border,#EAE7E0);padding-top:14px;margin-top:4px;">
+        <button type="button" class="btn-check" id="btn-check" onclick="checkUpdate()">Check for updates</button>
+        <span id="update-status" style="font-size:13px;color:var(--pn-fg-3,#90939B);margin-left:10px;"></span>
+        <div class="alert alert-ok" id="update-ok" style="display:none;margin-top:12px;"></div>
+        <div class="alert alert-err" id="update-err" style="display:none;margin-top:12px;"></div>
       </div>
-      <a href="/ota" class="btn-firmware" style="display:inline-block;text-decoration:none;text-align:center;font-size:14px;font-weight:600;color:#0A0A0A;background:var(--pn-orange,#F7931A);border-radius:10px;padding:11px 18px;box-shadow:0 4px 12px rgba(247,147,26,.28);">Firmware update</a>
     </div>
   </form>
 
-  <div class="footer">PlugNSat v%VERSION% &nbsp;·&nbsp; <a href="/ota" style="color:var(--pn-orange);text-decoration:none;font-family:inherit;">Firmware update</a></div>
+  <div class="footer">PlugNSat v%VERSION%</div>
 
 </div>
 
@@ -653,7 +670,76 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
       });
     });
   }
-  document.addEventListener('DOMContentLoaded',function(){initSections();toggleBackend();});
+  function toggleUpdateBtn(){
+    var cb=document.getElementById('auto_update');
+    var mu=document.getElementById('manual-update');
+    if(mu) mu.style.display=cb.checked?'none':'';
+  }
+  function installUpdate(version){
+    var installBtn=document.getElementById('btn-install');
+    var okBox=document.getElementById('update-ok');
+    var errBox=document.getElementById('update-err');
+    if(installBtn) installBtn.disabled=true;
+    okBox.innerHTML='Downloading and flashing v'+version+'... Do not close this page. The device will reboot automatically.';
+    fetch('/api/ota-update',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'version='+encodeURIComponent(version)})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.ok){
+          okBox.innerHTML='Update started. Device is downloading and will reboot.'
+            +' This page will stop responding during the reboot. '
+            +' Reconnect to <a href="/" style="color:var(--pn-orange)">plugnsat.local</a>'
+            +' after reboot.';
+        } else {
+          errBox.textContent='Update failed: '+d.error;
+          errBox.style.display='block';
+          if(installBtn) installBtn.disabled=false;
+        }
+      })
+      .catch(function(){
+        errBox.textContent='Network error during update.';
+        errBox.style.display='block';
+        if(installBtn) installBtn.disabled=false;
+      });
+  }
+  function checkUpdate(){
+    var btn=document.getElementById('btn-check');
+    var status=document.getElementById('update-status');
+    var okBox=document.getElementById('update-ok');
+    var errBox=document.getElementById('update-err');
+    btn.disabled=true;
+    btn.textContent='Checking...';
+    status.textContent='';
+    okBox.style.display='none';
+    errBox.style.display='none';
+    fetch('/api/check-update')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        btn.disabled=false;
+        btn.textContent='Check for updates';
+        if(!d.ok){
+          errBox.textContent='Check failed: '+d.error;
+          errBox.style.display='block';
+          return;
+        }
+        if(d.available){
+          okBox.innerHTML='<div>Version <strong>'+d.latest+'</strong> is available.'
+            +' You are running '+d.current+'.</div>'
+            +'<button class="btn-install" id="btn-install"'
+            +' onclick="installUpdate(\''+d.latest+'\')">'
+            +'Install update</button>';
+          okBox.style.display='block';
+        } else {
+          status.textContent='You are up to date ('+d.current+').';
+        }
+      })
+      .catch(function(){
+        btn.disabled=false;
+        btn.textContent='Check for updates';
+        errBox.textContent='Network error. Check your WiFi connection.';
+        errBox.style.display='block';
+      });
+  }
+  document.addEventListener('DOMContentLoaded',function(){initSections();toggleBackend();toggleUpdateBtn();});
   </script>
 </body>
 </html>
@@ -1355,7 +1441,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     }
   });
 
-  server.on("/ota", HTTP_GET, [&config, &server]() {
+  server.on("/ota/dev", HTTP_GET, [&config, &server]() {
     if (!checkPortalAuth(server, config)) return;
     server.send(200, "text/html", processOtaPage(config));
   });

@@ -89,6 +89,15 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 | BTN1 (left) | Settings menu / Navigate | Enter AP setup mode |
 | BTN2 (right) | Force QR refresh / Confirm | - |
 
+## Firmware Updates
+
+PlugNSat supports over-the-air updates. Three ways to update:
+
+- **Auto-update on boot** (opt-in): enable it in the web portal and the device checks GitHub Releases at every boot, then installs new versions automatically.
+- **One-click update**: open `http://plugnsat.local`, click **Firmware update**, then **Check for updates** and **Install update**.
+
+All firmware is RSA-signed. The device verifies the signature before flashing and refuses unsigned or tampered files. If an update fails to boot, the device automatically rolls back to the previous version within 60 seconds.
+
 ### Settings menu
 
 Press BTN1 from the QR screen to open the Settings menu.
