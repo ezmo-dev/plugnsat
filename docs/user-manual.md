@@ -44,3 +44,22 @@ The PlugNSat has two physical buttons on the top edge of the device.
 > **Long press BTN1 (3 seconds)** always enters AP Setup mode, from any screen. This is the universal "reconfigure" action. Use it if you need to change WiFi, backend, or Shelly settings.
 
 ---
+
+## Screens
+
+### Splash screen
+
+<img src="images/plugnsat-screen-splash.png" width="280">
+
+Displayed for 5 seconds on every boot. Shows the PLUG⚡SAT pixel art logo, the tagline "Lightning Smart Plug", the website URL, and the firmware version.
+
+### Connecting
+
+<p>
+    <img src="images/plugnsat-screen-connecting.png" width="280">
+    <img src="images/plugnsat-screen-connected.png" width="280">
+<p>
+
+Appears while the device is connecting to your WiFi network. Shows the SSID it is trying to reach. If the connection succeeds, you briefly see the device's IP address before the QR screen loads.
+
+If **Auto-update on boot** is enabled in the web portal, two extra screens may appear after the WiFi connection: "Checking updates..." and, if a new version is found, "Updating... vX.X.X" followed by an automatic reboot. See [Firmware updates](#firmware-updates).
