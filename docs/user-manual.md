@@ -95,7 +95,7 @@ The Shelly is ON during the entire countdown. When the countdown reaches zero, t
 
 <img src="images/plugnsat-screen-error.png" width="280">
 
-Appears when the PlugNSat cannot reach the BTCPay Server (or Blink). The device shows the error message and the device IP address. It retries automatically every 10 seconds.
+Appears when the PlugNSat cannot reach the BTCPay Server (or Blink). The screen shows "Server error" and "Connection failed", with a countdown and "Press to exit". It retries automatically every 10 seconds.
 
 - **BTN1**: enter AP Setup mode (to fix the configuration)
 - **BTN2**: retry immediately
@@ -174,7 +174,7 @@ Change the price in satoshis that customers pay per activation.
 - **BTN1**: decrease (steps of 10 sats up to 1000, steps of 100 above; minimum: 1 sat)
 - **BTN2**: increase (same stepping)
 
-If a PIN is configured (set in the web portal), you must enter it before accessing this screen. The price is saved automatically and returns to the QR screen after 6 seconds of inactivity. The next invoice will use the new price.
+If a PIN is configured (set in the web portal), you must enter it before accessing this screen. The price is saved automatically and returns to the QR screen after 6 seconds of inactivity.
 
 > **Note:** When you change the price, a new QR code is generated automatically with the updated price as soon as you leave this screen.
 

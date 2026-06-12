@@ -90,7 +90,7 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 
 ## Firmware Updates
 
-PlugNSat supports over-the-air updates. Three ways to update:
+PlugNSat supports over-the-air updates. Two ways to update:
 
 - **Auto-update on boot** (opt-in): enable it in the web portal and the device checks GitHub Releases at every boot, then installs new versions automatically.
 - **One-click update**: open `http://plugnsat.local`, click **Check for updates** in the Firmware update section, then **Install update** if a new version is available.
