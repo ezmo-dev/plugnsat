@@ -277,6 +277,14 @@ This triggers the Shelly just like a real payment, without creating a Lightning 
 
 ---
 
+## Step 6 — Keeping your PlugNSat up to date
+
+Open `http://plugnsat.local`. In the **Firmware update** section, click **Check for updates**. If a newer version is available, click **Install update** — the device downloads, verifies, flashes, and reboots on its own.
+
+Prefer zero maintenance? Tick **Auto-update on boot** and the device checks and installs updates automatically every time it restarts.
+
+---
+
 ## Next steps
 
 - Read the [User Manual](user-manual.md) to learn about all screens and button controls
