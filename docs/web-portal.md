@@ -22,3 +22,66 @@ There are two ways to reach the web portal depending on the device's current sta
 > In AP mode the portal is never password-protected, so you can never lock yourself out during setup. A Web Access Password (see Step 5) only applies in normal mode on your WiFi.
 
 ---
+
+## Configuration fields
+
+The portal is organized in 5 steps. All fields are saved at once when you press **Save and restart**. Each step can be collapsed or expanded by tapping its title; the collapsed state is remembered in your browser.
+
+### Step 1: WiFi
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **SSID** | Your WiFi network name (2.4 GHz). The Shelly must be on the same network. | `MyHomeWiFi` |
+| **Password** | Your WiFi password. | `********` |
+
+> The Shelly Plug S Gen3 only supports 2.4 GHz networks. If your router broadcasts both 2.4 and 5 GHz under the same name, you may need to separate them or force the 2.4 GHz band.
+
+> For security, saved passwords are never sent back to the browser. Existing values appear as `********`. Leave them untouched to keep the current password, or type a new one to replace it.
+
+### Step 2: Lightning Backend
+
+PlugNSat supports two Lightning backends. Select one from the **Backend** dropdown; the form shows only the fields for the selected backend.
+
+| Backend | When to use |
+|---------|-------------|
+| **BTCPay Server** | You run your own server. Full control, no middleman. |
+| **Blink** | A ready-to-use wallet, no server needed. Sign up at `blink.sv`. |
+
+#### BTCPay Server fields
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Server URL** | The full URL of your BTCPay Server instance. No trailing slash. | `https://btcpay.mydomain.com` |
+| **API Key** | Your BTCPay Greenfield API key. Must have the correct permissions (see below). | `a1b2c3d4e5...` |
+| **Store ID** | Your BTCPay Store ID. Found in Settings > General or in the URL. | `8HRcCq...HwPs` |
+
+##### Required API key permissions
+
+The API key must have exactly these three permissions enabled:
+
+| Permission | Internal name | Why it's needed |
+|------------|---------------|-----------------|
+| Create invoices | `cancreateinvoice` | To generate Lightning invoices when a customer scans the QR |
+| View invoices | `canviewinvoices` | To check if an invoice has been paid (polling) |
+| Use Lightning node | `canuselightningnode` | To retrieve the LNURL from the invoice's payment methods |
+
+To create a key: BTCPay Server > Account > Manage Account > API Keys > Generate Key > check the three permissions > Generate > copy immediately.
+
+##### How it works technically
+
+When a QR code needs to be generated, the PlugNSat:
+
+1. Creates an invoice via `POST /api/v1/stores/{storeId}/invoices` with amount in BTC, payment methods `BTC-LN` and `BTC-LNURL`, and a 5-minute expiry
+2. Fetches the payment methods via `GET /api/v1/stores/{storeId}/invoices/{id}/payment-methods`
+3. Extracts the LNURL from the `BTC-LNURL` payment method's `paymentLink` field
+4. Displays the LNURL as a QR code (much shorter than a BOLT11 invoice, which makes the QR simpler and easier to scan on the small LCD)
+5. Polls the invoice status every 5 seconds via `GET /api/v1/stores/{storeId}/invoices/{id}` and checks for `Settled` or `Processing`
+
+#### Blink fields
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **API Key** | Your Blink API key. Generate one at `dashboard.blink.sv` under API Keys. | `blink_...` |
+| **BTC Wallet ID** | Which wallet receives the sats. Found at `dashboard.blink.sv`. | `f79a...` |
+
+> Blink uses the GraphQL API at `https://api.blink.sv/graphql` (fixed endpoint, no server URL to enter). It returns a BOLT11 invoice rather than an LNURL, so the QR code is longer than with BTCPay but still scannable easily.
