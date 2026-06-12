@@ -167,7 +167,6 @@ A vertical bar and percentage indicator show the current level. The brightness i
 
 ### Price
 
-
 <img src="images/plugnsat-screen-price.png" width="280">
 
 Change the price in satoshis that customers pay per activation.
@@ -176,3 +175,34 @@ Change the price in satoshis that customers pay per activation.
 - **BTN2**: increase (same stepping)
 
 If a PIN is configured (set in the web portal), you must enter it before accessing this screen. The price is saved automatically and returns to the QR screen after 6 seconds of inactivity. The next invoice will use the new price.
+
+> **Note:** When you change the price, a new QR code is generated automatically with the updated price as soon as you leave this screen.
+
+### Duration
+
+<img src="images/plugnsat-screen-duration.png" width="280">
+
+Change how long the Shelly stays on after a payment, in seconds.
+
+- **BTN1**: decrease (steps of 10s up to 300s, steps of 60s above; minimum: 1s)
+- **BTN2**: increase (same stepping, maximum: 86400s / 24 hours)
+
+The screen also shows a human-readable conversion (e.g. "5 min", "1h 30min"). If a PIN is configured, you must enter it first. The duration is saved automatically and returns to the QR screen after 6 seconds of inactivity.
+
+> **Note:** Changing the duration takes effect on the next payment, with no QR refresh needed.
+
+### PIN entry
+
+<p>
+    <img src="images/plugnsat-screen-pin-entry.png" width="280">
+    <img src="images/plugnsat-screen-pin-wrong.png" width="280">
+<p>
+
+If you set a 4-digit PIN in the web portal, the PIN entry screen appears before accessing Price or Duration settings.
+
+- **BTN1**: cycle the current digit (0 > 1 > 2 > ... > 9 > 0)
+- **BTN2**: confirm current digit and move to next (or submit on the 4th digit)
+
+Previous digits are masked with `*`. If the PIN is wrong, the screen flashes "Wrong PIN" and resets after 1.5 seconds. The PIN screen has a 15-second timeout (returns to settings if inactive).
+
+---
