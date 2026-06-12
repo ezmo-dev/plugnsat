@@ -127,3 +127,52 @@ Entered on first boot, or by long-pressing BTN1 (3 seconds) from any screen. The
 If a WiFi network was previously configured, pressing any button exits AP mode and reconnects to WiFi. Button presses are ignored during the first 3 seconds after entering AP mode, to avoid exiting it by accident.
 
 ---
+
+## Settings menu
+
+Press **BTN1** (short press) from the QR screen to enter the Settings menu.
+
+<img src="images/plugnsat-screen-settings.png" width="280">
+
+The menu has 4 options. Use **BTN1** to move between them and **BTN2** to select.
+
+### Device Info
+
+<img src="images/plugnsat-screen-device-info.png" width="280">
+
+Displays a summary of the current device state. This information is useful for debugging and support:
+
+- Firmware version (top-right corner)
+- WiFi SSID and signal strength (RSSI)
+- Device IP address (use `http://<device-IP-address>` to reach the web portal if `http://plugnsat.local` does not work; this IP can change)
+- Shelly hostname
+- Current price and duration
+- Payment count since last boot
+- Uptime
+
+Press any button to return to the QR screen.
+
+### Brightness
+
+<img src="images/plugnsat-screen-brightness.png" width="280">
+
+Adjust the screen brightness. The QR code is displayed in the background at the current brightness so you can see the effect in real time.
+
+- **BTN1**: decrease brightness (minimum: ~4%)
+- **BTN2**: increase brightness (maximum: 100%)
+
+A vertical bar and percentage indicator show the current level. The brightness is saved automatically and returns to the QR screen after 6 seconds of inactivity.
+
+> **Tip:** Because this is an LED-backlit screen, maximum brightness is not always best for scanning. A setting around 21% usually gives the cleanest QR code reading, with less glare and better contrast for wallet cameras.
+
+### Price
+
+
+<img src="images/plugnsat-screen-price.png" width="280">
+
+Change the price in satoshis that customers pay per activation.
+
+- **BTN1**: decrease (steps of 10 sats up to 1000, steps of 100 above; minimum: 1 sat)
+- **BTN2**: increase (same stepping)
+
+If a PIN is configured (set in the web portal), you must enter it before accessing this screen. The price is saved automatically and returns to the QR screen after 6 seconds of inactivity. The next invoice will use the new price.
