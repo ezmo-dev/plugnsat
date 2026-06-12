@@ -106,6 +106,7 @@ unsigned long lastSettingsInput = 0;
 unsigned long lastBrightnessInput = 0;
 unsigned long lastPriceInput = 0;
 unsigned long lastDurationInput = 0;
+int priceOnEnterMenu = 0;
 
 // PIN entry
 int pinEntry[4] = {0, 0, 0, 0};
@@ -606,6 +607,7 @@ void loopSettings() {
         lastPinInput = millis();
         currentState = STATE_PIN_ENTRY;
       } else {
+        priceOnEnterMenu = config.priceSats;
         lastPriceInput = millis();
         currentState = STATE_PRICE;
       }
@@ -663,7 +665,11 @@ void loopBrightness() {
 void loopPrice() {
   if (millis() - lastPriceInput > MENU_TIMEOUT_MS) {
     saveConfig();
-    returnToQR();
+    if (config.priceSats != priceOnEnterMenu) {
+      generateAndShowQR();
+    } else {
+      returnToQR();
+    }
     return;
   }
   if (screenNeedsRedraw) {
@@ -749,6 +755,7 @@ void loopPinEntry() {
       for (int i = 0; i < 4; i++) entered += String(pinEntry[i]);
       if (entered == config.pin) {
         if (pinTargetState == STATE_PRICE) {
+          priceOnEnterMenu = config.priceSats;
           lastPriceInput = millis();
           currentState = STATE_PRICE;
         } else {
