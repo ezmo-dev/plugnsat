@@ -206,3 +206,55 @@ If you set a 4-digit PIN in the web portal, the PIN entry screen appears before 
 Previous digits are masked with `*`. If the PIN is wrong, the screen flashes "Wrong PIN" and resets after 1.5 seconds. The PIN screen has a 15-second timeout (returns to settings if inactive).
 
 ---
+
+## Firmware updates
+
+PlugNSat can update its own firmware over WiFi. Updates are downloaded from the official PlugNSat releases and verified with a cryptographic signature before installation, so only authentic firmware can be installed.
+
+There are two ways to update, both managed from the web portal:
+
+### Manual update (recommended)
+
+1. Open the web portal (device IP address or `http://plugnsat.local`)
+2. In the **Firmware update** section, click **Check for updates**
+3. If a new version is available, click **Install update**
+4. The device downloads the firmware, verifies it, and reboots on the new version
+
+You stay in full control: nothing is installed without your action.
+
+### Auto-update on boot (opt-in)
+
+Enable the **Auto-update on boot** checkbox in the web portal. From then on, every time the device restarts, it checks for a new version right after connecting to WiFi and installs it automatically. You will see "Checking updates..." and, if an update is found, "Updating... vX.X.X" before the device reboots.
+
+If the update check or download fails, the device simply continues booting normally with its current firmware.
+
+> **Tip:** The current firmware version is visible on the splash screen and on the Device Info screen.
+
+---
+
+## Auto-behaviors
+
+These things happen automatically without any user action:
+
+| Behavior | Trigger | What happens |
+|----------|---------|--------------|
+| QR refresh | Every 4 min 45 sec | New invoice created, QR updated silently |
+| WiFi reconnect | WiFi connection lost | Automatic reconnection attempt |
+| Error recovery | BTCPay/Blink unreachable | Retry every 10 seconds |
+| Shelly retry | Shelly offline after payment | Retry every 10 seconds, full duration when back online |
+| Auto-restart | 60 consecutive polling errors (~5 min) | ESP32 reboots itself |
+| Auto-update | On boot, if enabled in web portal | Checks for new firmware, installs and reboots |
+| Screen timeout | No button press for 6 sec (settings, brightness, price, duration) | Returns to QR screen, saves changes |
+| PIN timeout | No button press for 15 sec | Returns to settings menu |
+
+---
+
+## Tips for daily use
+
+- **Leave it running.** PlugNSat is designed to run continuously without intervention. When powered over USB-C (both the USB-C model and the battery model plugged in), it runs 24/7. On battery alone, the battery model runs for as long as the charge lasts.
+- **Check the payment counter.** The number in the bottom-right of the Paid screen (#1, #2, #3...) counts payments since the last boot. Useful to know how many customers used it during the day.
+- **Adjust price and duration on the fly.** No need to open the web portal for quick changes. Use the buttons (BTN1 from QR > Price or Duration).
+- **Use a PIN** if the device is in a public place and you don't want someone to change the price or the duration.
+- **The web portal is always available** at `http://plugnsat.local` or at the device's IP address on the same WiFi network. You can access it from your phone or laptop.
+- **Keep your firmware up to date.** Check for updates from the web portal once in a while, or enable auto-update on boot if you prefer a hands-off approach.
+- **Brightness matters for QR scanning.** A setting around 21% usually gives the cleanest QR read on this LED-backlit screen. If customers still have trouble scanning, adjust the brightness up or down. Screen reflections on the LCD can be an issue in bright environments.
