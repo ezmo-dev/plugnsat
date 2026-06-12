@@ -63,3 +63,67 @@ Displayed for 5 seconds on every boot. Shows the PLUG⚡SAT pixel art logo, the 
 Appears while the device is connecting to your WiFi network. Shows the SSID it is trying to reach. If the connection succeeds, you briefly see the device's IP address before the QR screen loads.
 
 If **Auto-update on boot** is enabled in the web portal, two extra screens may appear after the WiFi connection: "Checking updates..." and, if a new version is found, "Updating... vX.X.X" followed by an automatic reboot. See [Firmware updates](#firmware-updates).
+
+### WiFi failed
+
+<img src="images/plugnsat-screen-wifi-failed.png" width="280">
+
+Appears if the device cannot connect to WiFi within 15 seconds. Shows the SSID it tried, a countdown before auto-retry (10 seconds), and two button options: BTN1 to enter AP Setup mode, BTN2 to retry immediately.
+
+### QR code (main screen)
+
+<img src="images/screen-full-qr.png" width="280">
+
+The primary operating screen. The QR code contains an LNURL that any Lightning wallet can scan. The QR auto-refreshes every 4 minutes 45 seconds (before the 5-minute invoice expiry) to always show a valid invoice.
+
+If "Show name" and/or "Show price" are enabled in the web portal, the QR code shifts to the left and an info panel appears on the right side with the device name, price in sats, and the mini PLUG⚡SAT logo.
+
+<img src="images/screen-qr-show-price-and-name.png" width="280">
+
+### Paid
+
+<img src="images/screen-paid.png" width="280">
+
+Appears when a payment is received. The screen brightness jumps to 100% to draw attention, and the screen is split in two halves:
+
+- **Left**: a green checkmark with "PAID" underneath
+- **Right**: the amount in sats, a countdown timer showing seconds remaining, a progress bar, and the payment counter (e.g. #3 for the third payment since boot)
+
+The Shelly is ON during the entire countdown. When the countdown reaches zero, the Shelly turns off, the brightness returns to its configured level, and a new QR code appears.
+
+### Error
+
+<img src="images/plugnsat-screen-error.png" width="280">
+
+Appears when the PlugNSat cannot reach the BTCPay Server (or Blink). The device shows the error message and the device IP address. It retries automatically every 10 seconds.
+
+- **BTN1**: enter AP Setup mode (to fix the configuration)
+- **BTN2**: retry immediately
+
+If payment polling fails 60 times in a row (about 5 minutes), the device restarts itself automatically.
+
+### Shelly offline
+
+<img src="images/plugnsat-screen-shelly-offline.png" width="280">
+
+Appears if a payment was received but the Shelly could not be reached. The payment is still considered valid (the customer did pay).
+
+The device automatically retries every 10 seconds. As soon as the Shelly comes back online, it is activated for the **full configured duration**, no matter how long it was offline. The customer paid for the full duration, so they get the full duration.
+
+Pressing any button returns to the QR screen and **cancels the retry**. Only do this if you have handled the situation manually (e.g. activated the Shelly yourself or refunded the customer).
+
+> **Important:** The customer is never charged twice. If the Shelly is offline, the payment still went through on the Lightning side.
+
+### AP Setup mode
+
+<img src="images/plugnsat-screen-ap-mode.png" width="280">
+
+Entered on first boot, or by long-pressing BTN1 (3 seconds) from any screen. The screen shows three boxes with connection instructions:
+
+1. WiFi name: `PlugNSat-Setup`
+2. Password: `plugnsat21`
+3. URL: `http://192.168.4.1`
+
+If a WiFi network was previously configured, pressing any button exits AP mode and reconnects to WiFi. Button presses are ignored during the first 3 seconds after entering AP mode, to avoid exiting it by accident.
+
+---
