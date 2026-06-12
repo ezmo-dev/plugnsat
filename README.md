@@ -40,7 +40,6 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 5. USB CDC On Boot: Enabled
 6. Flash Size: 16MB
 7. Partition Scheme: Minimal SPIFFS (1.9MB APP with OTA/128KB SPIFFS)
-8. PSRAM: OPI PSRAM
 
 ### Libraries (Sketch > Include Library > Manage Libraries)
 
@@ -94,7 +93,7 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 PlugNSat supports over-the-air updates. Three ways to update:
 
 - **Auto-update on boot** (opt-in): enable it in the web portal and the device checks GitHub Releases at every boot, then installs new versions automatically.
-- **One-click update**: open `http://plugnsat.local`, click **Firmware update**, then **Check for updates** and **Install update**.
+- **One-click update**: open `http://plugnsat.local`, click **Check for updates** in the Firmware update section, then **Install update** if a new version is available.
 
 All firmware is RSA-signed. The device verifies the signature before flashing and refuses unsigned or tampered files. If an update fails to boot, the device automatically rolls back to the previous version within 60 seconds.
 
