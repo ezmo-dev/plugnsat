@@ -641,6 +641,19 @@ static void drawBatteryIcon(TFT_eSPI &tft, int x, int y, int pct, uint16_t col) 
   if (fillW > 0) tft.fillRect(x + 2, y + 2, fillW, h - 4, col);
 }
 
+// Battery icon with a charging bolt inside. Same outline as drawBatteryIcon.
+static void drawChargingIcon(TFT_eSPI &tft, int x, int y, uint16_t col) {
+  int w = 22, h = 11;
+  tft.drawRect(x, y, w, h, col);
+  tft.fillRect(x + w, y + 3, 2, 5, col);       // terminal nub
+  // lightning bolt, centered in the body
+  int cx = x + w / 2;
+  int cy = y + h / 2;
+  tft.drawLine(cx + 1, y + 2, cx - 3, cy + 1, col);
+  tft.drawLine(cx - 3, cy + 1, cx + 1, cy + 1, col);
+  tft.drawLine(cx + 1, cy + 1, cx - 1, y + h - 2, col);
+}
+
 // Low-battery warning icon, bottom-right of main screen.
 // visible=true draws a red crossed-out battery; false clears the zone.
 // Only redraws this small corner, never the QR.
@@ -701,7 +714,12 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batter
     tft.setTextColor(COLOR_TEXT);
     tft.drawString(volt, SCREEN_W - 8 - pctW - 8, 12);
     int voltW = tft.textWidth(volt);
-    drawBatteryIcon(tft, SCREEN_W - 8 - pctW - 8 - voltW - 8 - 24, 8, pct, batCol);
+    int iconX = SCREEN_W - 8 - pctW - 8 - voltW - 8 - 24;
+    if (batteryMv >= 4250) {
+      drawChargingIcon(tft, iconX, 8, COLOR_SUCCESS);
+    } else {
+      drawBatteryIcon(tft, iconX, 8, pct, batCol);
+    }
   }
 
   // Separator "─── Network ──────────────────"  (y=38, more room below header)
