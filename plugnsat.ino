@@ -887,6 +887,7 @@ void loadConfig() {
     config.backendType = BACKEND_BTCPAY;
   config.portalPassword     = prefs.getString("portal_pw", "");
   config.autoUpdate         = prefs.getBool("auto_update", false);
+  config.isBattery          = prefs.getBool("is_battery", false);
   prefs.end();
 }
 
@@ -910,5 +911,6 @@ void saveConfig() {
   prefs.putInt("backend",         (int)config.backendType);
   prefs.putString("portal_pw",    config.portalPassword);
   prefs.putBool("auto_update",    config.autoUpdate);
+  prefs.putBool("is_battery",     config.isBattery);
   prefs.end();
 }
