@@ -52,6 +52,7 @@
 #include "ota.h"
 #include "webportal.h"
 #include "esp_sleep.h"
+#include <driver/rtc_io.h>
 
 //
 // GLOBALS
@@ -921,6 +922,8 @@ void enterLowBatterySleep() {
   ledcWrite(BACKLIGHT_PIN, 0);          // backlight off to save power
   tft.fillScreen(TFT_BLACK);
   // Wake when BTN_1 (GPIO0) goes LOW (pressed)
+  rtc_gpio_pullup_en((gpio_num_t)BTN_1);
+  rtc_gpio_pulldown_dis((gpio_num_t)BTN_1);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
   esp_deep_sleep_start();
 }
@@ -940,6 +943,8 @@ void enterManualSleep() {
   delay(3000);
   ledcWrite(BACKLIGHT_PIN, 0);
   tft.fillScreen(TFT_BLACK);
+  rtc_gpio_pullup_en((gpio_num_t)BTN_1);
+  rtc_gpio_pulldown_dis((gpio_num_t)BTN_1);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
   esp_deep_sleep_start();
 }
