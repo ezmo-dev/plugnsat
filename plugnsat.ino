@@ -158,7 +158,9 @@ void setup() {
   pinMode(BTN_2, INPUT_PULLUP);
 
   loadConfig();
-  batteryMv = readBatteryMv();
+  delay(100);
+  readBatteryMv();              // discard first unstable reading
+  batteryMv = readBatteryMv();  // real value
   initBackend(config.backendType);
   ledcWrite(BACKLIGHT_PIN, 255);
   displaySplash(tft);
