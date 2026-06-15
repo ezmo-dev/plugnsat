@@ -134,6 +134,8 @@ PlugNSatConfig config;
 // Battery
 int batteryMv = 0;              // Last measured battery voltage in mV
 unsigned long lastBatRead = 0;  // Last read timestamp
+bool lowBatBlinkOn = false;        // current blink phase
+unsigned long lastLowBatBlink = 0; // last blink toggle
 
 //
 // SETUP
@@ -395,6 +397,15 @@ void loopQRDisplay() {
     }
   }
   
+  // Low battery warning: blink crossed-out icon, battery model only
+  if (config.isBattery && batteryMv > 0 && batteryMv <= VBAT_LOW_MV) {
+    if (millis() - lastLowBatBlink > 700) {
+      lastLowBatBlink = millis();
+      lowBatBlinkOn = !lowBatBlinkOn;
+      drawLowBatteryWarning(tft, lowBatBlinkOn);
+    }
+  }
+
   // Buttons
   if (btn1Pressed) {
     settingsIndex = 0;
