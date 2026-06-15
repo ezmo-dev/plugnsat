@@ -18,6 +18,8 @@
 #define INVOICE_EXPIRY_MIN 5         // BTCPay invoice expiration
 #define FIRMWARE_VERSION   "0.2.0"
 #define BACKLIGHT_PIN      38
+#define VBAT_PIN        4       // T-Display S3 battery ADC (onboard 2x100k divider)
+#define VBAT_LOW_MV     3400    // Low battery threshold in millivolts
 #define MENU_TIMEOUT_MS    6000
 #define LONG_PRESS_MS      3000
 #define BTN_ICON_X         294

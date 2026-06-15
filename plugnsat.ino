@@ -131,6 +131,10 @@ bool screenNeedsRedraw = true;
 // Config
 PlugNSatConfig config;
 
+// Battery
+int batteryMv = 0;              // Last measured battery voltage in mV
+unsigned long lastBatRead = 0;  // Last read timestamp
+
 //
 // SETUP
 //
@@ -154,6 +158,7 @@ void setup() {
   pinMode(BTN_2, INPUT_PULLUP);
 
   loadConfig();
+  batteryMv = readBatteryMv();
   initBackend(config.backendType);
   ledcWrite(BACKLIGHT_PIN, 255);
   displaySplash(tft);
@@ -179,6 +184,10 @@ void setup() {
 //
 
 void loop() {
+  if (millis() - lastBatRead > 30000) {
+    lastBatRead = millis();
+    batteryMv = readBatteryMv();
+  }
   otaTick();
   server.handleClient();
   readButtons();
@@ -859,6 +868,17 @@ void readButtons() {
     Serial.println("Long press -> AP mode");
     startAPMode();
   }
+}
+
+// Reads battery voltage in mV. Onboard divider halves VBAT, so x2.
+// analogReadMilliVolts handles per-chip ADC calibration via factory eFuse.
+int readBatteryMv() {
+  uint32_t sum = 0;
+  for (int i = 0; i < 16; i++) {
+    sum += analogReadMilliVolts(VBAT_PIN);
+  }
+  // x2 for onboard divider, x1.017 calibration measured vs multimeter
+  return (int)((sum / 16) * 2 * 1.017);
 }
 
 //
