@@ -20,6 +20,8 @@
 #define BACKLIGHT_PIN      38
 #define VBAT_PIN        4       // T-Display S3 battery ADC (onboard 2x100k divider)
 #define VBAT_LOW_MV     3400    // Low battery threshold in millivolts
+#define VBAT_CUTOFF_MV  3100    // Software cutoff, deep sleep below this
+#define VBAT_CUTOFF_COUNT 5     // Consecutive low reads required before cutoff
 #define MENU_TIMEOUT_MS    6000
 #define LONG_PRESS_MS      3000
 #define BTN_ICON_X         294

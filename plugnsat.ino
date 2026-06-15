@@ -51,6 +51,7 @@
 #include "backend.h"
 #include "ota.h"
 #include "webportal.h"
+#include "esp_sleep.h"
 
 //
 // GLOBALS
@@ -136,6 +137,7 @@ int batteryMv = 0;              // Last measured battery voltage in mV
 unsigned long lastBatRead = 0;  // Last read timestamp
 int prevBatteryMv = 0;        // previous reading, for charge trend
 bool isCharging = false;      // true if voltage is rising
+int lowBatCount = 0;          // consecutive readings below cutoff
 bool lowBatBlinkOn = false;        // current blink phase
 unsigned long lastLowBatBlink = 0; // last blink toggle
 
@@ -199,6 +201,15 @@ void loop() {
     }
     prevBatteryMv = fresh;
     batteryMv = fresh;
+    // Software low-voltage cutoff, battery model only, not while charging
+    if (config.isBattery && !isCharging && fresh > 0 && fresh <= VBAT_CUTOFF_MV) {
+      lowBatCount++;
+      if (lowBatCount >= VBAT_CUTOFF_COUNT) {
+        enterLowBatterySleep();
+      }
+    } else {
+      lowBatCount = 0;
+    }
   }
   otaTick();
   server.handleClient();
@@ -889,6 +900,27 @@ void readButtons() {
     Serial.println("Long press -> AP mode");
     startAPMode();
   }
+}
+
+// Clean shutdown when battery critically low. Shows a final screen,
+// then deep sleeps. Wakes on BTN_1 press (GPIO0 low) or USB power.
+void enterLowBatterySleep() {
+  Serial.println("Battery critical -> deep sleep");
+  ledcWrite(BACKLIGHT_PIN, 255);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(COLOR_ERROR);
+  tft.setTextSize(2);
+  tft.drawString("BATTERY EMPTY", SCREEN_W / 2, SCREEN_H / 2 - 20);
+  tft.setTextSize(1);
+  tft.setTextColor(COLOR_TEXT);
+  tft.drawString("Charge to restart", SCREEN_W / 2, SCREEN_H / 2 + 15);
+  delay(4000);
+  ledcWrite(BACKLIGHT_PIN, 0);          // backlight off to save power
+  tft.fillScreen(TFT_BLACK);
+  // Wake when BTN_1 (GPIO0) goes LOW (pressed)
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
+  esp_deep_sleep_start();
 }
 
 // Reads battery voltage in mV. Onboard divider halves VBAT, so x2.
