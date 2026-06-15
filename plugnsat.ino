@@ -136,6 +136,8 @@ PlugNSatConfig config;
 //
 
 void setup() {
+  pinMode(15, OUTPUT);
+  digitalWrite(15, HIGH);
   otaInit();
   Serial.begin(115200);
   delay(500);
