@@ -69,6 +69,7 @@ struct PlugNSatConfig {
   BackendType backendType; // Lightning backend (default: BTCPay)
   String portalPassword;   // HTTP Basic Auth for web portal (empty = no auth)
   bool autoUpdate;         // Check GitHub and auto-install on boot (default: false)
+  bool isBattery;          // true = modele batterie, false = modele USB-C
 };
 
 #endif
