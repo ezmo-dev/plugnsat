@@ -500,6 +500,11 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span class="toggle-label">Show price on QR screen</span>
       </label>
+      <label class="toggle">
+        <input type="checkbox" name="is_battery" value="1" %IS_BATTERY_CHECKED%>
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        <span class="toggle-label">Battery model (enables battery info and power off)</span>
+      </label>
       <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
       <div id="tpst" class="hint" style="margin-top:6px"></div>
     </div>
@@ -1135,6 +1140,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%DEV_NAME%",    htmlEscape(config.deviceName));
   html.replace("%SETTINGS_PIN%",       config.pin.length() > 0 ? "****" : "");
   html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
+  html.replace("%IS_BATTERY_CHECKED%", config.isBattery ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
   html.replace("%AUTO_UPDATE_CHECKED%", config.autoUpdate ? "checked" : "");
   html.replace("%VERSION%",            FIRMWARE_VERSION);
@@ -1186,6 +1192,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.showName  = server.arg("show_name")  == "1";
     config.showPrice = server.arg("show_price") == "1";
     config.autoUpdate = server.hasArg("auto_update");
+    config.isBattery  = server.hasArg("is_battery");
     String newPin             = server.arg("settings_pin");
     if (newPin.length() == 0) {
       config.pin = "";
