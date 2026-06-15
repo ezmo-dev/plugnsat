@@ -641,6 +641,22 @@ static void drawBatteryIcon(TFT_eSPI &tft, int x, int y, int pct, uint16_t col) 
   if (fillW > 0) tft.fillRect(x + 2, y + 2, fillW, h - 4, col);
 }
 
+// Low-battery warning icon, bottom-right of main screen.
+// visible=true draws a red crossed-out battery; false clears the zone.
+// Only redraws this small corner, never the QR.
+static void drawLowBatteryWarning(TFT_eSPI &tft, bool visible) {
+  int x = 292, y = 150;     // bottom-right corner
+  int w = 22, h = 12;
+  int zoneX = x - 2, zoneY = y - 2, zoneW = w + 6, zoneH = h + 4;
+  tft.fillRect(zoneX, zoneY, zoneW, zoneH, COLOR_BG);  // always clear first
+  if (!visible) return;
+  tft.drawRect(x, y, w, h, COLOR_ERROR);
+  tft.fillRect(x + w, y + 4, 2, 4, COLOR_ERROR);       // terminal nub
+  // diagonal slash across the icon
+  tft.drawLine(x, y + h, x + w, y, COLOR_ERROR);
+  tft.drawLine(x, y + h - 1, x + w, y - 1, COLOR_ERROR);
+}
+
 //
 // INFO
 //
