@@ -134,6 +134,8 @@ PlugNSatConfig config;
 // Battery
 int batteryMv = 0;              // Last measured battery voltage in mV
 unsigned long lastBatRead = 0;  // Last read timestamp
+int prevBatteryMv = 0;        // previous reading, for charge trend
+bool isCharging = false;      // true if voltage is rising
 bool lowBatBlinkOn = false;        // current blink phase
 unsigned long lastLowBatBlink = 0; // last blink toggle
 
@@ -190,7 +192,13 @@ void setup() {
 void loop() {
   if (millis() - lastBatRead > 30000) {
     lastBatRead = millis();
-    batteryMv = readBatteryMv();
+    int fresh = readBatteryMv();
+    if (prevBatteryMv > 0) {
+      // rising by more than 15mV between samples means charging
+      isCharging = (fresh > prevBatteryMv + 15);
+    }
+    prevBatteryMv = fresh;
+    batteryMv = fresh;
   }
   otaTick();
   server.handleClient();
@@ -586,7 +594,7 @@ void loopShellyOffline() {
 
 void loopInfo() {
   if (screenNeedsRedraw) {
-    displayInfo(tft, config, paymentCount, batteryMv);
+    displayInfo(tft, config, paymentCount, batteryMv, isCharging);
     screenNeedsRedraw = false;
   }
   if (btn1Pressed || btn2Pressed) {

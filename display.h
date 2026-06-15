@@ -674,7 +674,7 @@ static void drawLowBatteryWarning(TFT_eSPI &tft, bool visible) {
 // INFO
 //
 
-void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batteryMv) {
+void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batteryMv, bool charging) {
   tft.fillScreen(COLOR_BG);
   tft.setTextSize(1);
 
@@ -715,7 +715,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batter
     tft.drawString(volt, SCREEN_W - 8 - pctW - 8, 12);
     int voltW = tft.textWidth(volt);
     int iconX = SCREEN_W - 8 - pctW - 8 - voltW - 8 - 24;
-    if (batteryMv >= 4250) {
+    if (charging) {
       drawChargingIcon(tft, iconX, 8, COLOR_SUCCESS);
     } else {
       drawBatteryIcon(tft, iconX, 8, pct, batCol);
