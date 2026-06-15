@@ -810,7 +810,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batter
 // SETTINGS MENU
 //
 
-void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
+void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive, bool isBattery) {
   tft.fillScreen(COLOR_BG);
 
   uint16_t colOrange = tft.color565(247, 147, 26);
@@ -870,6 +870,15 @@ void displaySettings(TFT_eSPI &tft, int selectedIndex, bool pinActive) {
   // ▲▼ — facing BTN1 (bottom button), 6px gap between shapes
   tft.fillTriangle(rx,     134, rx - 5, 140, rx + 5, 140, colCyan);
   tft.fillTriangle(rx,     152, rx - 5, 146, rx + 5, 146, colCyan);
+
+  // Battery model only: small Turn OFF entry at the very bottom
+  if (isBattery) {
+    uint16_t offCol = (selectedIndex == 4) ? colOrange : COLOR_GRAY;
+    tft.setTextDatum(BC_DATUM);
+    tft.setTextColor(offCol);
+    tft.setTextSize(1);
+    tft.drawString("Turn OFF", btnCX, SCREEN_H - 3);
+  }
 }
 
 //
