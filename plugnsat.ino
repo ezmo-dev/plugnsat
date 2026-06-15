@@ -624,12 +624,12 @@ void loopSettings() {
     return;
   }
   if (screenNeedsRedraw) {
-    displaySettings(tft, settingsIndex, config.pin.length() == 4);
+    displaySettings(tft, settingsIndex, config.pin.length() == 4, config.isBattery);
     screenNeedsRedraw = false;
   }
   if (btn1Pressed) {
     lastSettingsInput = millis();
-    settingsIndex = (settingsIndex + 1) % 4;
+    settingsIndex = (settingsIndex + 1) % (config.isBattery ? 5 : 4);
     screenNeedsRedraw = true;
   }
   if (btn2Pressed) {
@@ -655,7 +655,7 @@ void loopSettings() {
         currentState = STATE_PRICE;
       }
       screenNeedsRedraw = true;
-    } else {
+    } else if (settingsIndex == 3) {
       if (config.pin.length() == 4) {
         pinDigitIndex = 0;
         for (int i = 0; i < 4; i++) pinEntry[i] = 0;
@@ -668,6 +668,8 @@ void loopSettings() {
         currentState = STATE_DURATION;
       }
       screenNeedsRedraw = true;
+    } else if (settingsIndex == 4 && config.isBattery) {
+      enterManualSleep();
     }
   }
 }
@@ -919,6 +921,25 @@ void enterLowBatterySleep() {
   ledcWrite(BACKLIGHT_PIN, 0);          // backlight off to save power
   tft.fillScreen(TFT_BLACK);
   // Wake when BTN_1 (GPIO0) goes LOW (pressed)
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
+  esp_deep_sleep_start();
+}
+
+// Manual power off from settings menu. Deep sleep, wake on BTN_1 or USB.
+void enterManualSleep() {
+  Serial.println("Manual power off -> deep sleep");
+  ledcWrite(BACKLIGHT_PIN, 255);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextColor(COLOR_TEXT);
+  tft.setTextSize(2);
+  tft.drawString("POWERED OFF", SCREEN_W / 2, SCREEN_H / 2 - 20);
+  tft.setTextSize(1);
+  tft.setTextColor(COLOR_GRAY);
+  tft.drawString("Press button to wake", SCREEN_W / 2, SCREEN_H / 2 + 15);
+  delay(3000);
+  ledcWrite(BACKLIGHT_PIN, 0);
+  tft.fillScreen(TFT_BLACK);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
   esp_deep_sleep_start();
 }
