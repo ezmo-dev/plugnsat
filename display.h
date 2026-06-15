@@ -667,7 +667,7 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batter
     // Battery model: version next to logo, battery gauge top-right
     tft.setTextDatum(TL_DATUM); tft.setTextSize(1);
     tft.setTextColor(COLOR_GRAY);
-    tft.drawString("v" FIRMWARE_VERSION, 100, 12);
+    tft.drawString("v" FIRMWARE_VERSION, 110, 12);
 
     int pct = lipoPercent(batteryMv);
     uint16_t batCol = (batteryMv <= VBAT_LOW_MV) ? COLOR_ERROR
