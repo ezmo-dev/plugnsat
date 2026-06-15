@@ -615,11 +615,37 @@ void displayWiFiFailed(TFT_eSPI &tft, String ssid, int secondsLeft) {
   tft.drawString("Retry connection", rx - 12, 141);
 }
 
+// LiPo voltage to percent, single cell, lookup table with interpolation.
+static int lipoPercent(int mv) {
+  static const int v[] = {3270,3610,3690,3730,3770,3790,3820,3870,3920,3980,4060,4200};
+  static const int p[] = {0,   5,   10,  20,  30,  40,  50,  60,  70,  80,  90,  100};
+  const int n = 12;
+  if (mv <= v[0]) return 0;
+  if (mv >= v[n-1]) return 100;
+  for (int i = 0; i < n - 1; i++) {
+    if (mv < v[i+1]) {
+      int range = v[i+1] - v[i];
+      int into  = mv - v[i];
+      return p[i] + (p[i+1] - p[i]) * into / range;
+    }
+  }
+  return 100;
+}
+
+// Small battery icon: body + terminal nub. Fill proportional to percent.
+static void drawBatteryIcon(TFT_eSPI &tft, int x, int y, int pct, uint16_t col) {
+  int w = 22, h = 11;
+  tft.drawRect(x, y, w, h, col);
+  tft.fillRect(x + w, y + 3, 2, 5, col);       // terminal nub
+  int fillW = (w - 4) * pct / 100;
+  if (fillW > 0) tft.fillRect(x + 2, y + 2, fillW, h - 4, col);
+}
+
 //
 // INFO
 //
 
-void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
+void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batteryMv) {
   tft.fillScreen(COLOR_BG);
   tft.setTextSize(1);
 
@@ -632,10 +658,35 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments) {
   tft.setTextColor(colOrange); tft.drawString("N",    58, 6); // 10 + 4*12
   tft.setTextColor(colCyan);   tft.drawString("sat",  70, 6); // 58 + 1*12
 
-  // Version top-right in gray
-  tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("v" FIRMWARE_VERSION, SCREEN_W - 8, 12);
+  if (!config.isBattery) {
+    // USB-C model: version top-right, unchanged
+    tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
+    tft.setTextColor(COLOR_GRAY);
+    tft.drawString("v" FIRMWARE_VERSION, SCREEN_W - 8, 12);
+  } else {
+    // Battery model: version next to logo, battery gauge top-right
+    tft.setTextDatum(TL_DATUM); tft.setTextSize(1);
+    tft.setTextColor(COLOR_GRAY);
+    tft.drawString("v" FIRMWARE_VERSION, 100, 12);
+
+    int pct = lipoPercent(batteryMv);
+    uint16_t batCol = (batteryMv <= VBAT_LOW_MV) ? COLOR_ERROR
+                    : (pct <= 20)                ? COLOR_ACCENT
+                                                 : COLOR_SUCCESS;
+    // Layout right-aligned: [icon] X.XX/4.20V  NN% ending at SCREEN_W-8
+    char volt[14];
+    snprintf(volt, sizeof(volt), "%d.%02d/4.20V", batteryMv / 1000, (batteryMv % 1000) / 10);
+    String pctStr = String(pct) + "%";
+
+    tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
+    tft.setTextColor(COLOR_GRAY);
+    tft.drawString(pctStr, SCREEN_W - 8, 12);
+    int pctW = tft.textWidth(pctStr);
+    tft.setTextColor(COLOR_TEXT);
+    tft.drawString(volt, SCREEN_W - 8 - pctW - 8, 12);
+    int voltW = tft.textWidth(volt);
+    drawBatteryIcon(tft, SCREEN_W - 8 - pctW - 8 - voltW - 8 - 24, 8, pct, batCol);
+  }
 
   // Separator "─── Network ──────────────────"  (y=38, more room below header)
   tft.drawFastHLine(8, 34, SCREEN_W - 16, colOrange);

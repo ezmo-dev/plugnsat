@@ -573,7 +573,7 @@ void loopShellyOffline() {
 
 void loopInfo() {
   if (screenNeedsRedraw) {
-    displayInfo(tft, config, paymentCount);
+    displayInfo(tft, config, paymentCount, batteryMv);
     screenNeedsRedraw = false;
   }
   if (btn1Pressed || btn2Pressed) {
