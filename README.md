@@ -56,7 +56,7 @@ QR auto-refreshes every 4m45s before the 5-minute invoice expiry.
 1. Download the **Shelly app** ([iOS](https://apps.apple.com/app/shelly-cloud/id1147164547) / [Android](https://play.google.com/store/apps/details?id=cloud.shelly.smartcontrol))
 2. Plug the Shelly into a wall outlet
 3. Open the app and follow the instructions to add the device to your WiFi network
-4. Once connected, go to the plug settings and set **Initial state** to **Off**
+4. Once connected, open the plug settings and, under Input/Output settings, configure the Shelly to turn OFF when it has power (so the connected device stays off until a payment is received)
 
 > The Shelly must be on the same WiFi network that PlugNSat will connect to.
 
@@ -107,6 +107,7 @@ Press BTN1 from the QR screen to open the Settings menu.
 | Brightness | Adjust screen brightness (BTN1 decreases, BTN2 increases) |
 | Price | Change price in sats (BTN1 decreases, BTN2 increases) |
 | Duration | Change activation duration in seconds (BTN1 decreases, BTN2 increases) |
+| Turn OFF | Battery model only. Puts the device into deep sleep. Wake with BTN1 or by connecting USB power. |
 
 Price and Duration can be protected with a 4-digit PIN, configurable in the web portal. If a PIN is set, it must be entered before accessing these settings.
 

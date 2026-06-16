@@ -131,14 +131,19 @@ If a WiFi network was previously configured, pressing any button exits AP mode a
 ## Settings menu
 
 Press **BTN1** (short press) from the QR screen to enter the Settings menu.
+<p>
+    <img src="images/plugnsat-screen-settings.png" width="280">
+    <img src="images/plugnsat-screen-settings-battery.png" width="280">
+<p>
 
-<img src="images/plugnsat-screen-settings.png" width="280">
-
-The menu has 4 options. Use **BTN1** to move between them and **BTN2** to select.
+The menu has 4 options on the USB-C model: Device Info, Brightness, Price, and Duration. On the battery model, a 5th option, Turn OFF, appears at the bottom (it puts the device into deep sleep; wake it with BTN1 or by connecting USB power). Use **BTN1** to move between options and **BTN2** to select.
 
 ### Device Info
 
-<img src="images/plugnsat-screen-device-info.png" width="280">
+<p>
+    <img src="images/plugnsat-screen-device-info-usbc.png" width="280">
+    <img src="images/plugnsat-screen-device-info-battery.png" width="280">
+<p>
 
 Displays a summary of the current device state. This information is useful for debugging and support:
 

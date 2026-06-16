@@ -49,7 +49,7 @@
 - [x] Battery level indicator on screen and web portal
   - [x] Device Info: battery icon, voltage (X.XX/4.20V), percentage (LiPo curve)
   - [x] Charging icon when voltage trend is rising
-- [ ] Battery UI polish: refine design of all battery-related screen elements
+- [x] Battery UI polish: refine design of all battery-related screen elements
 - [ ] Enclosure prototypes (USB and battery): desk stand, magnetic mount, wall mount
 - [ ] Test prints for each enclosure
 - [ ] General V0.2 audit: review all new features for correctness and consistency

@@ -220,7 +220,8 @@ You can click **Test connection** to verify the PlugNSat can reach the Shelly.
 
 ### Step 4 of 5: Device Settings
 
-- **Name**: a display name for your PlugNSat (up to 18 characters if shown on screen, up to 40 otherwise)
+- **Hardware model**: select **USB-C** for the mains-powered model or **Battery** for the LiPo model. Choosing Battery enables battery info on the Device Info screen and the Turn OFF (power-off) item in the settings menu. Pick the one matching your device.
+- **Name**: a display name for your PlugNSat. If "Show name on QR screen" is enabled, the name is limited to 18 characters and may only contain letters, numbers, spaces, periods, and hyphens (no other special characters). If it is not shown on screen, up to 40 characters are allowed with no character restriction.
 - **Show name on QR screen**: toggle to display the name next to the QR code
 - **Price**: amount in satoshis the customer pays per activation
 - **Duration**: how many seconds the Shelly stays on after a payment
