@@ -138,6 +138,7 @@ int batteryMv = 0;              // Last measured battery voltage in mV
 unsigned long lastBatRead = 0;  // Last read timestamp
 int prevBatteryMv = 0;        // previous reading, for charge trend
 bool isCharging = false;      // true if voltage is rising
+int chargeRiseCount = 0;      // consecutive rising readings
 int lowBatCount = 0;          // consecutive readings below cutoff
 bool lowBatBlinkOn = false;        // current blink phase
 unsigned long lastLowBatBlink = 0; // last blink toggle
@@ -198,8 +199,13 @@ void loop() {
     lastBatRead = millis();
     int fresh = readBatteryMv();
     if (prevBatteryMv > 0) {
-      // rising by more than 15mV between samples means charging
-      isCharging = (fresh > prevBatteryMv + 15);
+      if (fresh > prevBatteryMv + 15) {
+        chargeRiseCount++;
+      } else {
+        chargeRiseCount = 0;
+      }
+      // need a sustained rise over several samples, not a single rebound
+      isCharging = (chargeRiseCount >= 3);
     }
     prevBatteryMv = fresh;
     batteryMv = fresh;
