@@ -37,9 +37,19 @@
 - [x] Research and select the right LiPo battery model (capacity, connector, dimensions for enclosure)
 - [x] "Check for updates" button in web portal
 - [x] Auto-update option on boot
-- [ ] Battery-powered prototype (LiPo integration with T-Display S3)
-- [ ] Power management: sleep mode, low battery indicator on screen
-- [ ] Battery level indicator on screen and web portal
+- [x] Battery-powered prototype (LiPo integration with T-Display S3)
+  - [x] GPIO15 power-enable for battery operation (screen on without USB)
+  - [x] VBAT reading on GPIO4 with onboard divider, factory eFuse + 1.017 calibration
+  - [x] Battery model flag (isBattery) in config + web portal toggle, persisted
+- [x] Power management: sleep mode, low battery indicator on screen
+  - [x] Manual Turn OFF in settings menu (deep sleep, wake on BTN_1 or USB)
+  - [x] Software low-voltage cutoff at 3100mV (confirmed over consecutive reads)
+  - [x] Low battery warning: blinking crossed-out icon, bottom-right of main screen
+  - [x] RTC pull-up on wake pin to prevent immediate wake
+- [x] Battery level indicator on screen and web portal
+  - [x] Device Info: battery icon, voltage (X.XX/4.20V), percentage (LiPo curve)
+  - [x] Charging icon when voltage trend is rising
+- [ ] Battery UI polish: refine design of all battery-related screen elements
 - [ ] Enclosure prototypes (USB and battery): desk stand, magnetic mount, wall mount
 - [ ] Test prints for each enclosure
 - [ ] General V0.2 audit: review all new features for correctness and consistency
