@@ -336,6 +336,27 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
     }
     .toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
     .toggle-label { font-size: 13px; color: var(--pn-fg-2); font-weight: 500; }
+    .segmented {
+      display: inline-flex;
+      border: 1px solid var(--pn-border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+    .segmented input[type="radio"] { display: none; }
+    .segmented label {
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pn-fg-2);
+      cursor: pointer;
+      background: transparent;
+      transition: background 0.15s, color 0.15s;
+      margin: 0;
+    }
+    .segmented label + input + label { border-left: 1px solid var(--pn-border); }
+    .segmented input:checked + label { background: var(--pn-cyan); color: #fff; }
     ::selection { background: rgba(247,147,26,.25); color: var(--pn-fg); }
     .sec h2 { cursor: pointer; user-select: none; }
     .chev { display: inline-block; width: 7px; height: 7px; border-right: 2px solid var(--pn-fg-3); border-bottom: 2px solid var(--pn-fg-3); transform: rotate(45deg); transition: transform .2s ease; margin-right: 9px; margin-bottom: 2px; vertical-align: middle; pointer-events: none; }
@@ -477,6 +498,13 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
 
     <div class="sec">
       <h2>Device settings</h2>
+      <label>Hardware model <span class="tip" data-tip="Select USB-C for the mains-powered model, Battery for the LiPo model. Battery enables battery info and the power-off menu.">i</span></label>
+      <div class="segmented">
+        <input type="radio" name="is_battery" id="model-usbc" value="0" %MODEL_USBC_CHECKED%>
+        <label for="model-usbc">USB-C</label>
+        <input type="radio" name="is_battery" id="model-batt" value="1" %MODEL_BATT_CHECKED%>
+        <label for="model-batt">Battery</label>
+      </div>
       <label>Name <span class="tip" data-tip="The name shown on the device screen and on this page. Keep it short if you enable display.">i</span></label>
       <input type="text" name="dev_name" id="dev-name" value="%DEV_NAME%" placeholder="PlugNSat" oninput="validateName()">
       <div id="name-err" class="hint"></div>
@@ -499,11 +527,6 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
         <input type="checkbox" name="show_price" value="1" %SHOW_PRICE_CHECKED%>
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
         <span class="toggle-label">Show price on QR screen</span>
-      </label>
-      <label class="toggle">
-        <input type="checkbox" name="is_battery" value="1" %IS_BATTERY_CHECKED%>
-        <span class="toggle-track"><span class="toggle-thumb"></span></span>
-        <span class="toggle-label">Battery model (enables battery info and power off)</span>
       </label>
       <button type="button" class="tbtn" onclick="testPayment()">Simulate payment (free)</button>
       <div id="tpst" class="hint" style="margin-top:6px"></div>
@@ -1140,7 +1163,8 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%DEV_NAME%",    htmlEscape(config.deviceName));
   html.replace("%SETTINGS_PIN%",       config.pin.length() > 0 ? "****" : "");
   html.replace("%SHOW_NAME_CHECKED%",  config.showName  ? "checked" : "");
-  html.replace("%IS_BATTERY_CHECKED%", config.isBattery ? "checked" : "");
+  html.replace("%MODEL_USBC_CHECKED%", config.isBattery ? "" : "checked");
+  html.replace("%MODEL_BATT_CHECKED%", config.isBattery ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
   html.replace("%AUTO_UPDATE_CHECKED%", config.autoUpdate ? "checked" : "");
   html.replace("%VERSION%",            FIRMWARE_VERSION);
@@ -1192,7 +1216,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.showName  = server.arg("show_name")  == "1";
     config.showPrice = server.arg("show_price") == "1";
     config.autoUpdate = server.hasArg("auto_update");
-    config.isBattery  = server.hasArg("is_battery");
+    config.isBattery  = (server.arg("is_battery") == "1");
     String newPin             = server.arg("settings_pin");
     if (newPin.length() == 0) {
       config.pin = "";
