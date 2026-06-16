@@ -148,6 +148,7 @@ The menu has 4 options on the USB-C model: Device Info, Brightness, Price, and D
 Displays a summary of the current device state. This information is useful for debugging and support:
 
 - Firmware version (top-right corner)
+- Battery percentage, icon, and voltage (battery model only)
 - WiFi SSID and signal strength (RSSI)
 - Device IP address (use `http://<device-IP-address>` to reach the web portal if `http://plugnsat.local` does not work; this IP can change)
 - Shelly hostname
