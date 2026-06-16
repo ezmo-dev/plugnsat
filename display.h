@@ -702,24 +702,37 @@ void displayInfo(TFT_eSPI &tft, PlugNSatConfig &config, int payments, int batter
     uint16_t batCol = (batteryMv <= VBAT_LOW_MV) ? COLOR_ERROR
                     : (pct <= 20)                ? COLOR_ACCENT
                                                  : COLOR_SUCCESS;
-    // Layout right-aligned: [icon] X.XX/4.20V  NN% ending at SCREEN_W-8
+    // Layout: NN%  [icon]  X.XX/4.20V   (voltage glued right)
     char volt[14];
     snprintf(volt, sizeof(volt), "%d.%02d/4.20V", batteryMv / 1000, (batteryMv % 1000) / 10);
     String pctStr = String(pct) + "%";
 
+    // percentage color follows level
+    uint16_t pctCol = (batteryMv <= VBAT_LOW_MV) ? COLOR_ERROR
+                    : (pct <= 20)                ? COLOR_ACCENT
+                                                 : COLOR_TEXT;
+
+    // icon vertically centered on the y12 top-datum text (text center ~y16)
+    int iconY = 10;
+
+    // voltage far right, gray
     tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
     tft.setTextColor(COLOR_GRAY);
-    tft.drawString(pctStr, SCREEN_W - 8, 12);
-    int pctW = tft.textWidth(pctStr);
-    tft.setTextColor(COLOR_TEXT);
-    tft.drawString(volt, SCREEN_W - 8 - pctW - 8, 12);
+    tft.drawString(volt, SCREEN_W - 8, 12);
     int voltW = tft.textWidth(volt);
-    int iconX = SCREEN_W - 8 - pctW - 8 - voltW - 8 - 24;
+
+    // icon left of voltage
+    int iconX = SCREEN_W - 8 - voltW - 8 - 24;
     if (charging) {
-      drawChargingIcon(tft, iconX, 8, COLOR_SUCCESS);
+      drawChargingIcon(tft, iconX, iconY, COLOR_SUCCESS);
     } else {
-      drawBatteryIcon(tft, iconX, 8, pct, batCol);
+      drawBatteryIcon(tft, iconX, iconY, pct, batCol);
     }
+
+    // percentage left of icon, level color
+    tft.setTextDatum(TR_DATUM); tft.setTextSize(1);
+    tft.setTextColor(pctCol);
+    tft.drawString(pctStr, iconX - 8, 12);
   }
 
   // Separator "─── Network ──────────────────"  (y=38, more room below header)
