@@ -147,6 +147,7 @@ unsigned long lastLowBatBlink = 0; // last blink toggle
 //
 
 void setup() {
+  gpio_hold_dis((gpio_num_t)15);
   pinMode(15, OUTPUT);
   digitalWrite(15, HIGH);
   otaInit();
@@ -922,6 +923,9 @@ void enterLowBatterySleep() {
   ledcWrite(BACKLIGHT_PIN, 0);          // backlight off to save power
   tft.fillScreen(TFT_BLACK);
   // Wake when BTN_1 (GPIO0) goes LOW (pressed)
+  digitalWrite(15, LOW);
+  gpio_hold_en((gpio_num_t)15);
+  gpio_deep_sleep_hold_en();
   rtc_gpio_pullup_en((gpio_num_t)BTN_1);
   rtc_gpio_pulldown_dis((gpio_num_t)BTN_1);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
@@ -943,6 +947,9 @@ void enterManualSleep() {
   delay(3000);
   ledcWrite(BACKLIGHT_PIN, 0);
   tft.fillScreen(TFT_BLACK);
+  digitalWrite(15, LOW);
+  gpio_hold_en((gpio_num_t)15);
+  gpio_deep_sleep_hold_en();
   rtc_gpio_pullup_en((gpio_num_t)BTN_1);
   rtc_gpio_pulldown_dis((gpio_num_t)BTN_1);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
