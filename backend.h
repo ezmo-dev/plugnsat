@@ -30,11 +30,11 @@ BackendInterface backend;
 // --- BTCPay wrappers ---
 
 bool btcpayCreateInvoiceWrapper(PlugNSatConfig &config, int amountSats, String &outInvoiceId, String &outLNURL) {
-  return btcpayCreateInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, amountSats, outInvoiceId, outLNURL);
+  return btcpayCreateInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, amountSats, outInvoiceId, outLNURL, config.allowSelfSignedTls);
 }
 
 String btcpayCheckInvoiceWrapper(PlugNSatConfig &config, const String &invoiceId, const String &invoicePayload) {
-  return btcpayCheckInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, invoiceId);
+  return btcpayCheckInvoice(config.btcpayUrl, config.btcpayApiKey, config.btcpayStoreId, invoiceId, config.allowSelfSignedTls);
 }
 
 // --- Blink wrappers ---

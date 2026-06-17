@@ -27,9 +27,13 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <esp_crt_bundle.h>
+
+extern const uint8_t x509_crt_imported_bundle_bin_start[] asm("_binary_x509_crt_bundle_start");
+extern const uint8_t x509_crt_imported_bundle_bin_end[]   asm("_binary_x509_crt_bundle_end");
 
 // Forward declaration
-bool btcpayGetLNURL(String url, String key, String store, String id, String &lnurl);
+bool btcpayGetLNURL(String url, String key, String store, String id, String &lnurl, bool allowSelfSigned);
 
 // 
 // CREATE INVOICE
@@ -38,10 +42,11 @@ bool btcpayGetLNURL(String url, String key, String store, String id, String &lnu
 bool btcpayCreateInvoice(
   String btcpayUrl, String apiKey, String storeId,
   int amountSats,
-  String &outInvoiceId, String &outLNURL
+  String &outInvoiceId, String &outLNURL,
+  bool allowSelfSigned
 ) {
   WiFiClientSecure client;
-  client.setInsecure();
+  if (allowSelfSigned) { client.setInsecure(); } else { client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start); }
   
   HTTPClient http;
   String url = btcpayUrl + "/api/v1/stores/" + storeId + "/invoices";
@@ -95,7 +100,7 @@ bool btcpayCreateInvoice(
     return false;
   }
   
-  return btcpayGetLNURL(btcpayUrl, apiKey, storeId, outInvoiceId, outLNURL);
+  return btcpayGetLNURL(btcpayUrl, apiKey, storeId, outInvoiceId, outLNURL, allowSelfSigned);
 }
 
 //
@@ -104,10 +109,11 @@ bool btcpayCreateInvoice(
 
 bool btcpayGetLNURL(
   String btcpayUrl, String apiKey, String storeId,
-  String invoiceId, String &outLNURL
+  String invoiceId, String &outLNURL,
+  bool allowSelfSigned
 ) {
   WiFiClientSecure client;
-  client.setInsecure();
+  if (allowSelfSigned) { client.setInsecure(); } else { client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start); }
   
   HTTPClient http;
   String url = btcpayUrl + "/api/v1/stores/" + storeId 
@@ -155,12 +161,13 @@ bool btcpayGetLNURL(
 //
 
 String btcpayCheckInvoice(
-  String btcpayUrl, String apiKey, String storeId, String invoiceId
+  String btcpayUrl, String apiKey, String storeId, String invoiceId,
+  bool allowSelfSigned
 ) {
   if (invoiceId.length() == 0) return "ERROR";
-  
+
   WiFiClientSecure client;
-  client.setInsecure();
+  if (allowSelfSigned) { client.setInsecure(); } else { client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start); }
   
   HTTPClient http;
   String url = btcpayUrl + "/api/v1/stores/" + storeId 

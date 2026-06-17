@@ -74,6 +74,7 @@ struct PlugNSatConfig {
   String portalPassword;   // HTTP Basic Auth for web portal (empty = no auth)
   bool autoUpdate;         // Check GitHub and auto-install on boot (default: false)
   bool isBattery;          // true = modele batterie, false = modele USB-C
+  bool allowSelfSignedTls; // accepter un certificat auto-signe pour BTCPay (defaut false)
 };
 
 #endif

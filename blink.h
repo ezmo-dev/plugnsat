@@ -30,7 +30,11 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <esp_crt_bundle.h>
 #include "config.h"
+
+extern const uint8_t x509_crt_imported_bundle_bin_start[] asm("_binary_x509_crt_bundle_start");
+extern const uint8_t x509_crt_imported_bundle_bin_end[]   asm("_binary_x509_crt_bundle_end");
 
 //
 // CREATE INVOICE
@@ -46,7 +50,7 @@ bool blinkCreateInvoice(
   String &outInvoiceId, String &outLNURL
 ) {
   WiFiClientSecure client;
-  client.setInsecure();
+  client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start);
 
   HTTPClient http;
   if (!http.begin(client, BLINK_GRAPHQL_URL)) {
@@ -132,7 +136,7 @@ String blinkCheckInvoice(
   if (paymentRequest.length() == 0) return "ERROR";
 
   WiFiClientSecure client;
-  client.setInsecure();
+  client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start);
 
   HTTPClient http;
   if (!http.begin(client, BLINK_GRAPHQL_URL)) return "ERROR";

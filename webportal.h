@@ -472,6 +472,17 @@ const char HTML_PAGE[] PROGMEM = R"rawliteral(
         <div class="hint">Permissions: cancreateinvoice, canviewinvoices</div>
         <label>Store ID <span class="tip" data-tip="Identifies which store receives payments. Find it in your BTCPay Server under Settings > General, or in the URL bar when viewing your store.">i</span></label>
         <input type="text" name="btcpay_store" value="%BTCPAY_STORE%">
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer; font-size:13px; color:var(--pn-fg-2); user-select:none;">Advanced options</summary>
+          <div style="margin-top:10px;">
+            <label class="toggle">
+              <input type="checkbox" name="self_signed" value="1" %SELF_SIGNED_CHECKED%>
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span class="toggle-label">Self-signed certificate (advanced BTCPay)</span>
+            </label>
+            <div class="hint">Leave unchecked (recommended). Only check if your BTCPay Server uses a self-signed certificate. If unsure, leave it unchecked: a standard BTCPay installation uses Let's Encrypt and does not need this option. Enabling this reduces security: the device will no longer verify the server's identity.</div>
+          </div>
+        </details>
       </div>
       <div id="sec-blink">
         <div class="hint" style="margin-bottom:8px; font-weight:500; color:var(--pn-fg-2);">Blink Wallet settings</div>
@@ -1167,6 +1178,7 @@ String processTemplate(PlugNSatConfig &config) {
   html.replace("%MODEL_BATT_CHECKED%", config.isBattery ? "checked" : "");
   html.replace("%SHOW_PRICE_CHECKED%", config.showPrice ? "checked" : "");
   html.replace("%AUTO_UPDATE_CHECKED%", config.autoUpdate ? "checked" : "");
+  html.replace("%SELF_SIGNED_CHECKED%", config.allowSelfSignedTls ? "checked" : "");
   html.replace("%VERSION%",            FIRMWARE_VERSION);
   html.replace("%PORTAL_PW%",          config.portalPassword.length() > 0 ? "********" : "");
   return html;
@@ -1216,6 +1228,7 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     config.showName  = server.arg("show_name")  == "1";
     config.showPrice = server.arg("show_price") == "1";
     config.autoUpdate = server.hasArg("auto_update");
+    config.allowSelfSignedTls = (server.arg("self_signed") == "1");
     config.isBattery  = (server.arg("is_battery") == "1");
     String newPin             = server.arg("settings_pin");
     if (newPin.length() == 0) {
