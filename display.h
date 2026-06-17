@@ -617,9 +617,10 @@ void displayWiFiFailed(TFT_eSPI &tft, String ssid, int secondsLeft) {
 
 // LiPo voltage to percent, single cell, lookup table with interpolation.
 static int lipoPercent(int mv) {
-  static const int v[] = {3100,3300,3400,3500,3600,3700,3750,3800,3850,3900,4000,4200};
-  static const int p[] = {0,   5,   12,  22,  35,  50,  60,  70,  78,  85,  93,  100};
-  const int n = 12;
+  // Calibrated from a real full discharge (QR screen on): voltage -> percent
+  static const int v[] = {3100,3320,3550,3790,3850,3900,4000,4100,4200};
+  static const int p[] = {0,   8,   17,  38,  58,  79,  92,  96,  100};
+  const int n = 9;
   if (mv <= v[0]) return 0;
   if (mv >= v[n-1]) return 100;
   for (int i = 0; i < n - 1; i++) {
