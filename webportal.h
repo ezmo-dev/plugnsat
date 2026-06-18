@@ -1280,7 +1280,30 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     if (host.length() == 0 || host.length() > 80
         || host.indexOf("/") >= 0
         || host.indexOf("http") >= 0
-        || host.indexOf("\\") >= 0) {
+        || host.indexOf("\\") >= 0
+        || host.indexOf(":") >= 0) {
+      server.send(400, "application/json", "{\"ok\":false}");
+      return;
+    }
+    // Accept only private IPv4 ranges or .local mDNS hostnames
+    bool lanOk = false;
+    if (host.endsWith(".local")) {
+      lanOk = true;
+    } else {
+      // IPv4 private: 10.x.x.x, 192.168.x.x, 172.16-31.x.x
+      if (host.startsWith("10.")) {
+        lanOk = true;
+      } else if (host.startsWith("192.168.")) {
+        lanOk = true;
+      } else if (host.startsWith("172.")) {
+        int dot2 = host.indexOf('.', 4);
+        if (dot2 > 4) {
+          int second = host.substring(4, dot2).toInt();
+          if (second >= 16 && second <= 31) lanOk = true;
+        }
+      }
+    }
+    if (!lanOk) {
       server.send(400, "application/json", "{\"ok\":false}");
       return;
     }
