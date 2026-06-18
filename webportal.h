@@ -1198,6 +1198,7 @@ static size_t   _otaSigBufLen = 0;
 static bool     _otaFirmwareReady = false;
 static bool     _otaSigReady = false;
 static bool     _otaUploadAuthFailed = false;
+static bool     _otaUploadTooLarge = false;
 
 void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &prefs) {
   portalAuthEnabled = (WiFi.getMode() == WIFI_STA);
@@ -1420,6 +1421,11 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
   server.on("/ota/upload", HTTP_POST, [&config, &server]() {
     // Completion handler
     if (!checkPortalAuth(server, config)) return;
+    if (_otaUploadTooLarge) {
+      _otaUploadTooLarge = false;
+      server.send(413, "text/plain", "Firmware too large");
+      return;
+    }
     if (!_otaFirmwareReady || !_otaSigReady) {
       if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
       server.send(400, "text/plain", "Missing firmware or signature file");
@@ -1470,12 +1476,21 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
           return;
         }
         _otaUploadAuthFailed = false;
+        _otaUploadTooLarge = false;
         Serial.println("OTA: receiving firmware: " + upload.filename);
         _otaFirmwareReady = false;
         if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
         _otaFirmwareBufLen = 0;
       } else if (upload.status == UPLOAD_FILE_WRITE) {
         if (_otaUploadAuthFailed) return;
+        if (_otaUploadTooLarge) return;
+        if (_otaFirmwareBufLen + upload.currentSize > OTA_MAX_FIRMWARE_BYTES) {
+          if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
+          _otaFirmwareBufLen = 0;
+          _otaUploadTooLarge = true;
+          Serial.println("OTA: firmware too large, upload rejected");
+          return;
+        }
         _otaFirmwareBuf = (uint8_t*)realloc(_otaFirmwareBuf,
                                              _otaFirmwareBufLen + upload.currentSize);
         if (!_otaFirmwareBuf) {

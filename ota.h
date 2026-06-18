@@ -13,6 +13,7 @@
 #include <esp_crt_bundle.h>
 
 #define OTA_ROLLBACK_TIMEOUT_MS 60000
+#define OTA_MAX_FIRMWARE_BYTES  1900000
 
 extern const uint8_t x509_crt_imported_bundle_bin_start[] asm("_binary_x509_crt_bundle_start");
 extern const uint8_t x509_crt_imported_bundle_bin_end[]   asm("_binary_x509_crt_bundle_end");
@@ -275,7 +276,7 @@ inline OtaFlashResult otaDownloadAndFlash(const String& version) {
   int contentLen = http2.getSize();
   Serial.println("OTA: firmware size: " + String(contentLen) + " bytes");
 
-  if (contentLen <= 0 || contentLen > 1900000) {
+  if (contentLen <= 0 || contentLen > OTA_MAX_FIRMWARE_BYTES) {
     result.error = "Invalid firmware size: " + String(contentLen);
     http2.end();
     return result;
