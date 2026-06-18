@@ -163,6 +163,8 @@ This is useful for:
 
 > The Device PIN prevents anyone near the PlugNSat from changing price and duration with the physical buttons. The Web Access Password prevents anyone on your WiFi from opening this page. The password is always disabled in setup (AP) mode so you cannot lock yourself out.
 
+> **Credentials reminder:** When your browser prompts for a login in normal mode, enter **`admin`** as the username and your configured password. The username is fixed and cannot be changed.
+
 ---
 
 ## Firmware update
