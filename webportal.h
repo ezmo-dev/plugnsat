@@ -1197,6 +1197,7 @@ static uint8_t  _otaSigBuf[256];
 static size_t   _otaSigBufLen = 0;
 static bool     _otaFirmwareReady = false;
 static bool     _otaSigReady = false;
+static bool     _otaUploadAuthFailed = false;
 
 void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &prefs) {
   portalAuthEnabled = (WiFi.getMode() == WIFI_STA);
@@ -1416,8 +1417,9 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     server.send(200, "text/html", processOtaPage(config));
   });
 
-  server.on("/ota/upload", HTTP_POST, [&server]() {
+  server.on("/ota/upload", HTTP_POST, [&config, &server]() {
     // Completion handler
+    if (!checkPortalAuth(server, config)) return;
     if (!_otaFirmwareReady || !_otaSigReady) {
       if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
       server.send(400, "text/plain", "Missing firmware or signature file");
@@ -1453,17 +1455,27 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
     delay(500);
     ESP.restart();
 
-  }, [&server]() {
+  }, [&config, &server]() {
     // Upload handler — called for each chunk of each file part
     HTTPUpload &upload = server.upload();
 
     if (upload.name == "firmware") {
       if (upload.status == UPLOAD_FILE_START) {
+        bool authOk = (config.portalPassword.length() == 0) ||
+                      server.authenticate("admin", config.portalPassword.c_str());
+        if (!authOk) {
+          _otaUploadAuthFailed = true;
+          if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
+          _otaFirmwareBufLen = 0;
+          return;
+        }
+        _otaUploadAuthFailed = false;
         Serial.println("OTA: receiving firmware: " + upload.filename);
         _otaFirmwareReady = false;
         if (_otaFirmwareBuf) { free(_otaFirmwareBuf); _otaFirmwareBuf = nullptr; }
         _otaFirmwareBufLen = 0;
       } else if (upload.status == UPLOAD_FILE_WRITE) {
+        if (_otaUploadAuthFailed) return;
         _otaFirmwareBuf = (uint8_t*)realloc(_otaFirmwareBuf,
                                              _otaFirmwareBufLen + upload.currentSize);
         if (!_otaFirmwareBuf) {
@@ -1474,11 +1486,13 @@ void setupWebPortal(WebServer &server, PlugNSatConfig &config, Preferences &pref
                upload.buf, upload.currentSize);
         _otaFirmwareBufLen += upload.currentSize;
       } else if (upload.status == UPLOAD_FILE_END) {
+        if (_otaUploadAuthFailed) return;
         _otaFirmwareReady = true;
         Serial.println("OTA: firmware buffered, " + String(_otaFirmwareBufLen) + " bytes");
       }
 
     } else if (upload.name == "signature") {
+      if (_otaUploadAuthFailed) return;
       if (upload.status == UPLOAD_FILE_START) {
         Serial.println("OTA: receiving signature: " + upload.filename);
         _otaSigReady = false;
