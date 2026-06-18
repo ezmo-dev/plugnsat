@@ -30,7 +30,7 @@
  */
 
 // OTA NOTE (Arduino IDE):
-// Board: LilyGO T-Display S3
+// Board: ESP32S3 Dev Module
 // Partition Scheme: select "Minimal SPIFFS (1.9MB APP with OTA/128KB SPIFFS)"
 // This provides two OTA app slots required for firmware updates.
 // Do not use a "No OTA" partition scheme.
