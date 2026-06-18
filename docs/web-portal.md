@@ -85,3 +85,114 @@ When a QR code needs to be generated, the PlugNSat:
 | **BTC Wallet ID** | Which wallet receives the sats. Found at `dashboard.blink.sv`. | `f79a...` |
 
 > Blink uses the GraphQL API at `https://api.blink.sv/graphql` (fixed endpoint, no server URL to enter). It returns a BOLT11 invoice rather than an LNURL, so the QR code is longer than with BTCPay but still scannable easily.
+
+### Step 3: Shelly Plug
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Shelly hostname or IP** | The address of your Shelly on the local network. Can be an IP or an mDNS hostname. | `shellyplugsg3-9070694c2cd4.local` |
+
+> Make sure the Shelly is plugged in, on the same WiFi, and set to **Off** as its default power-on state.
+
+#### Scan network
+
+Click **Scan network** to auto-discover Shelly devices on the local network via mDNS. The PlugNSat queries `_http._tcp` services and keeps the ones whose hostname starts with `shelly`. Matches appear in a dropdown for easy selection.
+
+<p>
+    <img src="images/webportal-scan-shelly-1.png" width="280">
+    <img src="images/webportal-scan-shelly-2.png" width="280">
+    <img src="images/webportal-scan-shelly-3.png" width="280">
+<p>
+
+> **Tip:** Use the mDNS hostname (`.local`) instead of the IP address. IP addresses can change if your router assigns a new one via DHCP. The mDNS hostname stays the same.
+
+#### Test connection
+
+Click **Test connection** to verify the PlugNSat can reach the Shelly. It sends an HTTP request to the Shelly's status endpoint (`/rpc/Switch.GetStatus?id=0`). If successful, you see a green confirmation with the current power draw in watts.
+
+<p>
+    <img src="images/webportal-test-shelly-1.png" width="280">
+    <img src="images/webportal-test-shelly-2.png" width="280">
+    <img src="images/webportal-test-shelly-3.png" width="280">
+<p>
+
+#### How the Shelly is controlled
+
+The PlugNSat communicates with the Shelly via local HTTP API (Shelly Gen2+ RPC). No cloud, no internet, no firmware modification.
+
+| Action | Endpoint |
+|--------|----------|
+| Turn on (with auto-off timer) | `GET /rpc/switch.set?id=0&on=true&toggle_after={seconds}` |
+| Turn off | `GET /rpc/switch.set?id=0&on=false` |
+| Check status | `GET /rpc/Switch.GetStatus?id=0` |
+
+The `toggle_after` parameter tells the Shelly to turn itself off after the configured duration. This means even if the PlugNSat loses power or WiFi, the Shelly will still turn off on time.
+
+### Step 4: Device settings
+
+| Field | Description | Default | Range |
+|-------|-------------|---------|-------|
+| **Name** | Display name for your PlugNSat. Shown on the info panel next to the QR if enabled. | `PlugNSat` | 1 to 40 characters (max 18 when "Show name" is on) |
+| **Show name on QR screen** | Toggle. When on, the name appears next to the QR code. | Off | On/Off |
+| **Price (satoshis)** | The amount a customer pays per activation. | `100` | 1 to 1,000,000 sats |
+| **Duration (seconds)** | How long the Shelly stays on after payment. | `60` | 1 to 86400 (24h) |
+| **Show price on QR screen** | Toggle. When on, the price in sats appears next to the QR code. | Off | On/Off |
+
+> **Name length and QR layout:** If "Show name" is enabled, the QR code shifts to the left to make room for the info panel. Long names (more than 9 characters) wrap to two lines. With display enabled the portal enforces a maximum of 18 characters; with display off the limit is 40.
+
+#### Simulate payment
+
+Below the device fields you will find a **Simulate payment (free)** button. This triggers the Shelly for the configured duration without creating a real Lightning invoice or spending any sats.
+
+<p>
+    <img src="images/webportal-simulate-1.png" width="280">
+    <img src="images/webportal-simulate-2.png" width="280">
+<p>
+
+This is useful for:
+- Testing the Shelly connection during setup
+- Demoing the product without needing a Lightning wallet
+- Verifying the device works end-to-end
+
+### Step 5: Security
+
+| Field | Description | Default | Range |
+|-------|-------------|---------|-------|
+| **Device PIN** | Optional 4-digit code that protects Price and Duration on the device buttons. | Empty (disabled) | 4 digits or empty |
+| **Web Access Password** | Optional password to protect this configuration page in normal mode. Login username is always `admin`. | Empty (disabled) | Any length or empty |
+
+> The Device PIN prevents anyone near the PlugNSat from changing price and duration with the physical buttons. The Web Access Password prevents anyone on your WiFi from opening this page. The password is always disabled in setup (AP) mode so you cannot lock yourself out.
+
+---
+
+## Firmware update
+
+Below the **Save and restart** button is a Firmware update card. It shows the current firmware version and lets you keep the device up to date.
+
+| Option | Behavior |
+|--------|----------|
+| **Auto-update on boot** | When enabled, the device checks GitHub Releases for a newer version every time it restarts and installs it automatically. Leave it off to stay in full control. |
+| **Check for updates** | Manual check. Queries the GitHub Releases API over HTTPS and reports whether a newer version is available. Shown only when auto-update is off. |
+
+Updates are verified with an RSA-SHA256 signature before flashing, so an unsigned or tampered firmware is refused.
+
+---
+
+## After saving
+
+When you click **Save and restart**:
+
+1. All settings are saved to the ESP32's non-volatile memory (NVS)
+2. The device reboots
+3. It connects to the configured WiFi
+4. A new QR code is generated with the new settings
+
+Settings persist across reboots and power losses. The only way to lose them is a firmware reflash or a factory reset.
+
+---
+
+## Accessing the portal in normal mode
+
+After setup, the web portal remains accessible at the device's IP address or at `http://plugnsat.local`. You can change any setting at any time by visiting this page from your phone or laptop on the same network.
+
+The IP address is displayed on the **Device Info** screen (BTN1 from QR > Device Info). You can also find it in your router's admin panel under connected devices, usually listed as "plugnsat" or "espressif".
