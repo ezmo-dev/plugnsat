@@ -102,6 +102,8 @@ Appears when the PlugNSat cannot reach the BTCPay Server (or Blink). The screen 
 
 If payment polling fails 60 times in a row (about 5 minutes), the device restarts itself automatically.
 
+> **This is normal.** After a prolonged loss of communication with the Lightning backend, the device reboots to restore a clean state. It will reconnect to WiFi and resume operation on its own. No action is needed from the operator.
+
 ### Shelly offline
 
 <img src="images/plugnsat-screen-shelly-offline.png" width="280">
