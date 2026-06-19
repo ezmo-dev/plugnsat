@@ -21,6 +21,8 @@ There are two ways to reach the web portal depending on the device's current sta
 
 > In AP mode the portal is never password-protected, so you can never lock yourself out during setup. A Web Access Password (see Step 5) only applies in normal mode on your WiFi.
 
+> **AP mode is a configuration and recovery mode, not an operating mode.** Anyone who can connect to the `PlugNSat-Setup` network (password: `plugnsat21`) has unrestricted access to the portal. Once you have entered your WiFi credentials and pressed Save, the device switches to normal mode where the Web Access Password is enforced. Do not leave the device in AP mode during normal operation.
+
 ---
 
 ## Configuration fields

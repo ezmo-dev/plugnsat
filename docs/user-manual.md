@@ -128,6 +128,8 @@ Entered on first boot, or by long-pressing BTN1 (3 seconds) from any screen. The
 
 If a WiFi network was previously configured, pressing any button exits AP mode and reconnects to WiFi. Button presses are ignored during the first 3 seconds after entering AP mode, to avoid exiting it by accident.
 
+> **AP mode is a configuration and recovery mode, not an operating mode.** While in AP mode, the web portal has no password protection — anyone connected to `PlugNSat-Setup` (password: `plugnsat21`) can access it freely. This is intentional so you can never lock yourself out. Once setup is done, press any button to return to WiFi. A Web Access Password configured in Step 5 of the portal only applies in normal (WiFi) mode.
+
 ---
 
 ## Settings menu
