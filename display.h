@@ -145,7 +145,7 @@ void displaySplash(TFT_eSPI &tft) {
 // CONNECTING
 //
 
-void displayConnecting(TFT_eSPI &tft, String ssid) {
+void displayConnecting(TFT_eSPI &tft, const String& ssid) {
   tft.fillScreen(COLOR_BG);
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_TEXT);
@@ -159,7 +159,7 @@ void displayConnecting(TFT_eSPI &tft, String ssid) {
 // STATUS (generic)
 //
 
-void displayStatus(TFT_eSPI &tft, String line1, String line2) {
+void displayStatus(TFT_eSPI &tft, const String& line1, const String& line2) {
   tft.fillScreen(COLOR_BG);
   tft.setTextDatum(MC_DATUM);
   tft.setTextColor(COLOR_TEXT);
@@ -243,7 +243,7 @@ QRResult renderQR(TFT_eSPI &tft, String data, int x, int y, int maxH) {
 // QR CODE (main screen - stays displayed permanently)
 //
 
-void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
+void displayQR(TFT_eSPI &tft, const String& data, int priceSats, const String& deviceName) {
   tft.fillScreen(TFT_BLACK);
   
   int side = qrSide(data, SCREEN_H - 2);
@@ -254,7 +254,7 @@ void displayQR(TFT_eSPI &tft, String data, int priceSats, String deviceName) {
 // QR CODE WITH INFO PANEL (right side: mini logo + optional name/price)
 //
 
-void displayQRWithInfo(TFT_eSPI &tft, String data, int priceSats, String deviceName, bool showName, bool showPrice) {
+void displayQRWithInfo(TFT_eSPI &tft, const String& data, int priceSats, const String& deviceName, bool showName, bool showPrice) {
   tft.fillScreen(TFT_BLACK);
 
   int side        = qrSide(data, SCREEN_H - 2);
@@ -499,7 +499,7 @@ void displayShellyOffline(TFT_eSPI &tft, int secondsLeft) {
 // ERROR
 //
 
-void displayError(TFT_eSPI &tft, String ip, int secondsLeft) {
+void displayError(TFT_eSPI &tft, const String& ip, int secondsLeft) {
   tft.fillScreen(COLOR_BG);
 
   // Vertical divider
@@ -551,7 +551,7 @@ void displayError(TFT_eSPI &tft, String ip, int secondsLeft) {
 // IF WIFI FAILED
 //
 
-void displayWiFiFailed(TFT_eSPI &tft, String ssid, int secondsLeft) {
+void displayWiFiFailed(TFT_eSPI &tft, const String& ssid, int secondsLeft) {
   tft.fillScreen(COLOR_BG);
 
   // Vertical divider
@@ -973,7 +973,7 @@ void displayDuration(TFT_eSPI &tft, int durationSeconds) {
 // BRIGHTNESS
 //
 
-void displayBrightness(TFT_eSPI &tft, int brightness, String qrData) {
+void displayBrightness(TFT_eSPI &tft, int brightness, const String& qrData) {
   tft.fillScreen(COLOR_BG);
 
   String qr      = (qrData.length() > 0) ? qrData : "PLUGNSAT";

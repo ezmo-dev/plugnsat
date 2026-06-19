@@ -33,14 +33,14 @@ extern const uint8_t x509_crt_imported_bundle_bin_start[] asm("_binary_x509_crt_
 extern const uint8_t x509_crt_imported_bundle_bin_end[]   asm("_binary_x509_crt_bundle_end");
 
 // Forward declaration
-bool btcpayGetLNURL(String url, String key, String store, String id, String &lnurl, bool allowSelfSigned);
+bool btcpayGetLNURL(const String& url, const String& key, const String& store, const String& id, String &lnurl, bool allowSelfSigned);
 
 // 
 // CREATE INVOICE
 //
 
 bool btcpayCreateInvoice(
-  String btcpayUrl, String apiKey, String storeId,
+  const String& btcpayUrl, const String& apiKey, const String& storeId,
   int amountSats,
   String &outInvoiceId, String &outLNURL,
   bool allowSelfSigned
@@ -108,8 +108,8 @@ bool btcpayCreateInvoice(
 //
 
 bool btcpayGetLNURL(
-  String btcpayUrl, String apiKey, String storeId,
-  String invoiceId, String &outLNURL,
+  const String& btcpayUrl, const String& apiKey, const String& storeId,
+  const String& invoiceId, String &outLNURL,
   bool allowSelfSigned
 ) {
   WiFiClientSecure client;
@@ -161,7 +161,7 @@ bool btcpayGetLNURL(
 //
 
 String btcpayCheckInvoice(
-  String btcpayUrl, String apiKey, String storeId, String invoiceId,
+  const String& btcpayUrl, const String& apiKey, const String& storeId, const String& invoiceId,
   bool allowSelfSigned
 ) {
   if (invoiceId.length() == 0) return "ERROR";

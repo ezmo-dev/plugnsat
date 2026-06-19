@@ -45,8 +45,8 @@ extern const uint8_t x509_crt_imported_bundle_bin_end[]   asm("_binary_x509_crt_
 //
 
 bool blinkCreateInvoice(
-  String apiKey, String walletId,
-  int amountSats, String deviceName,
+  const String& apiKey, const String& walletId,
+  int amountSats, const String& deviceName,
   String &outInvoiceId, String &outLNURL
 ) {
   WiFiClientSecure client;
@@ -131,7 +131,7 @@ bool blinkCreateInvoice(
 //
 
 String blinkCheckInvoice(
-  String apiKey, const String &paymentRequest
+  const String& apiKey, const String& paymentRequest
 ) {
   if (paymentRequest.length() == 0) return "ERROR";
 

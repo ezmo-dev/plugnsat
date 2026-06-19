@@ -24,7 +24,7 @@
 #include <ArduinoJson.h>
 
 // Turn ON with auto-off timer
-bool shellySwitchOn(String shellyHost, int durationSeconds) {
+bool shellySwitchOn(const String& shellyHost, int durationSeconds) {
   HTTPClient http;
   String url = "http://" + shellyHost
                + "/rpc/switch.set?id=0&on=true&toggle_after="
@@ -41,7 +41,7 @@ bool shellySwitchOn(String shellyHost, int durationSeconds) {
 }
 
 // Turn OFF manually
-bool shellySwitchOff(String shellyHost) {
+bool shellySwitchOff(const String& shellyHost) {
   HTTPClient http;
   String url = "http://" + shellyHost + "/rpc/switch.set?id=0&on=false";
   
@@ -54,7 +54,7 @@ bool shellySwitchOff(String shellyHost) {
 }
 
 // Check if Shelly is reachable
-bool shellyIsOnline(String shellyHost) {
+bool shellyIsOnline(const String& shellyHost) {
   HTTPClient http;
   String url = "http://" + shellyHost + "/rpc/Switch.GetStatus?id=0";
   
