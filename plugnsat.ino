@@ -875,6 +875,7 @@ void readButtons() {
   static bool btn2WasDown = false;
   static unsigned long btn1DownTime = 0;
   static unsigned long btn2DownTime = 0;
+  static bool btn1LongFired = false;
   
   bool btn1Down = (digitalRead(BTN_1) == LOW);
   bool btn2Down = (digitalRead(BTN_2) == LOW);
@@ -889,6 +890,7 @@ void readButtons() {
     if (held < 2000 && held > 30) {
       btn1Pressed = true;  // Short press (between 50ms and 2s)
     }
+    btn1LongFired = false;
   }
   btn1WasDown = btn1Down;
   
@@ -905,8 +907,8 @@ void readButtons() {
   btn2WasDown = btn2Down;
   
   // Long press BTN_1 (3s) = AP mode from any state
-  if (btn1Down && (millis() - btn1DownTime > LONG_PRESS_MS)) {
-    btn1DownTime = millis();  // Reset to avoid retriggering
+  if (btn1Down && (millis() - btn1DownTime > LONG_PRESS_MS) && !btn1LongFired) {
+    btn1LongFired = true;
     Serial.println("Long press -> AP mode");
     startAPMode();
   }
