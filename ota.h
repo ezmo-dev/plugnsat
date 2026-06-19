@@ -241,7 +241,10 @@ inline OtaFlashResult otaDownloadAndFlash(const String& version) {
   while (sigLen < sizeof(sigBuf) && millis() < sigTimeout) {
     if (sigStream->available()) {
       sigBuf[sigLen++] = sigStream->read();
+    } else if (!http.connected()) {
+      break;
     }
+    yield();
   }
   http.end();
   Serial.println("OTA: sig received, " + String(sigLen) + " bytes");
