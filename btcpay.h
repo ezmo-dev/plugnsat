@@ -24,13 +24,9 @@
 #ifndef BTCPAY_H
 #define BTCPAY_H
 
-#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include <esp_crt_bundle.h>
-
-extern const uint8_t x509_crt_imported_bundle_bin_start[] asm("_binary_x509_crt_bundle_start");
-extern const uint8_t x509_crt_imported_bundle_bin_end[]   asm("_binary_x509_crt_bundle_end");
+#include "tls.h"
 
 // Forward declaration
 bool btcpayGetLNURL(const String& url, const String& key, const String& store, const String& id, String &lnurl, bool allowSelfSigned);
@@ -46,7 +42,7 @@ bool btcpayCreateInvoice(
   bool allowSelfSigned
 ) {
   WiFiClientSecure client;
-  if (allowSelfSigned) { client.setInsecure(); } else { client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start); }
+  applyTls(client, allowSelfSigned);
   
   HTTPClient http;
   String url = btcpayUrl + "/api/v1/stores/" + storeId + "/invoices";
@@ -113,7 +109,7 @@ bool btcpayGetLNURL(
   bool allowSelfSigned
 ) {
   WiFiClientSecure client;
-  if (allowSelfSigned) { client.setInsecure(); } else { client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start); }
+  applyTls(client, allowSelfSigned);
   
   HTTPClient http;
   String url = btcpayUrl + "/api/v1/stores/" + storeId 
@@ -167,7 +163,7 @@ String btcpayCheckInvoice(
   if (invoiceId.length() == 0) return "ERROR";
 
   WiFiClientSecure client;
-  if (allowSelfSigned) { client.setInsecure(); } else { client.setCACertBundle(x509_crt_imported_bundle_bin_start, x509_crt_imported_bundle_bin_end - x509_crt_imported_bundle_bin_start); }
+  applyTls(client, allowSelfSigned);
   
   HTTPClient http;
   String url = btcpayUrl + "/api/v1/stores/" + storeId 
