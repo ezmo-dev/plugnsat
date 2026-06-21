@@ -914,45 +914,19 @@ void readButtons() {
   }
 }
 
-// Clean shutdown when battery critically low. Shows a final screen,
-// then deep sleeps. Wakes on BTN_1 press (GPIO0 low) or USB power.
-void enterLowBatterySleep() {
-  Serial.println("Battery critical -> deep sleep");
+void enterDeepSleep(const char* title, uint16_t titleColor,
+                    const char* subtitle, uint16_t subtitleColor,
+                    unsigned long delayMs) {
   ledcWrite(BACKLIGHT_PIN, 255);
   tft.fillScreen(TFT_BLACK);
   tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(COLOR_ERROR);
+  tft.setTextColor(titleColor);
   tft.setTextSize(2);
-  tft.drawString("BATTERY EMPTY", SCREEN_W / 2, SCREEN_H / 2 - 20);
+  tft.drawString(title, SCREEN_W / 2, SCREEN_H / 2 - 20);
   tft.setTextSize(1);
-  tft.setTextColor(COLOR_TEXT);
-  tft.drawString("Charge to restart", SCREEN_W / 2, SCREEN_H / 2 + 15);
-  delay(4000);
-  ledcWrite(BACKLIGHT_PIN, 0);          // backlight off to save power
-  tft.fillScreen(TFT_BLACK);
-  // Wake when BTN_1 (GPIO0) goes LOW (pressed)
-  digitalWrite(15, LOW);
-  gpio_hold_en((gpio_num_t)15);
-  gpio_deep_sleep_hold_en();
-  rtc_gpio_pullup_en((gpio_num_t)BTN_1);
-  rtc_gpio_pulldown_dis((gpio_num_t)BTN_1);
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
-  esp_deep_sleep_start();
-}
-
-// Manual power off from settings menu. Deep sleep, wake on BTN_1 or USB.
-void enterManualSleep() {
-  Serial.println("Manual power off -> deep sleep");
-  ledcWrite(BACKLIGHT_PIN, 255);
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextDatum(MC_DATUM);
-  tft.setTextColor(COLOR_TEXT);
-  tft.setTextSize(2);
-  tft.drawString("POWERED OFF", SCREEN_W / 2, SCREEN_H / 2 - 20);
-  tft.setTextSize(1);
-  tft.setTextColor(COLOR_GRAY);
-  tft.drawString("Press button to wake", SCREEN_W / 2, SCREEN_H / 2 + 15);
-  delay(3000);
+  tft.setTextColor(subtitleColor);
+  tft.drawString(subtitle, SCREEN_W / 2, SCREEN_H / 2 + 15);
+  delay(delayMs);
   ledcWrite(BACKLIGHT_PIN, 0);
   tft.fillScreen(TFT_BLACK);
   digitalWrite(15, LOW);
@@ -962,6 +936,19 @@ void enterManualSleep() {
   rtc_gpio_pulldown_dis((gpio_num_t)BTN_1);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BTN_1, 0);
   esp_deep_sleep_start();
+}
+
+// Clean shutdown when battery critically low. Shows a final screen,
+// then deep sleeps. Wakes on BTN_1 press (GPIO0 low) or USB power.
+void enterLowBatterySleep() {
+  Serial.println("Battery critical -> deep sleep");
+  enterDeepSleep("BATTERY EMPTY", COLOR_ERROR, "Charge to restart", COLOR_TEXT, 4000);
+}
+
+// Manual power off from settings menu. Deep sleep, wake on BTN_1 or USB.
+void enterManualSleep() {
+  Serial.println("Manual power off -> deep sleep");
+  enterDeepSleep("POWERED OFF", COLOR_TEXT, "Press button to wake", COLOR_GRAY, 3000);
 }
 
 // Reads battery voltage in mV. Onboard divider halves VBAT, so x2.
