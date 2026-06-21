@@ -45,11 +45,10 @@ void displaySplash(TFT_eSPI &tft) {
   tft.fillScreen(TFT_BLACK);
  
   // Colors
-  uint16_t orange = tft.color565(247, 147, 26);
-  uint16_t cyan   = tft.color565(0, 229, 255);
-  uint16_t yellow = tft.color565(255, 215, 0);     // bolt + gold accents
   uint16_t lgray  = tft.color565(200, 200, 210);    // "Lightning Smart Plug" (bright gray)
-  uint16_t gold   = tft.color565(255, 215, 0);      // "plugnsat.com" + pill badge
+  const uint16_t orange = COLOR_ORANGE_D;
+  const uint16_t cyan   = COLOR_CYAN_D;
+  const uint16_t gold   = COLOR_YELLOW_D;
  
   int ps = 5;   // letter pixel size
   int gap = ps;
@@ -98,7 +97,7 @@ void displaySplash(TFT_eSPI &tft) {
     uint8_t bits = bolt[row];
     for (int col = 0; col < boltCols; col++) {
       if (bits & (0x80 >> col)) {
-        tft.fillRect(x + col * bps, boltY + row * bps, bps - 1, bps - 1, yellow);
+        tft.fillRect(x + col * bps, boltY + row * bps, bps - 1, bps - 1, gold);
       }
     }
   }
@@ -266,9 +265,9 @@ void displayQRWithInfo(TFT_eSPI &tft, const String& data, int priceSats, const S
   int panelLeft = qrX + qrDim.qrPixW;
   int panelCX   = (panelLeft + SCREEN_W) / 2;
 
-  uint16_t orange = tft.color565(247, 147, 26);
-  uint16_t yellow = tft.color565(255, 215, 0);
-  uint16_t cyan   = tft.color565(0, 229, 255);
+  const uint16_t orange = COLOR_ORANGE_D;
+  const uint16_t yellow = COLOR_YELLOW_D;
+  const uint16_t cyan   = COLOR_CYAN_D;
 
 
   int ps      = 2;
