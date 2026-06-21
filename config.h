@@ -24,6 +24,18 @@
 #define VBAT_CUTOFF_COUNT 5     // Consecutive low reads required before cutoff
 #define MENU_TIMEOUT_MS    6000
 #define LONG_PRESS_MS      3000
+#define MAX_CONSECUTIVE_ERRORS  60
+#define WIFI_RETRY_WINDOW_MS    10000
+#define WIFI_CHECK_INTERVAL_MS  30000
+#define PIN_TIMEOUT_MS          15000
+#define PIN_WRONG_MS            1500
+#define LOWBAT_BLINK_MS         700
+#define HEAP_LOG_MS             300000
+#define BAT_READ_INTERVAL_MS    30000
+#define ERROR_RETRY_MS          10000
+#define SHELLY_OFFLINE_RETRY_MS 10000
+#define CHARGE_RISE_MV          15
+#define CHARGE_RISE_SAMPLES     3
 #define BTN_ICON_X         294
 
 // Blink API

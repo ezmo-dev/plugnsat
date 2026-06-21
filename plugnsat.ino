@@ -195,17 +195,17 @@ void setup() {
 //
 
 void loop() {
-  if (millis() - lastBatRead > 30000) {
+  if (millis() - lastBatRead > BAT_READ_INTERVAL_MS) {
     lastBatRead = millis();
     int fresh = readBatteryMv();
     if (prevBatteryMv > 0) {
-      if (fresh > prevBatteryMv + 15) {
+      if (fresh > prevBatteryMv + CHARGE_RISE_MV) {
         chargeRiseCount++;
       } else {
         chargeRiseCount = 0;
       }
       // need a sustained rise over several samples, not a single rebound
-      isCharging = (chargeRiseCount >= 3);
+      isCharging = (chargeRiseCount >= CHARGE_RISE_SAMPLES);
     }
     prevBatteryMv = fresh;
     batteryMv = fresh;
@@ -330,7 +330,7 @@ void connectToWiFi() {
 
     unsigned long t = millis();
     int lastSecond = -1;
-    while (millis() - t < 10000) {
+    while (millis() - t < WIFI_RETRY_WINDOW_MS) {
       readButtons();
       if (btn1Pressed) { startAPMode(); return; }
       if (btn2Pressed) { connectToWiFi(); return; }
@@ -347,7 +347,7 @@ void connectToWiFi() {
 }
 
 bool ensureWiFi() {
-  if (millis() - lastWifiCheck < 30000) return WiFi.status() == WL_CONNECTED;
+  if (millis() - lastWifiCheck < WIFI_CHECK_INTERVAL_MS) return WiFi.status() == WL_CONNECTED;
   lastWifiCheck = millis();
   
   if (WiFi.status() != WL_CONNECTED) {
@@ -376,7 +376,7 @@ bool ensureWiFi() {
 void loopQRDisplay() {
   if (!ensureWiFi()) return;
 
-  if (millis() - lastHeapLog > 300000) {
+  if (millis() - lastHeapLog > HEAP_LOG_MS) {
     lastHeapLog = millis();
     Serial.println("Heap free: " + String(ESP.getFreeHeap()) + " bytes");
   }
@@ -397,7 +397,7 @@ void loopQRDisplay() {
     if (status == "ERROR") {
       consecutiveErrors++;
       Serial.println("Poll error #" + String(consecutiveErrors));
-      if (consecutiveErrors >= 60) {
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
         displayError(tft, WiFi.localIP().toString(), 5);
         delay(5000);
         ESP.restart();
@@ -426,7 +426,7 @@ void loopQRDisplay() {
   
   // Low battery warning: blink crossed-out icon, battery model only
   if (config.isBattery && batteryMv > 0 && batteryMv <= VBAT_LOW_MV) {
-    if (millis() - lastLowBatBlink > 700) {
+    if (millis() - lastLowBatBlink > LOWBAT_BLINK_MS) {
       lastLowBatBlink = millis();
       lowBatBlinkOn = !lowBatBlinkOn;
       drawLowBatteryWarning(tft, lowBatBlinkOn);
@@ -554,7 +554,7 @@ void loopError() {
     displayError(tft, WiFi.localIP().toString(), secondsLeft);
   }
 
-  if (millis() - errorStartTime > 10000) {
+  if (millis() - errorStartTime > ERROR_RETRY_MS) {
     lastDisplayedSecond = -1;
     consecutiveErrors = 0;
     ledcWrite(BACKLIGHT_PIN, config.brightness);
@@ -585,7 +585,7 @@ void loopShellyOffline() {
     return;
   }
 
-  if (millis() - shellyOfflineStartTime > 10000) {
+  if (millis() - shellyOfflineStartTime > SHELLY_OFFLINE_RETRY_MS) {
     lastDisplayedSecond = -1;
     if (shellyIsOnline(config.shellyHost)) {
       Serial.println("Shelly back online, retrying activation");
@@ -777,13 +777,13 @@ void loopDuration() {
 
 void loopPinEntry() {
   // 15s timeout -> back to settings
-  if (millis() - lastPinInput > 15000) {
+  if (millis() - lastPinInput > PIN_TIMEOUT_MS) {
     currentState = STATE_SETTINGS;
     screenNeedsRedraw = true;
     return;
   }
   // Clear wrong PIN message after 1.5s and reset
-  if (pinWrong && millis() - pinWrongTime > 1500) {
+  if (pinWrong && millis() - pinWrongTime > PIN_WRONG_MS) {
     pinWrong = false;
     pinDigitIndex = 0;
     for (int i = 0; i < 4; i++) pinEntry[i] = 0;
