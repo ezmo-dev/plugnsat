@@ -13,7 +13,7 @@
 #include <Arduino.h>
 
 // Timing
-#define POLL_INTERVAL_MS   5000      // Check payment every 5s (was 2s)
+#define POLL_INTERVAL_MS   5000      // Check payment status every 5s
 #define QR_REFRESH_MS      285000    // Refresh QR at 4min45s (before 5min expiry)
 #define INVOICE_EXPIRY_MIN 5         // BTCPay invoice expiration
 #define FIRMWARE_VERSION   "0.2.0"
@@ -62,14 +62,14 @@
 enum BackendType {
   BACKEND_BTCPAY = 0,
   BACKEND_BLINK  = 1,
-  BACKEND_COUNT // Always last, thanks! =)
+  BACKEND_COUNT // Sentinel: keep last for NVS validation
 };
 
 // Config struct
 struct PlugNSatConfig {
   String wifiSsid;
   String wifiPass;
-  String btcpayUrl;        // Instance URL, e.g. https://btcpay.mydomain.com"
+  String btcpayUrl;        // Instance URL, e.g. https://btcpay.mydomain.com
   String btcpayApiKey;
   String btcpayStoreId;
   String blinkApiKey;       // Blink API key (starts with blink_)
