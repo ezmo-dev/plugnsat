@@ -58,3 +58,49 @@ The QR auto-refreshes after 4 minutes 45 seconds (before the 5-minute invoice ex
 1. **Polling delay.** The PlugNSat checks for payment every 5 seconds. Wait a few seconds after the wallet confirms payment.
 2. **Backend is slow.** Lightning invoice settlement can take a moment depending on channel liquidity and node performance. The device treats both "Settled" and "Processing" as paid, so a slow final settlement still triggers activation.
 3. **WiFi issue.** If WiFi dropped between the payment and the poll, the PlugNSat may miss that poll. The device reconnects and picks up the status on the next poll.
+
+### The Shelly didn't turn on after payment
+
+**Symptoms:** The "PAID" screen appeared but the Shelly did not activate, or the "Shelly not found" screen appeared.
+
+**Things to check:**
+
+1. **Is the Shelly plugged in?** Check that it has power (LED indicator on the Shelly).
+2. **Is the Shelly on the same WiFi?** Both devices must be on the same local network.
+3. **Is the hostname correct?** Go to Device Info (BTN1 from QR) and check the "Shelly" field. If it shows an IP address, the Shelly may have changed IP via DHCP. Use the mDNS hostname instead (`.local`).
+4. **Can the Shelly be reached?** Open the Shelly hostname or IP in a browser on the same network. You should see the Shelly web interface.
+
+> **Note:** Even if the Shelly is offline, the customer's payment is still processed. The Lightning invoice was settled. You may need to activate the Shelly manually (via the Shelly app or by pressing the button on the Shelly itself).
+
+### "Error" screen keeps appearing
+
+This means the PlugNSat cannot reach the BTCPay Server (or Blink). The device retries automatically every 10 seconds.
+
+**Things to check:**
+
+1. **Is the BTCPay Server online?** Open the server URL in your browser.
+2. **Is the API key valid?** API keys can be revoked. Generate a new one if needed.
+3. **Did the server URL change?** If you migrated your BTCPay instance, update the URL in the web portal.
+4. **Is the Lightning node working?** Log into BTCPay > Settings > Lightning and check the status.
+
+If the device encounters 10 consecutive errors, it restarts itself automatically to recover from potential memory or connection issues.
+
+---
+
+## Shelly issues
+
+### "Scan network" doesn't find the Shelly
+
+**Possible causes:**
+
+1. **Shelly is on a different network.** Both devices must be on the same WiFi network and subnet.
+2. **mDNS is blocked.** Some routers block multicast DNS traffic. Try entering the Shelly's IP address manually instead.
+3. **Shelly is not powered on.** Make sure the Shelly has power (check its LED).
+
+**Manual alternative:** Open the Shelly app, find your device, and note the hostname or IP address. Enter it manually in the web portal's Shelly hostname field.
+
+### The Shelly turns on but the connected device doesn't
+
+1. **Check the device plugged into the Shelly.** Is it actually turned on (power switch in the "on" position)? Some devices have their own on/off switch.
+2. **Check the Shelly's max power rating.** The Shelly Plug S Gen3 supports up to 2500W. If your device draws more, the Shelly will not switch.
+3. **Check the wall outlet.** Try plugging the device directly into the wall to confirm it works.
