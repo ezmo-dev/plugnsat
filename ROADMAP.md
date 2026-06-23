@@ -52,8 +52,8 @@
 - [x] Battery UI polish: refine design of all battery-related screen elements
 - [ ] Enclosure prototypes (USB and battery): desk stand, magnetic mount, wall mount
 - [ ] Test prints for each enclosure
-- [ ] General V0.2 audit: review all new features for correctness and consistency
-- [ ] Security audit: review all new features (portal auth, XSS, input validation)
+- [x] General V0.2 audit: review all new features for correctness and consistency
+- [x] Security audit: review all new features (portal auth, XSS, input validation)
 - [ ] Finish documentation: User Manual, Web Portal Reference, Troubleshooting (Quick Start done; needed for landing page)
 
 ### v0.3 — Landing page and USB beta testing

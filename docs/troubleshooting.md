@@ -104,3 +104,42 @@ If the device encounters 10 consecutive errors, it restarts itself automatically
 1. **Check the device plugged into the Shelly.** Is it actually turned on (power switch in the "on" position)? Some devices have their own on/off switch.
 2. **Check the Shelly's max power rating.** The Shelly Plug S Gen3 supports up to 2500W. If your device draws more, the Shelly will not switch.
 3. **Check the wall outlet.** Try plugging the device directly into the wall to confirm it works.
+
+---
+
+## Web portal issues
+
+### Can't access the web portal at 192.168.4.1
+
+This address only works in **AP Setup mode** (when the device is broadcasting its own WiFi network). If the device is connected to your regular WiFi:
+
+1. Find the device's IP address on the Device Info screen (BTN1 from QR)
+2. Open `http://<device-ip>` in your browser on the same network
+
+### Can't access the web portal at the device's IP
+
+1. **Are you on the same WiFi?** The portal is only accessible on the local network.
+2. **Try refreshing.** The first connection can take a second while the ESP32 serves the page.
+3. **Try a different browser.** Some browsers aggressively redirect HTTP to HTTPS. The web portal uses HTTP (no SSL). Try typing the URL manually including `http://`.
+
+### Settings don't save
+
+If you click "Save and restart" but the settings revert to old values:
+
+1. Make sure you filled in all required fields (WiFi SSID, BTCPay URL, API Key, Store ID)
+2. Try again from AP mode (long press BTN1) for a fresh connection
+
+---
+
+## AP mode issues
+
+### I'm stuck in AP mode
+
+If the device keeps entering AP mode on every boot, it means no WiFi credentials are saved. Enter the web portal (`http://192.168.4.1`), fill in your WiFi credentials, and click Save and restart.
+
+### I can't find "PlugNSat-Setup" in my WiFi list
+
+1. Wait 10 seconds after the AP mode screen appears. The WiFi broadcast can take a moment.
+2. On your phone, pull down to refresh the WiFi list.
+3. Move closer to the PlugNSat (within 2 meters).
+4. If still not visible, try power-cycling the PlugNSat (unplug and replug USB-C).
