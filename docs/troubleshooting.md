@@ -143,3 +143,49 @@ If the device keeps entering AP mode on every boot, it means no WiFi credentials
 2. On your phone, pull down to refresh the WiFi list.
 3. Move closer to the PlugNSat (within 2 meters).
 4. If still not visible, try power-cycling the PlugNSat (unplug and replug USB-C).
+
+---
+
+## BTCPay Server specific issues
+
+### "Invoice error 401" or "Invoice error 403"
+
+This means the API key is invalid or doesn't have the right permissions.
+
+1. Go to BTCPay Server > Account > Manage Account > API Keys
+2. Check that your key has: `cancreateinvoice`, `canviewinvoices`, `canuselightningnode`
+3. If unsure, revoke the old key and create a new one
+
+### "No LNURL found"
+
+This means the BTCPay Server returned the invoice but the LNURL payment method is missing.
+
+1. Make sure your store has Lightning enabled (Settings > Lightning)
+2. Make sure LNURL is enabled in your store's Lightning settings
+3. Check that the payment method ID is `BTC-LNURL` (recent BTCPay versions changed the naming from `BTC-LightningNetwork`)
+
+---
+
+## Factory reset
+
+To reset the PlugNSat to its default state:
+
+1. Long press BTN1 (3 seconds) to enter AP Setup mode
+2. Connect to `PlugNSat-Setup` WiFi
+3. Open `http://192.168.4.1`
+4. Clear all fields and save, or simply re-enter new credentials
+
+> There is no "erase all" button yet. All settings are stored in the ESP32's non-volatile memory. Reflashing the firmware also clears all settings.
+
+---
+
+## Getting help
+
+If none of the above solves your problem:
+
+1. Open an issue on [GitHub](https://github.com/ezmo-dev/plugnsat/issues) with:
+   - Your firmware version (shown on the splash screen)
+   - A description of the issue
+   - Photos of the screen if relevant
+2. Check the [PlugNSat website](https://plugnsat.com) for updates
+3. Reach out on Twitter/Nostr to [@ezmo-dev](https://twitter.com/ezmo_dev)
